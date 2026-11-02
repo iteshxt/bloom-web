@@ -32,7 +32,7 @@
          ▼                               ▼
  ┌──── Supabase (ap-south-1) ────┐   ┌── leetcode.com ──┐
  │ Postgres + RLS                │   │ /graphql (public, │
- │ Auth (email OTP)              │   │  unofficial)      │
+ │ Auth (Google sign-in)         │   │  unofficial)      │
  │ Realtime                      │   └───────────────────┘
  │ pg_cron + pg_net ─────────────┼──► every 10 min POST /api/cron/tick
  └───────────────────────────────┘
@@ -80,7 +80,7 @@ On the Hobby plan, Vercel Cron only allows schedules that run at most **once per
 | Supabase Free | Postgres (a few MB), Auth (2 users), Realtime (2 clients) | Tiny data; the heartbeat prevents pausing |
 | Web Push | Browser push services (Google/Apple/Mozilla) | Free |
 | LeetCode GraphQL | About 300 requests a day | Public, unofficial endpoint; polite polling |
-| Supabase Auth email | A few OTP emails a month | The built-in sender has a low hourly limit, which is fine for 2 users. Optionally plug in a free SMTP provider (such as Resend) if it gets in the way. |
+| Google sign-in | One Google Cloud OAuth client | Free; no email service is needed because there are no OTP or magic-link emails |
 
 ---
 
@@ -89,6 +89,7 @@ On the Hobby plan, Vercel Cron only allows schedules that run at most **once per
 ```
 /app
   /(auth)/login/page.tsx
+  /auth/callback/route.ts        # Google OAuth return (section 13)
   /onboarding/page.tsx
   /(app)/layout.tsx              # authenticated shell, realtime provider
   /(app)/page.tsx                # duel dashboard
@@ -152,7 +153,7 @@ vercel.json
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | client + server | Web Push |
 | `VAPID_PRIVATE_KEY` | server only | Web Push |
 | `VAPID_SUBJECT` | server only | `mailto:you@example.com` |
-| `ALLOWED_EMAILS` | server only | Comma-separated list of the two emails allowed to use the app |
+| `ALLOWED_EMAILS` | server only | Comma-separated list of the two Google account emails allowed to use the app |
 | `APP_URL` | server | `https://<name>.vercel.app`, used in push links |
 
 ---
@@ -785,6 +786,7 @@ Errors use the shape `{ error: { code, message } }` with an HTTP status of 400, 
 
 | Method & path | Body | Does |
 |---|---|---|
+| `GET /auth/callback` | — | OAuth return: exchanges the code for a session, enforces `ALLOWED_EMAILS`, redirects (section 13) |
 | `POST /api/onboarding/profile` | `{ displayName, avatarKey, color }` | Creates or updates the profile. Rejects emails not in `ALLOWED_EMAILS`. |
 | `GET /api/leetcode/validate?username=` | — | Runs Q_USER; returns `{ exists, avatar, solved }` |
 | `POST /api/leetcode/link` | `{ username }` | Validates, saves, sets `leetcode_verified_at`, and runs an initial sync (pre-season) |
@@ -898,11 +900,12 @@ In `app/layout.tsx` metadata: `appleWebApp: { capable: true, title: 'Bloom', sta
 
 ## 13. Authentication
 
-- Supabase Auth with **email OTP** (6-digit code), not magic links, because links open in the browser instead of the installed PWA on iOS.
-  - `supabase.auth.signInWithOtp({ email })`, then `supabase.auth.verifyOtp({ email, token, type: 'email' })`.
-  - In the Supabase dashboard, edit the **Magic Link** email template to show `{{ .Token }}` instead of a link.
-- Sessions are kept by `@supabase/ssr` cookies, refreshed in middleware. In practice users stay signed in for months.
-- **Allowlist:** `ALLOWED_EMAILS` is checked in `/api/onboarding/profile`. Every other `/api` route requires an existing profile in a pair. Optionally, turn off new signups in Supabase after both accounts exist.
+- Supabase Auth with **Google sign-in only**. Both players use Android, where an installed PWA shares Chrome's cookies, so the OAuth redirect returns to the app signed in. No email OTP, magic links or passwords, so no email service is needed.
+  - `/login` calls `supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${origin}/auth/callback` } })` (PKCE flow).
+  - `app/auth/callback/route.ts` exchanges the code with `supabase.auth.exchangeCodeForSession(code)`, then checks the email against `ALLOWED_EMAILS`. Not allowed → sign out and redirect to `/login?error=not_allowed`. Allowed → redirect to `/onboarding` if there's no profile in a pair yet, otherwise `/`.
+  - One-time setup: a Google Cloud project with an OAuth consent screen (External, both Gmail addresses added as test users) and a **Web** OAuth client whose authorized redirect URI is `https://<project-ref>.supabase.co/auth/v1/callback`. Paste its client ID and secret into Supabase → Auth → Providers → Google. In Supabase → Auth → URL configuration, set the Site URL to `APP_URL` and allow `http://localhost:3000/auth/callback` and `<APP_URL>/auth/callback` as redirect URLs.
+- Sessions are kept by `@supabase/ssr` cookies, refreshed in `proxy.ts`. In practice users stay signed in for months.
+- **Allowlist:** `ALLOWED_EMAILS` is checked in `/auth/callback` and again in `/api/onboarding/profile`. Every other `/api` route requires an existing profile in a pair. Optionally, turn off new signups in Supabase after both accounts exist.
 
 ---
 
@@ -953,7 +956,7 @@ Install on Android and iPhone; push works on both; a real LeetCode solve appears
 1. **Supabase**
    1. Create a project (Free, region Mumbai / ap-south-1).
    2. Connect the Supabase MCP server to the project and apply migrations `0001`–`0003` with its `apply_migration` tool (no local database or Docker).
-   3. Auth → Providers: Email enabled. Auth → Email templates: Magic Link template shows `{{ .Token }}`.
+   3. Auth → Providers: Google enabled with the Google Cloud OAuth client (section 13); Email provider disabled. Auth → URL configuration: Site URL and redirect URLs (section 13).
    4. Vault: create `cron_secret` and `app_url` (section 9.1).
    5. Database → Publications: add the realtime tables (section 6.2).
 2. **VAPID keys:** `npx web-push generate-vapid-keys`.
@@ -984,7 +987,7 @@ Install on Android and iPhone; push works on both; a real LeetCode solve appears
 1. Repo scaffold, Tailwind, Supabase clients, migrations, RLS.
 2. `lib/time.ts` + **engine with the full test suite (section 14.1)**. Nothing else depends on UI.
 3. LeetCode client + sync service + tick + lease lock + pg_cron.
-4. Auth (OTP), onboarding, pairing, LeetCode linking.
+4. Auth (Google sign-in), onboarding, pairing, LeetCode linking.
 5. Dashboard (unstyled) wired to realtime.
 6. Restores, targets, gifts, milestones APIs and screens.
 7. Push (VAPID, service worker, subscribe flow, notify service, scheduled reminders).

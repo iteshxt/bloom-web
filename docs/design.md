@@ -400,7 +400,7 @@ Only **one** banner shows at a time, in priority order: request to you > your fr
 
 ### 10.10 Inputs
 - 52 px tall, `r-sm`, white fill, 1.5 px border in `line` that becomes the player colour with a 4 px soft ring on focus. Labels sit above in Figtree 600 14 px.
-- **OTP input:** six round "seed" slots (48 px circles). Each sprouts a small leaf when a digit is typed. Pasting fills them in sequence at 40 ms intervals.
+- **Code input (pair join):** six round "seed" slots (48 px circles). Each sprouts a small leaf when a character is typed. Pasting fills them in sequence at 40 ms intervals.
 - **LeetCode username:** while typing, a small "checking…" sprout spins. When valid, a mini profile card appears below (LeetCode avatar, solved count) with a mint check.
 
 ### 10.11 Heatmap tiles
@@ -448,13 +448,13 @@ Each screen follows the sky-on-top, calm-panel-below structure unless noted. `{P
 │   Grow a little every day,   │
 │   together.                  │
 │                              │
-│ ╭──────────────────────────╮ │
-│ │ name@email.com           │ │
-│ ╰──────────────────────────╯ │
-│ (     Send my code     )     │  ← primary (blush by default)
+│                              │
+│ ( G  Continue with Google )  │  ← primary (blush by default)
 └──────────────────────────────┘
 ```
-- Then the **OTP step:** six seed slots with "We sent a 6-digit code to name@email.com" and "Resend code" (available after 30 s, with a countdown).
+- One button and no other fields. The Google "G" mark sits on the left of the label, following Google's sign-in branding rules; it is the only third-party logo in the UI.
+- While the redirect is in flight, the button shows the petal spinner and reads "Opening Google…".
+- If the Google account isn't one of the two invited ones, the user comes back here with a frost banner: "This Bloom is for two. Sign in with your invited Google account."
 - Entry choreography (the one page-load moment): the sky fades in (400 ms), the islands float up (staggered 120 ms, floaty spring), the creatures pop in and wave, then the wordmark's two o's roll in from the sides and overlap.
 
 ### 11.2 Onboarding (`/onboarding`)
@@ -464,7 +464,7 @@ A step-by-step flow on a single calm panel. Progress is shown as **five little s
 3. **LeetCode:** the username field with live verification (section 10.10).
 4. **Pair up:**
    - *Create:* shows a big 6-character code in Baloo 2, with "Copy code" and "Share" (Web Share API) buttons, and a start-date picker (default tomorrow).
-   - *Join:* six character slots like the OTP input.
+   - *Join:* six character slots (the code input, 10.10).
    - When the partner joins, their island and creature float into the sky with a little chime.
 5. **Install and notifications:**
    - Android: a primary "Install Bloom" button.
@@ -893,7 +893,7 @@ Extend the theme to read the variables: colours (`cloud`, `ink`, `ink-2`, `p`, `
   /bloom      Bloom.tsx (stage + micro-step + frozen/restored props)
   /companions Companion.tsx (mood engine)  /kinds/{Mochi,Tofu,Pip,Bun,Puff,Sprig}.tsx
   /icons      /puffy/*.tsx  /line/*.tsx
-  /ui         Button  Chip  StatChip  Countdown  Sheet  Toast  Banner  Seeds  ProgressBar  OtpSeeds
+  /ui         Button  Chip  StatChip  Countdown  Sheet  Toast  Banner  Seeds  ProgressBar  CodeSeeds
   /game       TodayQuestCard  PlayerCard  TokenPouch  Heatmap  JourneyRoad  GiftBox  GiftShelf
   /moments    DayComplete  OnIce  Thaw  Shatter  Milestone  Unboxing  LevelUp  TokenRefill
 /lib/motion.ts  /lib/sound.ts  /lib/haptics.ts  /lib/useSkyBand.ts

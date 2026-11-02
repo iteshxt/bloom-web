@@ -167,7 +167,7 @@ When a day `D` ends (01:00 IST on D+1) incomplete, it is **missed**:
 Priority: **P0** = required for v1 launch, **P1** = v1 if time allows, **P2** = later.
 
 ### 5.1 Onboarding and pairing (P0)
-- As a new user, I sign in with my email using a **6-digit one-time code**. A code works reliably inside an installed PWA, where magic links don't.
+- As a new user, I sign in with my **Google account** in one tap. Only the two allowed Google accounts can get in; anyone else is signed straight back out.
 - I set a display name, pick a companion creature from a built-in set, and pick my player colour (blush, sky or lilac). The two players can't share a colour.
 - I enter my **LeetCode username**. The app checks it exists and shows my LeetCode avatar and solved count to confirm.
 - The first player creates a pair and gets a **6-character invite code** to share. The second player enters the code to join. A pair is locked at 2 players.
@@ -269,7 +269,7 @@ Visual design, layout and animation are defined in `design.md`. This list only f
 
 | Route | Screen | Contents |
 |---|---|---|
-| `/login` | Sign in | Email field, OTP entry |
+| `/login` | Sign in | "Continue with Google" button |
 | `/onboarding` | Setup wizard | Name and avatar → LeetCode username → create or join pair → start date → install guide → enable notifications |
 | `/` | Duel dashboard | Section 5.2 |
 | `/player/[id]` | Player profile | Heatmap, stats, badges, target (editable when it's the partner) |

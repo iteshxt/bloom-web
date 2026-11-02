@@ -14,7 +14,7 @@ Read the relevant one before changing behavior, data or UI. **Don't invent rules
 If the docs disagree: **prd §4 > techspec > design** for behavior; **design** wins for anything visual or copy. If you change behavior, update the doc in the same change.
 
 ## Stack
-Next.js (App Router, TypeScript strict) · Tailwind · Motion (`motion`) · TanStack Query · Supabase (Postgres, Auth with email OTP, Realtime, pg_cron + pg_net) · `web-push` (VAPID) · Zod · Vitest · hosted on Vercel Hobby (region `bom1`). Everything must stay on free tiers.
+Next.js (App Router, TypeScript strict) · Tailwind · Motion (`motion`) · TanStack Query · Supabase (Postgres, Auth with Google sign-in, Realtime, pg_cron + pg_net) · `web-push` (VAPID) · Zod · Vitest · hosted on Vercel Hobby (region `bom1`). Everything must stay on free tiers.
 
 ## Commands
 ```bash
@@ -93,10 +93,10 @@ tests/engine/     scenario tests (techspec §14.1)
 - Push goes only through `lib/services/notify.ts`: insert into `notification_log` with a dedupe key first, respect `notif_prefs`, then send. Delete subscriptions on 404/410.
 - Request notification permission only from a user tap (an iOS requirement, and only in the installed PWA).
 - `public/sw.js` is hand-written (no PWA plugin) and served with `Cache-Control: no-cache`.
-- Auth uses email **OTP codes**, not magic links (magic links break inside an installed iOS PWA).
+- Auth is **Google sign-in only** (Supabase Google provider, PKCE redirect to `/auth/callback`). No email OTP, magic links or passwords, so there is no email service to run.
 
 ## Security
-- `ALLOWED_EMAILS` gates onboarding. Every mutating route checks session → pair membership → role (self or partner) before acting.
+- `ALLOWED_EMAILS` (the two Google account emails) gates sign-in at `/auth/callback` and again at onboarding. Every mutating route checks session → pair membership → role (self or partner) before acting.
 - Validate all route input with Zod. Return `{ error: { code, message } }` with an appropriate status code.
 - Parse manual check-in URLs with a strict regex for the problem slug; never fetch user-supplied URLs.
 
