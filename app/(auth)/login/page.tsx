@@ -61,6 +61,31 @@ function SignIn() {
         <img src="/icons/google-g.svg" alt="" width={20} height={20} />
         {opening ? "Opening Google…" : "Continue with Google"}
       </Button>
+      {process.env.NODE_ENV === "development" && <DevSignIn />}
     </div>
+  );
+}
+
+/** Development only (removed from production builds): sign in as a test
+ *  player without Google, to try the screens. See app/api/dev/login. */
+function DevSignIn() {
+  return (
+    <form
+      method="post"
+      action="/api/dev/login"
+      className="border-line flex flex-col gap-2 rounded-md border-[1.5px] border-dashed p-4"
+    >
+      <p className="text-ink-2 text-sm">
+        Dev only: try the app as a test player
+      </p>
+      <div className="grid grid-cols-2 gap-2">
+        <Button variant="secondary" name="player" value="a" type="submit">
+          Test player A
+        </Button>
+        <Button variant="secondary" name="player" value="b" type="submit">
+          Test player B
+        </Button>
+      </div>
+    </form>
   );
 }
