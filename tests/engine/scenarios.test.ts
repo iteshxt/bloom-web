@@ -133,6 +133,10 @@ describe("misses and restores", () => {
     expect(sim.run.startedOn).toBe(day(1));
     expect(sim.notifs("streak_on_ice")).toHaveLength(0);
     expect(sim.notifs("streak_broken")).toHaveLength(0);
+    // A 0-day run ending isn't news: keep it out of the activity feed.
+    expect(
+      sim.of("activity").filter((a) => a.type === "run_ended"),
+    ).toHaveLength(0);
   });
 
   it("#10 request → approve with make-up, then D+1 solves target + make-up", () => {

@@ -89,13 +89,15 @@ export function endRun(
   run.endedOn = endedOn;
   run.endReason = reason;
   run.atRiskDay = undefined;
+  // A 0-day run ending isn't news: no feed entry and no push.
+  if (run.length === 0) return;
   activity(tx, "run_ended", {
     runId: run.id,
     length: run.length,
     reason,
     endedOn,
   });
-  if (notifyBroken && run.length > 0) {
+  if (notifyBroken) {
     notify(tx, "both", "streak_broken", run.id, { length: run.length, reason });
   }
 }
