@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { supabaseUrl } from "./env";
+import type { Database } from "./types";
 
 /** Secret-key client that bypasses RLS. Server only: used by route handlers
  *  and services after they have checked the session and the player's role. */
@@ -9,7 +10,7 @@ export function createAdminClient() {
   if (!secretKey)
     throw new Error("Missing environment variable SUPABASE_SECRET_KEY");
 
-  return createSupabaseClient(supabaseUrl(), secretKey, {
+  return createSupabaseClient<Database>(supabaseUrl(), secretKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
