@@ -9,6 +9,12 @@ export function createAdminClient() {
   const secretKey = process.env.SUPABASE_SECRET_KEY;
   if (!secretKey)
     throw new Error("Missing environment variable SUPABASE_SECRET_KEY");
+  // A publishable key here makes every query run as a signed-out visitor, so
+  // RLS silently returns nothing. Fail loudly instead.
+  if (secretKey.startsWith("sb_publishable_"))
+    throw new Error(
+      "SUPABASE_SECRET_KEY holds the publishable key; use the sb_secret_ key",
+    );
 
   return createSupabaseClient<Database>(supabaseUrl(), secretKey, {
     auth: { persistSession: false, autoRefreshToken: false },
