@@ -95,6 +95,21 @@ describe("buildSavePayload", () => {
     expect(solo.notifications.every((n) => n.player_id === "p1")).toBe(true);
   });
 
+  it("omits sync when it was skipped, so the database doesn't count a failure", () => {
+    // JSON null is not SQL NULL: save_player_state treats any present `sync`
+    // as an attempt, so a skipped sync must leave the key out entirely.
+    const sim = new Sim();
+    const p = buildSavePayload({
+      refs,
+      state: sim.state,
+      effects: [],
+      submissions: [],
+      now: new Date(),
+    });
+    expect(p).not.toHaveProperty("sync");
+    expect(JSON.parse(JSON.stringify(p))).not.toHaveProperty("sync");
+  });
+
   it("assigns a partner's badge to the partner", () => {
     const sim = new Sim();
     sim.playDays(day(0), 2);

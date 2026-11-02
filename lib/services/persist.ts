@@ -36,7 +36,9 @@ export interface SavePayload {
   partner_id: string | null;
   best_streak: number;
   last_finalized_day: DayKey | null;
-  sync: { ok: boolean; attempted_at: string; error: string | null } | null;
+  /** Absent when no sync was attempted. Never null: the database function
+   *  treats any present value as an attempt (JSON null isn't SQL NULL). */
+  sync?: { ok: boolean; attempted_at: string; error: string | null };
   runs: Record<string, unknown>[];
   days: Record<string, unknown>[];
   restore_requests: Record<string, unknown>[];
@@ -67,13 +69,13 @@ export function buildSavePayload(input: {
     partner_id: refs.partnerId,
     best_streak: state.bestStreak,
     last_finalized_day: state.lastFinalizedDay ?? null,
-    sync: input.sync
-      ? {
-          ok: input.sync.ok,
-          attempted_at: input.sync.attemptedAt.toISOString(),
-          error: input.sync.error ?? null,
-        }
-      : null,
+    ...(input.sync && {
+      sync: {
+        ok: input.sync.ok,
+        attempted_at: input.sync.attemptedAt.toISOString(),
+        error: input.sync.error ?? null,
+      },
+    }),
     runs: state.runs.map((r) => ({
       id: r.id,
       started_on: r.startedOn,
