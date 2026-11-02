@@ -13,6 +13,7 @@ import type {
 export { processSubmissions, assignDay } from "./assign";
 export { canFinalize, finalizeOverdue } from "./evaluate";
 export { requestRestore, cancelRestore, respondRestore } from "./restore";
+export { scheduledNotifications, SYNC_FAILING_AFTER_MS } from "./reminders";
 export { targetFor } from "./tx";
 export { levelForXp, solveXp, xpForLevel } from "./xp";
 export * from "./types";
