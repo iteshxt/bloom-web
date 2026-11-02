@@ -96,7 +96,7 @@ tests/engine/     scenario tests (techspec §14.1)
 - Auth is **Google sign-in only** (Supabase Google provider, PKCE redirect to `/auth/callback`). No email OTP, magic links or passwords, so there is no email service to run.
 
 ## Security
-- `ALLOWED_EMAILS` (the two Google account emails) gates sign-in at `/auth/callback` and again at onboarding. Every mutating route checks session → pair membership → role (self or partner) before acting.
+- Sign-up is **open to anyone** with a Google account; each pair is exactly two players and RLS keeps every pair's data private to its members. Every mutating route checks session → pair membership → role (self or partner) before acting.
 - Validate all route input with Zod. Return `{ error: { code, message } }` with an appropriate status code.
 - Parse manual check-in URLs with a strict regex for the problem slug; never fetch user-supplied URLs.
 
@@ -114,7 +114,7 @@ tests/engine/     scenario tests (techspec §14.1)
 - No new paid services, no secrets in client code, no Vercel crons more frequent than daily.
 
 ## Environment variables
-`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `CRON_SECRET`, `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `ALLOWED_EMAILS`, `APP_URL`. Keep `.env.example` updated; never commit `.env.local`.
+`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `CRON_SECRET`, `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `APP_URL`. Keep `.env.example` updated; never commit `.env.local`.
 
 ## Build order
 Follow techspec §18: scaffold → time + **engine with full tests** → LeetCode sync + tick + lock + cron → auth/onboarding/pairing → dashboard + realtime → restores/targets/gifts/milestones → push → PWA → design pass (design §16.4) → P1 features → QA on a real Android phone and iPhone.

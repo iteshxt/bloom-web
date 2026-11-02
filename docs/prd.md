@@ -8,7 +8,7 @@
 | Status | Draft v1.0 |
 | Date | 2 Nov 2026 |
 | Platform | Installable Progressive Web App (PWA), hosted on Vercel |
-| Players | Exactly 2 (one "pair") |
+| Players | Pairs of exactly 2. Sign-up is open, so any number of pairs can play, each private to its two players |
 | Companion docs | `techspec.md` (how it's built), `design.md` (look & feel, to be written) |
 
 ---
@@ -30,7 +30,7 @@ The app should feel like a cozy video game rather than a productivity tool: prog
 6. **Install on any phone.** Android and iPhone both work, through the PWA install flow, with push notifications.
 
 ### Non-goals (v1)
-- More than 2 players, public leaderboards, or social features beyond the pair.
+- More than 2 players in a pair, public leaderboards, or social features beyond the pair.
 - Native iOS/Android apps or home-screen widgets.
 - Code editing or problem solving inside the app; all solving happens on leetcode.com.
 - In-app purchases or real payments for gifts. Gifts are fulfilled in real life.
@@ -168,7 +168,7 @@ When a day `D` ends (01:00 IST on D+1) incomplete, it is **missed**:
 Priority: **P0** = required for v1 launch, **P1** = v1 if time allows, **P2** = later.
 
 ### 5.1 Onboarding and pairing (P0)
-- As a new user, I sign in with my **Google account** in one tap. Only the two allowed Google accounts can get in; anyone else is signed straight back out.
+- As a new user, I sign in with my **Google account** in one tap. Anyone with a Google account can sign up.
 - I set a display name, pick a companion creature from a built-in set, and pick my player colour (blush, sky or lilac). The two players can't share a colour.
 - I enter my **LeetCode username**. The app checks it exists and shows my LeetCode avatar and solved count to confirm.
 - The first player creates a pair and gets a **6-character invite code** to share. The second player enters the code to join. A pair is locked at 2 players.

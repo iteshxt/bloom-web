@@ -8,10 +8,6 @@ import { createClient } from "@/lib/supabase/browser";
 // design.md §11.1: one button, no other fields. The sky, islands and
 // entrance choreography arrive with the design pass.
 
-const ERRORS: Record<string, string> = {
-  not_allowed:
-    "This Bloom is for two. Sign in with your invited Google account.",
-};
 const FALLBACK_ERROR = "Sign-in didn't finish. Try again.";
 
 export default function LoginPage() {
@@ -34,11 +30,7 @@ function SignIn() {
   const errorCode = useSearchParams().get("error");
   const [opening, setOpening] = useState(false);
   const [failed, setFailed] = useState(false);
-  const error = failed
-    ? FALLBACK_ERROR
-    : errorCode
-      ? (ERRORS[errorCode] ?? FALLBACK_ERROR)
-      : null;
+  const error = failed || errorCode ? FALLBACK_ERROR : null;
 
   async function signIn() {
     setOpening(true);

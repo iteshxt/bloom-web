@@ -454,7 +454,7 @@ Each screen follows the sky-on-top, calm-panel-below structure unless noted. `{P
 ```
 - One button and no other fields. The Google "G" mark sits on the left of the label, following Google's sign-in branding rules; it is the only third-party logo in the UI.
 - While the redirect is in flight, the button shows the petal spinner and reads "Opening Google…".
-- If the Google account isn't one of the two invited ones, the user comes back here with a frost banner: "This Bloom is for two. Sign in with your invited Google account."
+- If sign-in doesn't finish, the user comes back here with a frost banner: "Sign-in didn't finish. Try again."
 - Entry choreography (the one page-load moment): the sky fades in (400 ms), the islands float up (staggered 120 ms, floaty spring), the creatures pop in and wave, then the wordmark's two o's roll in from the sides and overlap.
 
 ### 11.2 Onboarding (`/onboarding`)

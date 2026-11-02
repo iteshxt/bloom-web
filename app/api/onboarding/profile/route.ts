@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { apiError, readBody } from "@/lib/api/http";
-import { requireAllowedUser } from "@/lib/auth/session";
+import { requireUser } from "@/lib/auth/session";
 import { isUniqueViolation } from "@/lib/pair/errors";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { profileInput } from "@/lib/validation/onboarding";
 
 /** Creates or updates my profile: name, companion and colour. */
 export async function POST(request: Request) {
-  const guard = await requireAllowedUser(); // ALLOWED_EMAILS is checked here too
+  const guard = await requireUser();
   if (!guard.ok) return guard.response;
   const body = await readBody(request, profileInput);
   if (!body.ok) return body.response;

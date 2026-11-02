@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { isAllowedEmail, parseAllowlist } from "@/lib/auth/allowlist";
 import {
   INVITE_ALPHABET,
   INVITE_LENGTH,
@@ -12,22 +11,6 @@ import {
   startDateInput,
 } from "@/lib/validation/onboarding";
 import { istMidnight } from "@/lib/time";
-
-describe("allowlist", () => {
-  const raw = " Asha@Gmail.com , ravi@gmail.com ,";
-  it("parses, trims and lowercases", () => {
-    expect([...parseAllowlist(raw)]).toEqual([
-      "asha@gmail.com",
-      "ravi@gmail.com",
-    ]);
-  });
-  it("matches case-insensitively and rejects everyone else", () => {
-    expect(isAllowedEmail("ASHA@gmail.com", raw)).toBe(true);
-    expect(isAllowedEmail("someone@gmail.com", raw)).toBe(false);
-    expect(isAllowedEmail(undefined, raw)).toBe(false);
-    expect(isAllowedEmail("asha@gmail.com", undefined)).toBe(false);
-  });
-});
 
 describe("invite codes", () => {
   it("are 6 unambiguous characters", () => {

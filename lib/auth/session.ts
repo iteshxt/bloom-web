@@ -4,7 +4,6 @@ import { apiError } from "@/lib/api/http";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/lib/supabase/types";
-import { isAllowedEmail } from "./allowlist";
 
 export interface SessionUser {
   id: string;
@@ -22,8 +21,9 @@ export async function getSessionUser(): Promise<SessionUser | null> {
 type Guard<T> = { ok: true } & T;
 type Denied = { ok: false; response: NextResponse };
 
-/** Route guard: a signed-in user on the allowlist. */
-export async function requireAllowedUser(): Promise<
+/** Route guard: any signed-in user. Sign-up is open to anyone with a
+ *  Google account; each pair's data stays private to its two players (RLS). */
+export async function requireUser(): Promise<
   Guard<{ user: SessionUser }> | Denied
 > {
   const user = await getSessionUser();
@@ -32,16 +32,10 @@ export async function requireAllowedUser(): Promise<
       ok: false,
       response: apiError(401, "unauthenticated", "Sign in first"),
     };
-  if (!isAllowedEmail(user.email)) {
-    return {
-      ok: false,
-      response: apiError(403, "not_allowed", "This Bloom is for two"),
-    };
-  }
   return { ok: true, user };
 }
 
-/** Route guard: an allowed user who has a profile. Returns the admin client
+/** Route guard: a signed-in user who has a profile. Returns the admin client
  *  for the writes that follow (the server is the only writer). */
 export async function requireProfile(): Promise<
   | Guard<{
@@ -51,7 +45,7 @@ export async function requireProfile(): Promise<
     }>
   | Denied
 > {
-  const guard = await requireAllowedUser();
+  const guard = await requireUser();
   if (!guard.ok) return guard;
   const admin = createAdminClient();
   const { data: profile, error } = await admin

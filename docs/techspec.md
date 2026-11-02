@@ -155,7 +155,6 @@ vercel.json
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | client + server | Web Push |
 | `VAPID_PRIVATE_KEY` | server only | Web Push |
 | `VAPID_SUBJECT` | server only | `mailto:you@example.com` |
-| `ALLOWED_EMAILS` | server only | Comma-separated list of the two Google account emails allowed to use the app |
 | `APP_URL` | server | `https://<name>.vercel.app`, used in push links |
 
 ---
@@ -765,7 +764,7 @@ Vercel Cron sends a `GET` with `Authorization: Bearer $CRON_SECRET`, so the tick
 ```
 verify Authorization header == CRON_SECRET  → else 401
 now = new Date()
-for each pair (there's one), for each player:
+for each paired player:
   if !acquireLock(player, owner='tick', ttl=60s) → skip
   try:
     1. syncLeetCode(player)                       (errors caught → sync_state)
@@ -815,8 +814,8 @@ Errors use the shape `{ error: { code, message } }` with an HTTP status of 400, 
 
 | Method & path | Body | Does |
 |---|---|---|
-| `GET /auth/callback` | — | OAuth return: exchanges the code for a session, enforces `ALLOWED_EMAILS`, redirects (section 13) |
-| `POST /api/onboarding/profile` | `{ displayName, avatarKey, color }` | Creates or updates the profile. Rejects emails not in `ALLOWED_EMAILS`. |
+| `GET /auth/callback` | — | OAuth return: exchanges the code for a session and redirects (section 13) |
+| `POST /api/onboarding/profile` | `{ displayName, avatarKey, color }` | Creates or updates the profile; 409 `color_taken` on a clash with the partner |
 | `GET /api/leetcode/validate?username=` | — | Runs Q_USER; returns `{ exists, avatar, solved }` |
 | `POST /api/leetcode/link` | `{ username }` | Checks the account exists (404 `leetcode_not_found`), saves LeetCode's spelling, sets `leetcode_verified_at`; if already in a pair, runs one tick after the response (`after()`) so pre-season solves appear at once |
 | `POST /api/pair/create` | `{ startDate }` | `startDate` from today (IST) to +90 days. Creates a pair with a 6-character code (no ambiguous characters, retried on a clash) and joins the creator; 409 `already_paired`. Runs one tick after the response |
@@ -931,11 +930,11 @@ In `app/layout.tsx` metadata: `appleWebApp: { capable: true, title: 'Bloom', sta
 
 - Supabase Auth with **Google sign-in only**. Both players use Android, where an installed PWA shares Chrome's cookies, so the OAuth redirect returns to the app signed in. No email OTP, magic links or passwords, so no email service is needed.
   - `/login` calls `supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${origin}/auth/callback` } })` (PKCE flow).
-  - `app/auth/callback/route.ts` exchanges the code with `supabase.auth.exchangeCodeForSession(code)`, then checks the email against `ALLOWED_EMAILS`. Not allowed → sign out and redirect to `/login?error=not_allowed`. Allowed → redirect to `/onboarding` if there's no profile in a pair yet, otherwise `/`.
-  - One-time setup: a Google Cloud project with an OAuth consent screen (External, both Gmail addresses added as test users) and a **Web** OAuth client whose authorized redirect URI is `https://<project-ref>.supabase.co/auth/v1/callback`. Paste its client ID and secret into Supabase → Auth → Providers → Google. In Supabase → Auth → URL configuration, set the Site URL to `APP_URL` and allow `http://localhost:3000/auth/callback` and `<APP_URL>/auth/callback` as redirect URLs.
+  - `app/auth/callback/route.ts` exchanges the code with `supabase.auth.exchangeCodeForSession(code)`, then redirects to `/` (the proxy sends players who haven't finished onboarding to `/onboarding`). It never follows a caller-supplied redirect.
+  - One-time setup: a Google Cloud project with an OAuth consent screen (External, **published** so any Google account can sign in; while it's in Testing only the listed test users can, and only email/profile scopes are used so no Google verification is needed) and a **Web** OAuth client whose authorized redirect URI is `https://<project-ref>.supabase.co/auth/v1/callback`. Paste its client ID and secret into Supabase → Auth → Providers → Google. In Supabase → Auth → URL configuration, set the Site URL to `APP_URL` and allow `http://localhost:3000/auth/callback` and `<APP_URL>/auth/callback` as redirect URLs.
 - Sessions are kept by `@supabase/ssr` cookies, refreshed in `proxy.ts`. In practice users stay signed in for months.
 - **Page routing (`proxy.ts`):** signed out → `/login`; signed in but not onboarded (no pair or no LeetCode username) → `/onboarding`; onboarded → the app (`/login` and `/onboarding` redirect to `/`). `/api/*` and `/auth/*` are never redirected: API routes answer 401/403 themselves.
-- **Allowlist:** `ALLOWED_EMAILS` is checked in `/auth/callback` and again in `/api/onboarding/profile`. Every other `/api` route requires an existing profile in a pair. Optionally, turn off new signups in Supabase after both accounts exist.
+- **Open sign-up:** anyone with a Google account can create a profile and create or join a pair. A pair is locked at 2 players, and RLS (§6.1) means a player can only ever read their own pair's rows. Every `/api` route except sign-up (`/api/onboarding/profile`, `/api/leetcode/validate`) requires an existing profile, and game routes require a pair.
 
 ---
 
