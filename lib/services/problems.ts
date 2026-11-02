@@ -3,6 +3,8 @@ import type { Difficulty } from "@/lib/engine";
 import { getQuestion } from "@/lib/leetcode/client";
 import type { Admin } from "./player";
 
+const FETCH_CONCURRENCY = 4;
+
 export interface ProblemInfo {
   difficulty?: Difficulty;
   topics: string[];
@@ -33,8 +35,15 @@ export async function ensureProblems(
 
   const missing = unique.filter((s) => !info[s]);
   const rows = [];
+  // A few at a time: fast enough for a first sync of 20 solves, still polite.
+  const metas = new Map<string, Awaited<ReturnType<typeof getQuestion>>>();
+  for (let i = 0; i < missing.length; i += FETCH_CONCURRENCY) {
+    const batch = missing.slice(i, i + FETCH_CONCURRENCY);
+    const results = await Promise.all(batch.map((slug) => getQuestion(slug)));
+    batch.forEach((slug, j) => metas.set(slug, results[j]));
+  }
   for (const slug of missing) {
-    const meta = await getQuestion(slug); // sequential: be polite to LeetCode
+    const meta = metas.get(slug);
     rows.push({
       title_slug: slug,
       frontend_id: meta?.frontendId ?? null,
