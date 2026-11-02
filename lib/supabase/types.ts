@@ -857,7 +857,17 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      level_for_xp: { Args: { p_xp: number }; Returns: number };
       my_pair_id: { Args: never; Returns: string };
+      release_lock: {
+        Args: { p_owner: string; p_player: string };
+        Returns: undefined;
+      };
+      save_player_state: { Args: { p: Json }; Returns: Json };
+      try_lock: {
+        Args: { p_owner: string; p_player: string; p_ttl_seconds?: number };
+        Returns: boolean;
+      };
     };
     Enums: {
       day_status: "pending" | "complete" | "missed" | "restored";
