@@ -103,7 +103,7 @@ When a day `D` ends (01:00 IST on D+1) incomplete, it is **missed**:
    - **Reject:** the run ends at D-1. A new run starts on day D+1, with no make-up required. No token is used.
    - **No request, or no response, by the end of the window:** the request **expires**. The run ends at D-1 and a new run starts on day D+1. No token is used.
 5. **Make-up failure:** if a restore was approved but day D+1 ends without reaching target + make-up, day D goes back to **missed**, the run ends at D-1, and the token **stays spent**. A new run starts on D+2.
-6. **Only one day can be restored at a time.** Since D+1 must be completed for the restore to stick, two missed days in a row always end the run.
+6. **Only one day can be restored at a time.** Since D+1 must be completed for the restore to stick, two missed days in a row always end the run. This holds whether or not make-up is enabled: with make-up off, D+1 must still reach its own target, otherwise day D reverts exactly as in rule 5 (no second restore is offered).
 7. Restore requests can't be withdrawn once the partner has responded. A pending request can be cancelled by the person who sent it.
 
 ### 4.7 Restore tokens

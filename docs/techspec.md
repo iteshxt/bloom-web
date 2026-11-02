@@ -566,7 +566,8 @@ finalizeDay(D, days, run, rules, now):
       if d.status == 'complete' → mark finalized, return
 
   // 2) D is incomplete
-  if d.makeupRequired > 0:                                   // approved restore, make-up not paid
+  if days[addDays(D,-1)]?.status == 'restored':              // approved restore hasn't stuck yet (PRD 4.6.5–4.6.6),
+                                                             // with or without make-up; never a second restore
       d.status = 'missed'
       days[addDays(D,-1)].status = 'missed'                  // un-restore
       run.length -= 1; run.lastCountedDay = addDays(D,-2)
@@ -928,6 +929,7 @@ All tests use a fixed `now` and fixture states. Minimum scenarios:
 | 21 | Solves before the start date | Stored, `counted=false`, no streak effect |
 | 22 | Level formula | 0→1, 100→2, 299→2, 300→3, 4500→10 |
 | 23 | Each badge condition | Earned exactly once |
+| 24 | Make-up off: approve, then D+1 ends below its target | Same as #11 (D reverted, run ends `makeup_failed`, token stays spent, new run at D+2); D+1 never goes on ice |
 
 ### 14.2 Integration
 - Services against a local Supabase (`supabase start`), with the LeetCode client mocked using recorded fixtures (msw).
