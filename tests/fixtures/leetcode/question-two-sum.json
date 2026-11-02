@@ -1,0 +1,14 @@
+{
+  "data": {
+    "question": {
+      "questionFrontendId": "1",
+      "title": "Two Sum",
+      "titleSlug": "two-sum",
+      "difficulty": "Easy",
+      "topicTags": [
+        { "name": "Array", "slug": "array" },
+        { "name": "Hash Table", "slug": "hash-table" }
+      ]
+    }
+  }
+}

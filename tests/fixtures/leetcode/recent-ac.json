@@ -1,0 +1,24 @@
+{
+  "data": {
+    "recentAcSubmissionList": [
+      {
+        "id": "1800000003",
+        "title": "Valid Parentheses",
+        "titleSlug": "valid-parentheses",
+        "timestamp": "1793548200"
+      },
+      {
+        "id": "1800000002",
+        "title": "Two Sum",
+        "titleSlug": "two-sum",
+        "timestamp": "1793541000"
+      },
+      {
+        "id": "1800000001",
+        "title": "Two Sum",
+        "titleSlug": "two-sum",
+        "timestamp": "1793540400"
+      }
+    ]
+  }
+}

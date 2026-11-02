@@ -1,0 +1,20 @@
+{
+  "data": {
+    "matchedUser": {
+      "username": "bloom-test-player",
+      "profile": {
+        "userAvatar": "https://assets.leetcode.com/users/default_avatar.jpg",
+        "realName": "",
+        "ranking": 250000
+      },
+      "submitStatsGlobal": {
+        "acSubmissionNum": [
+          { "difficulty": "All", "count": 42 },
+          { "difficulty": "Easy", "count": 25 },
+          { "difficulty": "Medium", "count": 15 },
+          { "difficulty": "Hard", "count": 2 }
+        ]
+      }
+    }
+  }
+}
