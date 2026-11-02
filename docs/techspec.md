@@ -134,6 +134,7 @@ On the Hobby plan, Vercel Cron only allows schedules that run at most **once per
   /migrations/0002_rls.sql
   /migrations/0003_cron.sql      # applied only after the first Vercel deploy
   /migrations/0004_advisor_fixes.sql
+  /migrations/0005_state_functions.sql   # save_player_state, try_lock / release_lock, level_for_xp
   seed.sql                       # badges catalogue etc.
 /tests
   /engine/*.test.ts
@@ -774,17 +775,22 @@ for each pair (there's one), for each player:
   finally: releaseLock(player)
 return 200 { ok, durationMs }
 ```
-Target duration is under 10 seconds. If the start date is in the future, the tick only syncs (for pre-season stats).
+Target duration is under 10 seconds. If the start date is in the future, the tick only syncs (for pre-season stats). Players run in parallel, each under its own lock; one player's failure doesn't stop the other's.
+
+**Persistence (`services/tick.ts`, `services/persist.ts`).** Steps 1–4 run the engine in memory (`processSubmissions` → `finalizeOverdue` → `ensureToday` → `scheduledNotifications`), then everything is saved with **one call to `save_player_state(jsonb)`** (`0005_state_functions.sql`), in a single transaction: runs (ended first), days (an existing row's `target` is never overwritten), restore requests, new submissions, XP events, badges (a partner's `big_heart` goes to the partner), first-time milestones, gift unlocks (an IOU row plus `gift_owed` to the giver when no gift is set), activity, notifications and sync bookkeeping. `profiles.xp_total` is recomputed as the sum of `xp_events`, and `level` with `level_for_xp`. The function returns only the notifications it newly logged, which are then delivered (Web Push from build step 7; until then a log line). A LeetCode failure is recorded as a failed sync (`last_error` = the error code) and never fails the tick.
 
 ### 9.4 Concurrency: per-player lease lock (`services/lock.ts`)
-The tick and on-demand `/api/sync` can overlap. A lease lock prevents double-processing:
+The tick and on-demand `/api/sync` can overlap. A lease lock prevents double-processing. It's two server-only functions in `0005_state_functions.sql`, wrapped by `withPlayerLock()`:
 ```sql
+-- try_lock(player, owner, ttl = 60): creates the sync_state row if needed, then
 update sync_state
-   set lock_until = now() + interval '60 seconds', lock_owner = $owner
- where player_id = $player and (lock_until is null or lock_until < now())
-returning player_id;          -- 0 rows → lock not acquired
+   set lock_until = now() + make_interval(secs => ttl), lock_owner = owner
+ where player_id = player and (lock_until is null or lock_until < now());
+-- returns found (false → someone else holds it; skip this player)
+
+-- release_lock(player, owner): clears the lock only if this owner still holds it
 ```
-Released with `lock_until = null`. The unique constraints in section 6 are the second line of defense.
+Each acquisition uses a unique owner (`tick:<uuid>`), so a slow run can't release a lock someone else took after its lease expired. The unique constraints in section 6 are the second line of defense.
 
 ### 9.5 Scheduled notification rules
 These are evaluated every tick with IST `minuteOfDay` and deduplicated through `notification_log.dedupe_key`. A 10-minute tick means each fires within 10 minutes of its nominal time.
