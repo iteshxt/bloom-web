@@ -939,8 +939,9 @@ All tests use a fixed `now` and fixture states. Minimum scenarios:
 | 24 | Make-up off: approve, then D+1 ends below its target | Same as #11 (D reverted, run ends `makeup_failed`, token stays spent, new run at D+2); D+1 never goes on ice |
 
 ### 14.2 Integration
-- Services against a local Supabase (`supabase start`), with the LeetCode client mocked using recorded fixtures (msw).
-- Tick idempotency: running the tick twice in a row produces no duplicate rows or notifications.
+- There is no local database. The engine is covered by pure unit tests (14.1); the LeetCode client is tested with recorded fixtures (msw), never the real API.
+- Services and migrations are checked against the hosted Supabase project through the Supabase MCP server (schema, RLS, rows written, logs).
+- Tick idempotency: running the tick twice in a row against the hosted project produces no duplicate rows or notifications.
 
 ### 14.3 Manual QA checklist (before launch)
 Install on Android and iPhone; push works on both; a real LeetCode solve appears after Sync; the full restore round-trip works across the two phones; gift unboxing works; offline launch shows the shell.
@@ -951,7 +952,7 @@ Install on Android and iPhone; push works on both; a real LeetCode solve appears
 
 1. **Supabase**
    1. Create a project (Free, region Mumbai / ap-south-1).
-   2. Run migrations `0001`–`0003` (with the Supabase CLI `supabase db push`, or paste into the SQL editor).
+   2. Connect the Supabase MCP server to the project and apply migrations `0001`–`0003` with its `apply_migration` tool (no local database or Docker).
    3. Auth → Providers: Email enabled. Auth → Email templates: Magic Link template shows `{{ .Token }}`.
    4. Vault: create `cron_secret` and `app_url` (section 9.1).
    5. Database → Publications: add the realtime tables (section 6.2).

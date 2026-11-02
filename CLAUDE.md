@@ -23,11 +23,8 @@ pnpm dev                      # local app on :3000
 pnpm test                     # vitest (engine + services)
 pnpm test:watch
 pnpm lint && pnpm typecheck   # run both before calling work done
-supabase start                # local Postgres/Auth/Realtime (Docker)
-supabase db reset             # re-run migrations + seed locally
-supabase migration new <name> # new SQL migration
-supabase gen types typescript --local > lib/supabase/types.ts   # after any schema change
 ```
+There is **no local database** (no Docker, no `supabase start`). Development and checks run against the hosted Supabase project through the **Supabase MCP server**: write each migration as a file in `supabase/migrations/`, apply it with the MCP `apply_migration` tool, inspect with `list_tables` / `execute_sql` / `get_logs`, and regenerate `lib/supabase/types.ts` with `generate_typescript_types` after any schema change.
 To trigger the heartbeat locally: `curl -X POST localhost:3000/api/cron/tick -H "Authorization: Bearer $CRON_SECRET"`.
 
 ## Layout
