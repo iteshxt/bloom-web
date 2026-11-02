@@ -3,3 +3,4 @@ pnpm-lock.yaml
 docs
 CLAUDE.md
 AGENTS.md
+.mcp.json
