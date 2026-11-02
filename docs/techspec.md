@@ -228,7 +228,8 @@ create table profiles (
   id                   uuid primary key references auth.users on delete cascade,
   pair_id              uuid references pairs on delete set null,
   display_name         text not null,
-  avatar_key           text not null default 'default',
+  avatar_key           text not null default 'mochi',      -- companion kind: mochi|tofu|pip|bun|puff|sprig
+  color                text not null default 'blush' check (color in ('blush','sky','lilac')),
   leetcode_username    text,
   leetcode_verified_at timestamptz,
   xp_total             int  not null default 0,
@@ -249,6 +250,9 @@ begin
 end $$;
 create trigger trg_pair_size before insert or update of pair_id on profiles
   for each row execute function enforce_pair_size();
+
+-- The two players can't share a colour (design.md §3.4)
+create unique index one_color_per_pair on profiles (pair_id, color) where pair_id is not null;
 
 -- ───────── Targets (history) ─────────
 create table daily_targets (
@@ -479,6 +483,9 @@ create policy "read problems"  on problems          for select using (auth.role(
 **Gifts are server-only.** The receiver must not be able to see a gift's title, details or link before the reveal. So `gifts` has no client policy at all, and gift data is served by `GET /api/gifts`, which masks unrevealed fields on the server. Realtime for gifts works as a signal only: the client listens for `activity` rows of kind `gift_*` and refetches.
 
 `push_subscriptions`, `notification_log` and `sync_state` have no client policies (server only).
+
+### 6.3 Device-only preferences
+Theme, sounds, haptics and the reduced-motion override (design.md §11.14) are per-device preferences stored in `localStorage` under `bloom:prefs`. They are not in the database and are not synced between devices.
 
 ### 6.2 Realtime
 Add to the `supabase_realtime` publication: `days`, `runs`, `restore_requests`, `activity`, `profiles`, `daily_targets`, `badges_earned`.
@@ -764,7 +771,7 @@ These are evaluated every tick with IST `minuteOfDay` and deduplicated through `
 | reminder_late | 23:00 ≤ IST time < 24:00, today incomplete | `reminder_late:<player>:<day>` |
 | reminder_grace | 00:15 ≤ IST time < 01:00, yesterday pending and incomplete | `reminder_grace:<player>:<yesterday>` |
 | restore_closing | pending request and `expires_at - now ≤ 2h` | `restore_closing:<request>` |
-| restore nudge to requester | at risk, no request, 20:00 IST on window day | `restore_ask:<player>:<missed>` |
+| restore_ask | at risk, no request, 20:00 IST on window day | `restore_ask:<player>:<missed>` |
 | sync_failing | `now - last_success_at > 3h` | `sync_failing:<player>:<day>` |
 
 Event-driven notifications (partner_done, restore_requested, milestone_reached and so on) are sent from engine effects right away.
@@ -778,11 +785,11 @@ Errors use the shape `{ error: { code, message } }` with an HTTP status of 400, 
 
 | Method & path | Body | Does |
 |---|---|---|
-| `POST /api/onboarding/profile` | `{ displayName, avatarKey }` | Creates or updates the profile. Rejects emails not in `ALLOWED_EMAILS`. |
+| `POST /api/onboarding/profile` | `{ displayName, avatarKey, color }` | Creates or updates the profile. Rejects emails not in `ALLOWED_EMAILS`. |
 | `GET /api/leetcode/validate?username=` | — | Runs Q_USER; returns `{ exists, avatar, solved }` |
 | `POST /api/leetcode/link` | `{ username }` | Validates, saves, sets `leetcode_verified_at`, and runs an initial sync (pre-season) |
 | `POST /api/pair/create` | `{ startDate }` | Creates a pair with a 6-character code (no ambiguous characters); joins the creator |
-| `POST /api/pair/join` | `{ code }` | Joins; 409 if the pair is full |
+| `POST /api/pair/join` | `{ code }` | Joins; 409 `pair_full` if the pair is full, 409 `color_taken` if the partner already has my colour (UI asks me to pick another) |
 | `PATCH /api/pair` | `{ startDate? , addMilestone?, makeupEnabled? }` | startDate only before the start; milestones can only be added |
 | `POST /api/sync` | — | On-demand sync of my account (60 s rate limit) plus finalizing overdue days |
 | `POST /api/restore/request` | `{ message? }` | Section 7.6 |

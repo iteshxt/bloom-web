@@ -92,7 +92,7 @@ Every pastel has a deep partner for text, icons and fine details placed on it. U
 | pastels | same hex | Pastels glow beautifully on plum. Text on pastels still uses the deep shades. |
 
 ### 3.4 Player colours
-- Each player owns **one colour**, chosen in onboarding from `blush`, `sky` or `lilac`. Defaults are blush for whoever creates the pair and sky for whoever joins. The two players can't pick the same colour.
+- Each player owns **one colour**, chosen in onboarding from `blush`, `sky` or `lilac` and stored in `profiles.color`. The picker defaults to blush; if the joining player's pick clashes with the partner's, the join step asks them to pick another. The two players can't pick the same colour.
 - Everything that belongs to a player uses their colour: their flower's petals, their heatmap tiles, their player card's tint and shadow, their creature's scarf, their side of the journey road, and their chat-bubble messages in restores.
 - When only one player is shown (for example a profile), the whole screen takes a gentle 4% wash of that player's colour.
 
@@ -534,7 +534,7 @@ The reference's navigation screen, reimagined as a garden road.
 └──────────────────────────────┘
 ```
 - The road is a long vertical scene that changes by stage: meadow for 0–15, flower fields for 15–30, a pond with lily pads for 30–50, a blossom grove for 50–100, and a hilltop garden at 100.
-- **Gift stops:** a gift box on a little pedestal at each milestone. Locked ones show a hint tag; ones achieved by you get a mint flag with your colour, and Riya's get a flag in her colour.
+- **Gift stops:** a gift box on a little pedestal at each milestone. Locked ones show a hint tag; ones achieved by you get a mint flag with your colour, and Riya's get a flag in Riya's colour.
 - Both creatures stand on the road at their current streak and walk (a 4-frame bob) when the screen opens, auto-scrolling to centre on you.
 - At-risk players stand in a little frozen puddle on the road.
 - **Bottom panel:** a wave-edged white card with a "direction" pill ("7 days to your next gift") and the progress slider "23 traveled · 7 left", in your colour, with your flower as the slider thumb.
@@ -613,7 +613,7 @@ A card per run, showing the dates, length in Baloo 2, the flower stage reached, 
 Grouped white cards (`r-md` rows, no hairline between rows; 12 px spacing):
 - **Profile:** name, companion and colour (opens the onboarding carousel as a sheet), LeetCode username.
 - **Reminders:** a toggle for each notification category, plus "Send a test notification".
-- **Appearance:** theme (Follow the sky / Always day / Always night), sounds on/off, haptics on/off, reduced motion (follows the system by default).
+- **Appearance:** theme (Follow the sky / Always day / Always night), sounds on/off, haptics on/off, reduced motion (follows the system by default). These are per-device preferences kept in `localStorage`, not synced between devices.
 - **Challenge:** milestones (add only), make-up on/off, start date (before the start only).
 - **About:** version, diagnostics (hidden behind 5 taps on the version), sign out.
 
@@ -799,12 +799,13 @@ Warm, playful, gently teasing, never guilt-trippy. Bloom talks like a cozy frien
 | streak_on_ice | Your flower is frosted | Ask Riya for a restore before 1 am tomorrow ❄️ |
 | streak_broken | A new seed is planted | Your 23-day streak ended. Day 1 starts now 🌱 |
 | restore_requested | Riya needs a little sunshine | "I had a fever" · Tap to decide |
+| restore_ask | Your flower is still frosted | Ask Riya for a restore before 1 am ❄️ |
 | restore_closing | Riya's request closes soon | 2 hours left to decide |
 | restore_answered (yes) | Riya thawed your flower 💖 | Finish today plus 1 make-up to keep it |
 | restore_answered (no) | Riya said not this time | A new seed is planted. You've got this 🌱 |
 | target_changed | New daily goal | Riya set your target to 3, starting tomorrow |
 | milestone_reached (self) | 30 days! | Your bouquet bloomed. Riya's gift is unlocked 🎁 |
-| milestone_reached (partner) | Riya hit 30 days! | Her gift is unlocked. Is it ready? 👀 |
+| milestone_reached (partner) | Riya hit 30 days! | Your gift for Riya is unlocked. Is it ready? 👀 |
 | gift_owed | You owe a gift | Riya reached 30 days. Wrap something special 🎁 |
 | gift_revealed | Riya opened your gift | Your 30-day surprise is out 💝 |
 | gift_received | Gift delivered | Riya marked your gift as received 💝 |
@@ -813,7 +814,7 @@ Warm, playful, gently teasing, never guilt-trippy. Bloom talks like a cozy frien
 | nudge | Riya nudged you | "Go do your LeetCode 😤" |
 | sync_failing | Can't reach LeetCode | Manual check-in is on until it's back |
 
-(Pronouns in "milestone_reached (partner)" adapt to the player; the app stores an optional pronoun in settings, defaulting to the player's name instead of a pronoun.)
+(Copy always uses display names, never pronouns. There is no pronoun setting.)
 
 ### 14.3 Preset nudges
 - "Go do your LeetCode 😤"

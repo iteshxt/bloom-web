@@ -168,7 +168,7 @@ Priority: **P0** = required for v1 launch, **P1** = v1 if time allows, **P2** = 
 
 ### 5.1 Onboarding and pairing (P0)
 - As a new user, I sign in with my email using a **6-digit one-time code**. A code works reliably inside an installed PWA, where magic links don't.
-- I set a display name and pick an avatar from a built-in set.
+- I set a display name, pick a companion creature from a built-in set, and pick my player colour (blush, sky or lilac). The two players can't share a colour.
 - I enter my **LeetCode username**. The app checks it exists and shows my LeetCode avatar and solved count to confirm.
 - The first player creates a pair and gets a **6-character invite code** to share. The second player enters the code to join. A pair is locked at 2 players.
 - The pair creator picks the **start date**, which defaults to tomorrow.
@@ -185,7 +185,7 @@ Shows **both players side by side** (me on one side, partner on the other):
 - level and XP progress bar;
 - last synced time, with a "Sync now" button;
 - a countdown to the end of today's day, highlighted during the grace hour;
-- a status banner when relevant ("Your streak is on ice — ask for a restore", "She's asking you for a restore!", "You owe a gift!").
+- a status banner when relevant ("Your streak is on ice — ask for a restore", "{Partner} is asking you for a restore!", "You owe a gift!").
 
 **Acceptance:** dashboard numbers match the engine's state. Changes made by the partner (solve, approval, gift reveal) appear within a few seconds without refreshing.
 
@@ -217,7 +217,7 @@ Shows **both players side by side** (me on one side, partner on the other):
 
 ### 5.7 Milestones and celebrations (P0)
 - Reaching a milestone triggers a full-screen celebration (confetti and animation; details in design.md), a token refill animation, and a gift unlock if it's a first-time achievement.
-- The partner is notified ("She hit 30 days! Her gift is unlocked — make sure it's ready 👀").
+- The partner is notified ("{Partner} hit 30 days! Your gift for them is unlocked — make sure it's ready 👀").
 - A milestone path/map shows 15 → 30 → 50 → 100 with my progress and lifetime achievements.
 
 ### 5.8 Gift vault (P0)
@@ -286,23 +286,24 @@ Visual design, layout and animation are defined in `design.md`. This list only f
 
 ## 7. Notification catalogue
 
-All times are IST. Each notification is sent at most once per key (deduplicated).
+All times are IST. Each notification is sent at most once per key (deduplicated). Copy always refers to the partner by display name (`{Partner}`), never by pronoun; final copy lives in design.md §14.2.
 
 | Kind | Recipient | Trigger | Example copy |
 |---|---|---|---|
 | reminder_evening | player | 21:00, today incomplete | "3 hours left — 0/1 today 🔥" |
 | reminder_late | player | 23:00, today incomplete | "1 hour to midnight! Grace hour after that." |
 | reminder_grace | player | 00:15, previous day incomplete | "45 min of grace left to save your streak 😱" |
-| partner_done | player | partner completes today | "She's done for today. Your move 👀" |
+| partner_done | player | partner completes today | "{Partner} is done for today. Your move 👀" |
 | streak_on_ice | player | day missed, tokens > 0 | "Your streak is on ice ❄️ Ask for a restore before 1 AM tomorrow." |
 | streak_broken | both | run ends | "Streak over at 23 days 💔 New run starts today." |
-| restore_requested | partner | request sent | "She's asking for a restore: 'I had a fever 🥺'" |
+| restore_requested | partner | request sent | "{Partner} is asking for a restore: 'I had a fever 🥺'" |
+| restore_ask | player | 20:00 on the window day, at risk, no request sent yet | "Your flower is still frosted. Ask {Partner} before 1 am ❄️" |
 | restore_closing | partner | 2 h before window end, still pending | "Restore request expires in 2 hours." |
 | restore_answered | requester | approve/reject | "Restore approved 💖 Make-up: 1 extra problem today." |
 | target_changed | player | partner changes target | "Your daily target is now 3, from tomorrow." |
 | milestone_reached | both | milestone hit | "30 DAYS! 🎉 Gift unlocked." |
 | gift_owed | giver | gift unlocked, not set | "You owe a gift for 30 days!" |
-| gift_revealed | giver | receiver opened it | "She opened her 30-day gift 🎁" |
+| gift_revealed | giver | receiver opened it | "{Partner} opened your 30-day gift 🎁" |
 | gift_received | giver | marked received | "Gift marked received 💝" |
 | level_up | player | new level | "Level 7 reached!" |
 | badge_earned | player | new badge | "Badge unlocked: Night Owl 🦉" |
