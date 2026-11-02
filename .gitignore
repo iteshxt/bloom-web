@@ -1,25 +1,27 @@
 # dependencies
-node_modules/
+/node_modules
+.pnpm-debug.log*
 
 # next.js / build
-.next/
-out/
-build/
+/.next/
+/out/
+/build
 *.tsbuildinfo
 next-env.d.ts
 
-# env (never commit secrets)
-.env
-.env*.local
+# env files: never commit secrets (the example file is committed)
+.env*
+!.env.example
 
-# vercel / supabase
-.vercel/
+# vercel / supabase cli state
+.vercel
 supabase/.temp/
 supabase/.branches/
 
 # testing
-coverage/
+/coverage
 
 # misc
 .DS_Store
+*.pem
 *.log
