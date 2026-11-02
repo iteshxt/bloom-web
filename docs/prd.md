@@ -119,6 +119,7 @@ When a day `D` ends (01:00 IST on D+1) incomplete, it is **missed**:
   - tokens refill to 3;
   - if this player has **never achieved this milestone before**, it becomes an **achievement** and **unlocks the partner's gift** for it.
 - Milestones are earned **once per player for life**. Reaching 15 again after a broken streak still gets a celebration and a token refill, but no new gift. The next new gift is the next milestone above the player's best.
+- A milestone reached on a restored day is kept (achievement, gift, XP and badge) even if that restore is later undone by a failed make-up.
 - **Gifts:**
   - Each player can pre-set a gift for each of their partner's milestones: a title, a teaser hint visible before unlock, optional details, and an optional link.
   - Before unlock, the receiver sees only a locked mystery box with the hint, if one was given.
@@ -133,7 +134,7 @@ When a day `D` ends (01:00 IST on D+1) incomplete, it is **missed**:
 | Easy solve (first time solved, as recorded by the app — LeetCode doesn't publicly expose older solve history) | 10 |
 | Medium solve | 25 |
 | Hard solve | 50 |
-| Re-solve of a problem already solved on an earlier day | half of the above |
+| Re-solve of a problem already solved on an earlier day | half of the above, rounded down (Medium → 12) |
 | Duplicate solve on the same day | 0 |
 | Daily target completed | +20 |
 | Make-up day completed | +30 |
@@ -149,7 +150,7 @@ When a day `D` ends (01:00 IST on D+1) incomplete, it is **missed**:
 | first_blood | First Blood | First counted solve |
 | hat_trick | Hat Trick | 3+ distinct solves in one day |
 | hard_hitter | Hard Hitter | First Hard solve |
-| hard_mode | Hard Mode | 10 Hard solves total |
+| hard_mode | Hard Mode | 10 distinct Hard problems solved (re-solving one doesn't count again) |
 | night_owl | Night Owl | A solve during the grace hour that saved the previous day |
 | early_bird | Early Bird | A solve before 08:00 IST |
 | perfect_week | Perfect Week | 7-day streak |
@@ -295,7 +296,7 @@ All times are IST. Each notification is sent at most once per key (deduplicated)
 | reminder_grace | player | 00:15, previous day incomplete | "45 min of grace left to save your streak 😱" |
 | partner_done | player | partner completes today | "{Partner} is done for today. Your move 👀" |
 | streak_on_ice | player | day missed, tokens > 0 | "Your streak is on ice ❄️ Ask for a restore before 1 AM tomorrow." |
-| streak_broken | both | run ends | "Streak over at 23 days 💔 New run starts today." |
+| streak_broken | both | run ends (not after a rejected restore: restore_answered already says it) | "Streak over at 23 days 💔 New run starts today." |
 | restore_requested | partner | request sent | "{Partner} is asking for a restore: 'I had a fever 🥺'" |
 | restore_ask | player | 20:00 on the window day, at risk, no request sent yet | "Your flower is still frosted. Ask {Partner} before 1 am ❄️" |
 | restore_closing | partner | 2 h before window end, still pending | "Restore request expires in 2 hours." |

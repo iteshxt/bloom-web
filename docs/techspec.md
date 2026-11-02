@@ -520,20 +520,23 @@ assignDay(sub, days, rules):
   if m < rules.graceMinutes:
      P = addDays(C, -1)
      prev = days[P]
-     if P >= rules.startDate
-        and prev exists, prev.status == 'pending', !prev.finalized
-        and !prev.solvedSlugs.has(sub.slug)
-        and prev.solvedSlugs.size < required(prev):
-          return P
+     if P >= rules.startDate and P > lastFinalizedDay:
+        if prev doesn't exist → return P                     // nothing solved yet: still needs problems (PRD 4.4)
+        if prev.status == 'pending', !prev.finalized
+           and !prev.solvedSlugs.has(sub.slug)
+           and prev.solvedSlugs.size < required(prev):
+             return P
   return C
 ```
 Submissions are processed **in ascending `submitted_at` order**. Each assigned submission:
 - `counted = assignedDay >= startDate && !day.solvedSlugs.has(slug)`
-- `isResolve = slug was counted on any earlier day` (check with a DB query)
-- XP: base by difficulty (10/25/50; difficulty unknown → 10), halved if `isResolve`, 0 if not counted.
+- `isResolve = slug was counted on any earlier day` (the service loads each counted slug's first day into the engine's `history`)
+- XP: base by difficulty (10/25/50; difficulty unknown → 10), halved and rounded down if `isResolve`, 0 if not counted.
 - If counted, add the slug to `solvedSlugs`, then call `evaluateCompletion`.
 
 ### 7.3 Completion (`evaluate.ts`), PRD 4.5
+Completion and counting are two steps. A day becomes `complete` **live**, as soon as it has enough distinct solves (unless the run is on ice). It is **counted** into the run (`runId`, `length`, day XP, `partner_done`, milestones) only when every earlier day of the run is settled, by `advance()`, which walks forward from the run's `lastCountedDay + 1`. So a later day that fills up first (a grace-hour duplicate, or a sync catching up after downtime) waits for the day before it and can never skip over a missed day. When a day goes on ice, any later day that is complete but not yet counted goes back to pending (held).
+
 ```
 evaluateCompletion(day, run, rules):
   if day.status != 'pending' → no-op
@@ -569,6 +572,7 @@ finalizeDay(D, days, run, rules, now):
   if run.atRiskDay == addDays(D, -1):
       expire any pending request for run.atRiskDay           // status 'expired'
       endRun(run, endedOn=run.atRiskDay, reason=request? 'restore_expired' : 'missed')
+      notify both 'streak_broken'
       run = startRun(D)                                      // new run includes D
       evaluateCompletion(d, run)                             // released from hold
       if d.status == 'complete' → mark finalized, return
@@ -580,6 +584,7 @@ finalizeDay(D, days, run, rules, now):
       days[addDays(D,-1)].status = 'missed'                  // un-restore
       run.length -= 1; run.lastCountedDay = addDays(D,-2)
       endRun(run, endedOn=D, reason='makeup_failed')         // token stays spent
+      notify both 'streak_broken'                            // milestones reached on the restored day are kept
       startRun(addDays(D,1)); finalized; return
 
   d.status = 'missed'
@@ -589,16 +594,18 @@ finalizeDay(D, days, run, rules, now):
       notify both 'streak_broken' (only if the ended run's length > 0)
   else:
       run.atRiskDay = D
+      hold later complete-but-uncounted days (back to pending)
       notify self 'streak_on_ice' (window ends at dayEndsAt(D+1))
   d.finalized = true
 ```
-`startRun(day)` creates a run with `length 0`, `tokensRemaining = rules.tokensPerRun`, and `startedOn = day`. It must also attach any already-complete pending day (`day`) to the new run. That case is covered in step 1.
+`startRun(day)` creates a run with `length 0`, `tokensRemaining = rules.tokensPerRun`, and `startedOn = day`, then calls `advance()` so any day from `day` onward that has already filled up is counted into it.
 
 **When is a day overdue enough to finalize?** When `now >= dayEndsAt(D)` **and** at least one of:
 - `sync_state.last_success_at >= dayEndsAt(D)` (a sync after the boundary has captured every grace-hour solve), or
 - `now >= dayEndsAt(D) + 6h` (LeetCode unreachable; finalize with what we have).
 
 ### 7.6 Restore actions (`restore.ts`)
+The rules live in the pure `lib/engine/restore.ts`; `lib/services/restore.ts` checks who is acting, takes the lease lock, calls it and persists the result.
 ```
 requestRestore(player, message, now):
   run.atRiskDay set; now < dayEndsAt(run.atRiskDay + 1); no live request for that day
@@ -618,7 +625,7 @@ respondRestore(approver, requestId, approve, reply, now):
      evaluateCompletion(days[missed+1], run)              // may complete right away
      badge check 'big_heart' for approver
   else:
-     endRun(run, endedOn=missed, reason='restore_rejected')
+     endRun(run, endedOn=missed, reason='restore_rejected')  // no streak_broken: restore_answered says it
      newRun = startRun(missed+1); evaluateCompletion(days[missed+1], newRun)
   notify requester 'restore_answered'
 ```
