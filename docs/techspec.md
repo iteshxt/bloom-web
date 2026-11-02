@@ -132,7 +132,8 @@ On the Hobby plan, Vercel Cron only allows schedules that run at most **once per
 /supabase
   /migrations/0001_init.sql
   /migrations/0002_rls.sql
-  /migrations/0003_cron.sql
+  /migrations/0003_cron.sql      # applied only after the first Vercel deploy
+  /migrations/0004_advisor_fixes.sql
   seed.sql                       # badges catalogue etc.
 /tests
   /engine/*.test.ts
@@ -240,11 +241,12 @@ create table profiles (
   created_at           timestamptz not null default now()
 );
 
--- Enforce max 2 players per pair
-create function enforce_pair_size() returns trigger language plpgsql as $$
+-- Enforce max 2 players per pair (search_path pinned in 0004)
+create function enforce_pair_size() returns trigger
+language plpgsql set search_path = '' as $$
 begin
   if new.pair_id is not null and
-     (select count(*) from profiles where pair_id = new.pair_id and id <> new.id) >= 2 then
+     (select count(*) from public.profiles where pair_id = new.pair_id and id <> new.id) >= 2 then
     raise exception 'pair is full';
   end if;
   return new;
@@ -447,7 +449,7 @@ create table sync_state (
 );
 ```
 
-### 6.1 Row Level Security (`0002_rls.sql`)
+### 6.1 Row Level Security (`0002_rls.sql`, tuned in `0004_advisor_fixes.sql`)
 The client is **read-only**. All writes use the secret key in route handlers.
 
 ```sql
@@ -455,27 +457,32 @@ create function public.my_pair_id() returns uuid
 language sql stable security definer set search_path = public as $$
   select pair_id from profiles where id = auth.uid()
 $$;
+-- Only signed-in users need it (every policy calls it); signed-out callers don't.
+revoke execute on function public.my_pair_id() from public, anon;
 
 -- Enable RLS on every table
 alter table pairs enable row level security;
 alter table profiles enable row level security;
 -- … repeat for all tables …
 
-create policy "read own pair"    on pairs    for select using (id = my_pair_id());
-create policy "read pair members" on profiles for select using (id = auth.uid() or pair_id = my_pair_id());
+-- Wrap auth.uid() / my_pair_id() in (select …) so Postgres evaluates them
+-- once per statement, not once per row.
+create policy "read own pair"     on pairs    for select to authenticated using (id = (select my_pair_id()));
+create policy "read pair members" on profiles for select to authenticated
+  using (id = (select auth.uid()) or pair_id = (select my_pair_id()));
 
 -- Generic pattern for pair-scoped tables:
-create policy "read pair rows" on days              for select using (pair_id = my_pair_id());
-create policy "read pair rows" on runs              for select using (pair_id = my_pair_id());
-create policy "read pair rows" on submissions       for select using (pair_id = my_pair_id());
-create policy "read pair rows" on daily_targets     for select using (pair_id = my_pair_id());
-create policy "read pair rows" on restore_requests  for select using (pair_id = my_pair_id());
-create policy "read pair rows" on milestone_achievements for select using (pair_id = my_pair_id());
-create policy "read pair rows" on xp_events         for select using (pair_id = my_pair_id());
-create policy "read pair rows" on badges_earned     for select using (pair_id = my_pair_id());
-create policy "read pair rows" on nudges            for select using (pair_id = my_pair_id());
-create policy "read pair rows" on activity          for select using (pair_id = my_pair_id());
-create policy "read problems"  on problems          for select using (auth.role() = 'authenticated');
+create policy "read pair rows" on days              for select to authenticated using (pair_id = (select my_pair_id()));
+create policy "read pair rows" on runs              for select to authenticated using (pair_id = (select my_pair_id()));
+create policy "read pair rows" on submissions       for select to authenticated using (pair_id = (select my_pair_id()));
+create policy "read pair rows" on daily_targets     for select to authenticated using (pair_id = (select my_pair_id()));
+create policy "read pair rows" on restore_requests  for select to authenticated using (pair_id = (select my_pair_id()));
+create policy "read pair rows" on milestone_achievements for select to authenticated using (pair_id = (select my_pair_id()));
+create policy "read pair rows" on xp_events         for select to authenticated using (pair_id = (select my_pair_id()));
+create policy "read pair rows" on badges_earned     for select to authenticated using (pair_id = (select my_pair_id()));
+create policy "read pair rows" on nudges            for select to authenticated using (pair_id = (select my_pair_id()));
+create policy "read pair rows" on activity          for select to authenticated using (pair_id = (select my_pair_id()));
+create policy "read problems"  on problems          for select to authenticated using (true);
 
 -- Gifts: NO client policy. RLS is enabled on `gifts`, but no select policy exists,
 -- so the client can never read a gift's title/details before it's revealed.
@@ -491,6 +498,15 @@ Theme, sounds, haptics and the reduced-motion override (design.md §11.14) are p
 ### 6.2 Realtime
 Add to the `supabase_realtime` publication: `days`, `runs`, `restore_requests`, `activity`, `profiles`, `daily_targets`, `badges_earned`.
 The client subscribes once per session with the filter `pair_id=eq.<pairId>` on each table and invalidates the matching TanStack Query keys.
+
+### 6.4 Indexes and advisor notes (`0004_advisor_fixes.sql`)
+`0004` adds a `pair_id` index to every pair-scoped table that RLS and realtime filter on (`daily_targets`, `days`, `runs`, `submissions`, `restore_requests`, `milestone_achievements`, `xp_events`, `badges_earned`, `nudges`, `gifts`), plus `player_id` on `push_subscriptions` and `notification_log`.
+
+Advisor findings we accept on purpose:
+- **RLS enabled, no policy** on `gifts`, `push_subscriptions`, `notification_log`, `sync_state`: these are server-only (§6.1).
+- **Signed-in users can execute `my_pair_id()`** (SECURITY DEFINER): every policy calls it, so `authenticated` needs EXECUTE. Through `/rest/v1/rpc/my_pair_id` it only returns the caller's own `pair_id`, which they can already read from `profiles`.
+- **Unindexed foreign keys** on reference-only columns (`activity.actor_id`, `daily_targets.set_by`, `days.run_id`, `gifts.giver_id`, `milestone_achievements.run_id`, `nudges.from_id`/`to_id`, `restore_requests.approver_id`/`run_id`, `submissions.title_slug`): nothing looks rows up by them, and their parent rows are effectively never deleted. Two players produce at most a few thousand rows.
+- **Unused index**: expected while the database is empty.
 
 ---
 
@@ -962,7 +978,7 @@ Install on Android and iPhone; push works on both; a real LeetCode solve appears
 
 1. **Supabase**
    1. Create a project (Free, region Mumbai / ap-south-1).
-   2. Connect the Supabase MCP server to the project and apply migrations `0001`–`0003` with its `apply_migration` tool (no local database or Docker).
+   2. Connect the Supabase MCP server to the project and apply migrations `0001`, `0002` and `0004` with its `apply_migration` tool (no local database or Docker). Apply `0003` only once the app is deployed, because the cron job needs the app URL.
    3. Auth → Providers: Google enabled with the Google Cloud OAuth client (section 13); Email provider disabled. Auth → URL configuration: Site URL and redirect URLs (section 13).
    4. Vault: create `cron_secret` and `app_url` (section 9.1).
    5. Database → Publications: add the realtime tables (section 6.2).
