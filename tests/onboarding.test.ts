@@ -113,3 +113,19 @@ describe("onboarding input", () => {
     expect(ok("3 Nov")).toBe(false);
   });
 });
+
+describe("pairing errors", () => {
+  it("recognise the colour clash and a full pair", async () => {
+    const { isUniqueViolation, isPairFull } = await import("@/lib/pair/errors");
+    const clash = {
+      code: "23505",
+      message:
+        'duplicate key value violates unique constraint "one_color_per_pair"',
+    };
+    expect(isUniqueViolation(clash, "one_color_per_pair")).toBe(true);
+    expect(isUniqueViolation(clash, "pairs_invite_code_key")).toBe(false);
+    expect(isUniqueViolation({ code: "23503" })).toBe(false);
+    expect(isPairFull({ code: "P0001", message: "pair is full" })).toBe(true);
+    expect(isPairFull(null)).toBe(false);
+  });
+});
