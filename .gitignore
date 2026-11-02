@@ -25,3 +25,6 @@ supabase/.branches/
 .DS_Store
 *.pem
 *.log
+
+# personal Claude Code settings
+.claude/settings.local.json
