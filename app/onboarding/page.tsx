@@ -45,6 +45,7 @@ export default function OnboardingPage() {
     code: string;
     startDate: string;
   } | null>(null);
+  const [paired, setPaired] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const checkTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -68,9 +69,13 @@ export default function OnboardingPage() {
       setName(profile.display_name);
       setCompanion(profile.avatar_key as Companion);
       setColor(profile.color as PlayerColor);
+      // Already paired and linked: nothing left to set up.
+      if (profile.pair_id && profile.leetcode_username)
+        return router.replace("/");
+      setPaired(Boolean(profile.pair_id));
       setStep(profile.leetcode_username ? "pair" : "leetcode");
     })();
-  }, []);
+  }, [router]);
 
   async function run(action: () => Promise<void>) {
     setBusy(true);
@@ -218,6 +223,8 @@ export default function OnboardingPage() {
                 body: { username: lcName },
               });
               if (!res.ok) return setError(res.message);
+              // Someone who paired before linking LeetCode is done here.
+              if (paired) return router.push("/");
               setStep("pair");
             });
           }}
@@ -296,6 +303,9 @@ export default function OnboardingPage() {
                   const res = await api<{
                     pair: { inviteCode: string; startDate: string };
                   }>("/api/pair/create", { body: { startDate } });
+                  // A repeated submit: the pair exists and home shows its code.
+                  if (!res.ok && res.code === "already_paired")
+                    return router.push("/");
                   if (!res.ok) return setError(res.message);
                   setInvite({
                     code: res.data.pair.inviteCode,
@@ -333,6 +343,8 @@ export default function OnboardingPage() {
                   const res = await api("/api/pair/join", {
                     body: { code: joinCode },
                   });
+                  if (!res.ok && res.code === "already_paired")
+                    return router.push("/");
                   if (!res.ok) {
                     setColorClash(res.code === "color_taken");
                     return setError(res.message);
