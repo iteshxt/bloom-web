@@ -138,7 +138,7 @@ On the Hobby plan, Vercel Cron only allows schedules that run at most **once per
   seed.sql                       # badges catalogue etc.
 /tests
   /engine/*.test.ts
-middleware.ts                    # Supabase session refresh (named proxy.ts in Next.js 16+)
+proxy.ts                         # Supabase session refresh + page routing (Next.js 16's name for middleware)
 vercel.json
 ```
 
@@ -818,9 +818,9 @@ Errors use the shape `{ error: { code, message } }` with an HTTP status of 400, 
 | `GET /auth/callback` | — | OAuth return: exchanges the code for a session, enforces `ALLOWED_EMAILS`, redirects (section 13) |
 | `POST /api/onboarding/profile` | `{ displayName, avatarKey, color }` | Creates or updates the profile. Rejects emails not in `ALLOWED_EMAILS`. |
 | `GET /api/leetcode/validate?username=` | — | Runs Q_USER; returns `{ exists, avatar, solved }` |
-| `POST /api/leetcode/link` | `{ username }` | Validates, saves, sets `leetcode_verified_at`, and runs an initial sync (pre-season) |
-| `POST /api/pair/create` | `{ startDate }` | Creates a pair with a 6-character code (no ambiguous characters); joins the creator |
-| `POST /api/pair/join` | `{ code }` | Joins; 409 `pair_full` if the pair is full, 409 `color_taken` if the partner already has my colour (UI asks me to pick another) |
+| `POST /api/leetcode/link` | `{ username }` | Checks the account exists (404 `leetcode_not_found`), saves LeetCode's spelling, sets `leetcode_verified_at`; if already in a pair, runs one tick after the response (`after()`) so pre-season solves appear at once |
+| `POST /api/pair/create` | `{ startDate }` | `startDate` from today (IST) to +90 days. Creates a pair with a 6-character code (no ambiguous characters, retried on a clash) and joins the creator; 409 `already_paired`. Runs one tick after the response |
+| `POST /api/pair/join` | `{ code }` | Joins; 404 `pair_not_found`, 409 `pair_full` if the pair is full, 409 `color_taken` if the partner already has my colour (UI asks me to pick another). Runs one tick after the response |
 | `PATCH /api/pair` | `{ startDate? , addMilestone?, makeupEnabled? }` | startDate only before the start; milestones can only be added |
 | `POST /api/sync` | — | On-demand sync of my account (60 s rate limit) plus finalizing overdue days |
 | `POST /api/restore/request` | `{ message? }` | Section 7.6 |
@@ -934,6 +934,7 @@ In `app/layout.tsx` metadata: `appleWebApp: { capable: true, title: 'Bloom', sta
   - `app/auth/callback/route.ts` exchanges the code with `supabase.auth.exchangeCodeForSession(code)`, then checks the email against `ALLOWED_EMAILS`. Not allowed → sign out and redirect to `/login?error=not_allowed`. Allowed → redirect to `/onboarding` if there's no profile in a pair yet, otherwise `/`.
   - One-time setup: a Google Cloud project with an OAuth consent screen (External, both Gmail addresses added as test users) and a **Web** OAuth client whose authorized redirect URI is `https://<project-ref>.supabase.co/auth/v1/callback`. Paste its client ID and secret into Supabase → Auth → Providers → Google. In Supabase → Auth → URL configuration, set the Site URL to `APP_URL` and allow `http://localhost:3000/auth/callback` and `<APP_URL>/auth/callback` as redirect URLs.
 - Sessions are kept by `@supabase/ssr` cookies, refreshed in `proxy.ts`. In practice users stay signed in for months.
+- **Page routing (`proxy.ts`):** signed out → `/login`; signed in but not onboarded (no pair or no LeetCode username) → `/onboarding`; onboarded → the app (`/login` and `/onboarding` redirect to `/`). `/api/*` and `/auth/*` are never redirected: API routes answer 401/403 themselves.
 - **Allowlist:** `ALLOWED_EMAILS` is checked in `/auth/callback` and again in `/api/onboarding/profile`. Every other `/api` route requires an existing profile in a pair. Optionally, turn off new signups in Supabase after both accounts exist.
 
 ---
