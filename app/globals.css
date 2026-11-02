@@ -1,26 +1,151 @@
 @import "tailwindcss";
 
+/* Design tokens: design.md §3 and §16.1. Components use the Tailwind
+   utilities below, never raw hex. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --cloud: #f6f4fc;
+  --surface: #ffffff;
+  --glass: rgba(255, 255, 255, 0.72);
+  --ink: #2e2547;
+  --ink-2: #6e6589;
+  --ink-3: #a39bb8;
+  --line: rgba(46, 37, 71, 0.08);
+
+  --blush: #f7a8c8;
+  --blush-deep: #a8346c;
+  --blush-soft: #fdeef4;
+  --sky: #8ed3ea;
+  --sky-deep: #1c6e8f;
+  --sky-soft: #eaf7fb;
+  --lilac: #cdb8f5;
+  --lilac-deep: #5e44b0;
+  --lilac-soft: #f3eefd;
+  --peach: #ffb991;
+  --peach-deep: #a24a1f;
+  --peach-soft: #fff1e8;
+  --butter: #ffe18f;
+  --butter-deep: #7a5800;
+  --butter-soft: #fff8e1;
+  --mint: #aee8c6;
+  --mint-deep: #1f6e46;
+  --mint-soft: #edf9f2;
+  --frost: #c9d7ff;
+  --frost-deep: #3a4f9e;
+  --frost-soft: #eef2ff;
+  --leaf: #9ed9a9;
+  --leaf-deep: #3e8a55;
+
+  --r-tile: 8px;
+  --r-sm: 14px;
+  --r-md: 20px;
+  --r-lg: 28px;
+  --r-xl: 36px;
+
+  --shadow-soft: 0 12px 32px -16px rgba(46, 37, 71, 0.18);
+  --shadow-float: 0 20px 40px -18px rgba(46, 37, 71, 0.25);
+  --player-glow: 0.55;
+
+  /* Default player scope until an element sets data-player-color */
+  --p: var(--blush);
+  --p-deep: var(--blush-deep);
+  --p-soft: var(--blush-soft);
+  --p-rgb: 247 168 200;
 }
 
+:root[data-theme="night"] {
+  --cloud: #1d1836;
+  --surface: #2a2350;
+  --glass: rgba(42, 35, 80, 0.7);
+  --ink: #f4f0ff;
+  --ink-2: #bdb4da;
+  --ink-3: #837aa3;
+  --line: rgba(255, 255, 255, 0.08);
+  --shadow-soft: 0 12px 32px -16px rgba(0, 0, 0, 0.35);
+  --shadow-float: 0 20px 40px -18px rgba(0, 0, 0, 0.45);
+  --player-glow: 1;
+}
+
+/* Player scope: set on any element that belongs to a player */
+[data-player-color="blush"] {
+  --p: var(--blush);
+  --p-deep: var(--blush-deep);
+  --p-soft: var(--blush-soft);
+  --p-rgb: 247 168 200;
+}
+[data-player-color="sky"] {
+  --p: var(--sky);
+  --p-deep: var(--sky-deep);
+  --p-soft: var(--sky-soft);
+  --p-rgb: 142 211 234;
+}
+[data-player-color="lilac"] {
+  --p: var(--lilac);
+  --p-deep: var(--lilac-deep);
+  --p-soft: var(--lilac-soft);
+  --p-rgb: 205 184 245;
+}
+
+/* Tailwind theme (design.md §16.2). Defaults are cleared so only Bloom
+   tokens exist as utilities. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-*: initial;
+  --color-cloud: var(--cloud);
+  --color-surface: var(--surface);
+  --color-glass: var(--glass);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-p: var(--p);
+  --color-p-deep: var(--p-deep);
+  --color-p-soft: var(--p-soft);
+
+  --color-blush: var(--blush);
+  --color-blush-deep: var(--blush-deep);
+  --color-blush-soft: var(--blush-soft);
+  --color-sky: var(--sky);
+  --color-sky-deep: var(--sky-deep);
+  --color-sky-soft: var(--sky-soft);
+  --color-lilac: var(--lilac);
+  --color-lilac-deep: var(--lilac-deep);
+  --color-lilac-soft: var(--lilac-soft);
+  --color-peach: var(--peach);
+  --color-peach-deep: var(--peach-deep);
+  --color-peach-soft: var(--peach-soft);
+  --color-butter: var(--butter);
+  --color-butter-deep: var(--butter-deep);
+  --color-butter-soft: var(--butter-soft);
+  --color-mint: var(--mint);
+  --color-mint-deep: var(--mint-deep);
+  --color-mint-soft: var(--mint-soft);
+  --color-frost: var(--frost);
+  --color-frost-deep: var(--frost-deep);
+  --color-frost-soft: var(--frost-soft);
+  --color-leaf: var(--leaf);
+  --color-leaf-deep: var(--leaf-deep);
+
+  --radius-*: initial;
+  --radius-tile: var(--r-tile);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+  --radius-pill: 999px;
+
+  --shadow-*: initial;
+  --shadow-soft: var(--shadow-soft);
+  --shadow-float: var(--shadow-float);
+  --shadow-player: 0 14px 30px -14px
+    rgb(var(--p-rgb) / calc(0.55 * var(--player-glow)));
+  --shadow-glow-mint: 0 0 0 6px rgba(174, 232, 198, 0.45);
+  --shadow-glow-frost: 0 0 0 6px rgba(201, 215, 255, 0.55);
+
+  --font-display: var(--font-baloo);
+  --font-sans: var(--font-figtree);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--cloud);
+  color: var(--ink);
 }
