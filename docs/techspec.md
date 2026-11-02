@@ -21,7 +21,7 @@
  └───────┬──────────────────────────────▲─────────────────┘
          │ HTTPS (actions)              │ Web Push
          ▼                              │
- ┌──────────────── Vercel (region bom1) ┴─────────────────┐
+ ┌──────────────── Vercel (region hnd1) ┴─────────────────┐
  │  Next.js route handlers (/api/*)                       │
  │   • game actions (restore, target, gifts, nudge…)      │
  │   • /api/cron/tick  ← the heartbeat                    │
@@ -30,7 +30,7 @@
  └───────┬───────────────────────────────┬────────────────┘
          │ supabase-js (secret key)      │ POST graphql
          ▼                               ▼
- ┌──── Supabase (ap-south-1) ────┐   ┌── leetcode.com ──┐
+ ┌─ Supabase (ap-northeast-1) ───┐   ┌── leetcode.com ──┐
  │ Postgres + RLS                │   │ /graphql (public, │
  │ Auth (Google sign-in)         │   │  unofficial)      │
  │ Realtime                      │   └───────────────────┘
@@ -65,7 +65,7 @@ On the Hobby plan, Vercel Cron only allows schedules that run at most **once per
 | Styling | **Tailwind CSS** | Design tokens defined in design.md. |
 | Animation | **Motion** (`motion`, formerly Framer Motion) + `canvas-confetti` | Final animation library choices are confirmed in design.md (Lottie or Rive optional). |
 | Data fetching | **TanStack Query** + Supabase Realtime for cache invalidation | |
-| DB / Auth / Realtime | **Supabase** (`@supabase/supabase-js`, `@supabase/ssr`) | Region ap-south-1 (Mumbai). |
+| DB / Auth / Realtime | **Supabase** (`@supabase/supabase-js`, `@supabase/ssr`) | Region ap-northeast-1 (Tokyo). Vercel functions run in `hnd1` (Tokyo) so every server→database query stays local; phones in India pay about 100 ms once per request instead of on every query. |
 | Scheduler | Supabase **pg_cron + pg_net**; Vercel Cron as a daily backup | |
 | Push | **Web Push** with VAPID via the `web-push` npm package | No Firebase needed. |
 | PWA | `app/manifest.ts` + hand-written `public/sw.js` | No PWA plugin needed for our needs. |
@@ -754,7 +754,7 @@ select cron.schedule(
 ### 9.2 Vercel backup cron (`vercel.json`)
 ```json
 {
-  "regions": ["bom1"],
+  "regions": ["hnd1"],
   "crons": [{ "path": "/api/cron/tick", "schedule": "30 20 * * *" }]
 }
 ```
@@ -977,7 +977,7 @@ Install on Android and iPhone; push works on both; a real LeetCode solve appears
 ## 15. Setup and deployment
 
 1. **Supabase**
-   1. Create a project (Free, region Mumbai / ap-south-1).
+   1. Create a project (Free). Bloom's project is in Tokyo (ap-northeast-1), so Vercel uses `hnd1`; keep the two regions together.
    2. Connect the Supabase MCP server to the project and apply migrations `0001`, `0002` and `0004` with its `apply_migration` tool (no local database or Docker). Apply `0003` only once the app is deployed, because the cron job needs the app URL.
    3. Auth → Providers: Google enabled with the Google Cloud OAuth client (section 13); Email provider disabled. Auth → URL configuration: Site URL and redirect URLs (section 13).
    4. Vault: create `cron_secret` and `app_url` (section 9.1).

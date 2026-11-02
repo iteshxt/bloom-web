@@ -14,7 +14,7 @@ Read the relevant one before changing behavior, data or UI. **Don't invent rules
 If the docs disagree: **prd §4 > techspec > design** for behavior; **design** wins for anything visual or copy. If you change behavior, update the doc in the same change.
 
 ## Stack
-Next.js (App Router, TypeScript strict) · Tailwind · Motion (`motion`) · TanStack Query · Supabase (Postgres, Auth with Google sign-in, Realtime, pg_cron + pg_net) · `web-push` (VAPID) · Zod · Vitest · hosted on Vercel Hobby (region `bom1`). Everything must stay on free tiers.
+Next.js (App Router, TypeScript strict) · Tailwind · Motion (`motion`) · TanStack Query · Supabase (Postgres, Auth with Google sign-in, Realtime, pg_cron + pg_net) · `web-push` (VAPID) · Zod · Vitest · hosted on Vercel Hobby (region `hnd1`, Tokyo, next to the Supabase project in `ap-northeast-1`). Everything must stay on free tiers.
 
 ## Commands
 ```bash
