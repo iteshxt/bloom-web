@@ -14,6 +14,7 @@ let lastIndex = 0;
 function tabIndex(path: string): number {
   if (path.startsWith("/milestones")) return 1;
   if (path.startsWith("/gifts")) return 2;
+  if (path.startsWith("/badges")) return 3;
   if (path.startsWith("/player") || path.startsWith("/settings")) return 3;
   return 0;
 }

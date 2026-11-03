@@ -26,7 +26,8 @@ const ITEMS: {
     label: "Home",
     line: "home",
     puffy: "home",
-    match: (p) => p === "/" || p.startsWith("/restores"),
+    match: (p) =>
+      p === "/" || p.startsWith("/restores") || p.startsWith("/feed"),
   },
   {
     href: "/milestones",

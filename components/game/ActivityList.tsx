@@ -58,7 +58,7 @@ export function ActivityList({
                     <span className="w-9" />
                   )}
                   <span className="flex-1 text-sm">
-                    {describe(a, who?.name ?? "Someone")}
+                    {describe(a, who?.name ?? "Someone", people)}
                   </span>
                   {xp > 0 && (
                     <span className="rounded-pill bg-butter-soft text-butter-deep shrink-0 px-2 py-0.5 text-xs font-semibold">
@@ -78,7 +78,12 @@ export function ActivityList({
   );
 }
 
-function describe(a: ActivityItem, name: string): string {
+/** One line of copy for an activity row (design §11.12). */
+export function describe(
+  a: ActivityItem,
+  name: string,
+  people: Record<string, Person> = {},
+): string {
   const p = a.payload;
   switch (a.kind) {
     case "solve":
@@ -113,6 +118,8 @@ function describe(a: ActivityItem, name: string): string {
       return `${name} moved day 1`;
     case "target_changed":
       return `${name} set a new daily target: ${p.target}`;
+    case "nudge":
+      return `${name} nudged ${people[String(p.toId)]?.name ?? "their partner"}: “${p.message}”`;
     case "gift_wrapped":
       return `${name} wrapped a ${p.milestone}-day gift`;
     case "gift_revealed":

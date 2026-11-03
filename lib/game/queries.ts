@@ -168,3 +168,25 @@ export function useNudgesLeft(playerId: string | null) {
     },
   });
 }
+
+/** The pair's activity timeline, newest first (PRD 5.14). */
+export function useActivityFeed() {
+  return useQuery({
+    queryKey: ["feed"],
+    queryFn: async () => {
+      const { data, error } = await createClient()
+        .from("activity")
+        .select("id, actor_id, kind, payload, created_at")
+        .order("created_at", { ascending: false })
+        .limit(150);
+      if (error) throw error;
+      return (data ?? []).map((a) => ({
+        id: a.id,
+        actorId: a.actor_id,
+        kind: a.kind,
+        payload: (a.payload ?? {}) as Record<string, unknown>,
+        createdAt: a.created_at,
+      }));
+    },
+  });
+}

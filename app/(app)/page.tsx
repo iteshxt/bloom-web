@@ -31,6 +31,7 @@ import {
 } from "@/lib/game/queries";
 import type { Snapshot } from "@/lib/moments";
 import { todayIST } from "@/lib/time";
+import { useFeedSeen } from "@/lib/feedSeen";
 import { useMoments } from "@/lib/useMoments";
 
 // The duel dashboard (PRD 5.2, design §11.3): your island and your
@@ -52,6 +53,7 @@ export default function HomePage() {
   );
   const moments = useMoments(data?.me.id ?? null, snapshot);
   const [nudging, setNudging] = useState(false);
+  const feedSeen = useFeedSeen(data?.me.id ?? null);
 
   // Cached data (e.g. offline) beats an error screen; only show the error
   // when there's nothing to show.
@@ -128,6 +130,10 @@ export default function HomePage() {
   }
 
   const celebrating = moments.queue[0]?.kind === "day";
+  // The bell's dot: something from my partner I haven't seen in the feed.
+  const unread = data.activity.some(
+    (a) => a.actorId !== data.me.id && a.id > feedSeen,
+  );
 
   return (
     <main data-player-color={me.color} className="flex flex-1 flex-col">
@@ -157,11 +163,14 @@ export default function HomePage() {
           <div className="flex items-center gap-2">
             <CountdownPill me={me} />
             <Link
-              href="/settings"
-              aria-label="Notification settings"
-              className="bg-surface text-ink shadow-soft rounded-pill inline-flex h-11 w-11 items-center justify-center"
+              href="/feed"
+              aria-label={unread ? "Activity, something new" : "Activity"}
+              className="bg-surface text-ink shadow-soft rounded-pill relative inline-flex h-11 w-11 items-center justify-center"
             >
               <LineIcon name="bell" />
+              {unread && (
+                <span className="bg-peach ring-surface rounded-pill absolute top-2 right-2 h-2.5 w-2.5 ring-2" />
+              )}
             </Link>
           </div>
         </header>
