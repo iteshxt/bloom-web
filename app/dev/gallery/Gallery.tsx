@@ -291,7 +291,7 @@ export function Gallery() {
             2 left
           </Chip>
         </div>
-        <div className="flex gap-2 overflow-x-auto">
+        <div className="no-scrollbar flex gap-2 overflow-x-auto">
           <StatChip icon="hourglass" value="23" label="day streak" />
           <StatChip icon="crown" value="6" label="level" />
         </div>

@@ -60,7 +60,7 @@ export default function MilestonesPage() {
       color={me.color}
       skyClassName="pb-12"
       sky={
-        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+        <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
           <StatChip icon="bloom" value={myStreak} label="day streak" />
           <StatChip
             icon="gift"

@@ -90,3 +90,61 @@ export function useTargetHistory(playerId: string) {
     },
   });
 }
+
+export interface HistorySolve {
+  slug: string;
+  title: string;
+  difficulty: string | null;
+  topics: string[];
+  day: string;
+  submittedAt: string;
+  counted: boolean;
+  xp: number;
+}
+
+/** Everything a profile's heatmap and stats need (PRD 5.4): every day row,
+ *  every stored solve with its problem, and every run's length. */
+export function usePlayerHistory(playerId: string) {
+  return useQuery({
+    queryKey: ["history", playerId],
+    enabled: playerId !== "",
+    queryFn: async () => {
+      const supabase = createClient();
+      const [days, subs, runs] = await Promise.all([
+        supabase
+          .from("days")
+          .select("day, status, solved_count, target, makeup_required")
+          .eq("player_id", playerId),
+        supabase
+          .from("submissions")
+          .select(
+            "title_slug, assigned_day, submitted_at, counted, xp, problems(title, difficulty, topic_tags)",
+          )
+          .eq("player_id", playerId)
+          .order("submitted_at", { ascending: true }),
+        supabase.from("runs").select("length").eq("player_id", playerId),
+      ]);
+      for (const r of [days, subs, runs]) if (r.error) throw r.error;
+      return {
+        rows: (days.data ?? []).map((d) => ({
+          day: d.day,
+          status: d.status,
+          solved: d.solved_count,
+          target: d.target,
+          makeup: d.makeup_required,
+        })),
+        solves: (subs.data ?? []).map((s): HistorySolve => ({
+          slug: s.title_slug,
+          title: s.problems?.title ?? s.title_slug,
+          difficulty: s.problems?.difficulty ?? null,
+          topics: s.problems?.topic_tags ?? [],
+          day: s.assigned_day,
+          submittedAt: s.submitted_at,
+          counted: s.counted,
+          xp: s.xp,
+        })),
+        runLengths: (runs.data ?? []).map((r) => r.length),
+      };
+    },
+  });
+}

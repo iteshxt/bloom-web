@@ -265,6 +265,15 @@ body {
   );
 }
 
+/* Sideways scrollers (chip rows, carousels, the heatmap) scroll by touch
+   without a bar. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Text drawn straight on the sky: plum by day, white under dark skies. */
 .sky-ink {
   color: var(--plum);

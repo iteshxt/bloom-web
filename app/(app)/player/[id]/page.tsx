@@ -11,7 +11,7 @@ import { LineIcon } from "@/components/icons/line";
 import { PuffyIcon } from "@/components/icons/puffy";
 import { Island } from "@/components/sky/Island";
 import { Button } from "@/components/ui/Button";
-import { StatChip } from "@/components/ui/Chip";
+import { ProfileHistory } from "@/components/game/ProfileHistory";
 import { PageShell, SectionTitle } from "@/components/ui/PageShell";
 import { ProgressBar, Skeleton } from "@/components/ui/Progress";
 import { api } from "@/lib/api/client";
@@ -133,20 +133,19 @@ function PlayerProfile() {
         </>
       }
     >
-      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
-        <StatChip
-          icon="bloom"
-          value={view.streak}
-          label={view.onIce ? "on ice" : "day streak"}
-        />
-        <StatChip icon="sprout" value={growth.label} label="flower stage" />
-        <StatChip icon="star" value={player.xpTotal} label="total XP" />
-      </div>
+      <ProfileHistory
+        playerId={player.id}
+        name={player.name}
+        color={player.color}
+        streak={view.streak}
+        today={today}
+        startDate={duel.data.pair.startDate}
+      />
 
       <section className="bg-surface shadow-soft flex flex-col gap-3 rounded-lg p-5">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-lg font-semibold">
-            Level {player.level}
+            Level {player.level} · {growth.label}
           </h2>
           <span className="text-butter-ink tabular text-sm font-semibold">
             {view.xpIntoLevel} / {view.xpLevelSpan} XP

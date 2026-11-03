@@ -44,7 +44,7 @@ export function CompanionPicker({
         <legend className="mb-2 text-sm font-semibold">Companion</legend>
         <div
           ref={row}
-          className="relative -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-4 pt-1 pb-3"
+          className="no-scrollbar relative -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-4 pt-1 pb-3"
         >
           {COMPANIONS.map((c) => (
             <label

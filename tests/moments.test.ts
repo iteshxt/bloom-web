@@ -25,13 +25,19 @@ describe("signature moments (design §12.4)", () => {
     const seen = baseline(snap());
     const first = detectMoments(seen, snap({ doneToday: true, streak: 5 }));
     expect(first.moments).toEqual([{ kind: "day", streak: 5 }]);
-    const again = detectMoments(first.seen, snap({ doneToday: true, streak: 5 }));
+    const again = detectMoments(
+      first.seen,
+      snap({ doneToday: true, streak: 5 }),
+    );
     expect(again.moments).toEqual([]);
   });
 
   it("draws the rainbow when both are done", () => {
     const seen = baseline(snap({ doneToday: true }));
-    const r = detectMoments(seen, snap({ doneToday: true, bothDoneToday: true }));
+    const r = detectMoments(
+      seen,
+      snap({ doneToday: true, bothDoneToday: true }),
+    );
     expect(r.moments).toEqual([{ kind: "rainbow" }]);
   });
 
@@ -39,7 +45,12 @@ describe("signature moments (design §12.4)", () => {
     const seen = baseline(snap({ milestonesReached: [15] }));
     const r = detectMoments(
       seen,
-      snap({ doneToday: true, streak: 30, milestonesReached: [30, 15], level: 3 }),
+      snap({
+        doneToday: true,
+        streak: 30,
+        milestonesReached: [30, 15],
+        level: 3,
+      }),
     );
     expect(r.moments).toEqual([
       { kind: "day", streak: 30 },
@@ -52,7 +63,9 @@ describe("signature moments (design §12.4)", () => {
     const seen = baseline(snap());
     const r = detectMoments(seen, snap({ onIceDay: "2026-11-09" }));
     expect(r.moments).toEqual([{ kind: "ice", day: "2026-11-09" }]);
-    expect(detectMoments(r.seen, snap({ onIceDay: "2026-11-09" })).moments).toEqual([]);
+    expect(
+      detectMoments(r.seen, snap({ onIceDay: "2026-11-09" })).moments,
+    ).toEqual([]);
   });
 
   it("plays a restore answer first: thaw on approve, shatter otherwise", () => {
