@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { Bloom } from "@/components/bloom/Bloom";
+import { MomentHost } from "@/components/moments/Moments";
+import { Unboxing } from "@/components/moments/Unboxing";
+import { enqueueMoments, useMoments } from "@/lib/useMoments";
 import { Companion, type Mood } from "@/components/companions/Companion";
 import { LineIcon } from "@/components/icons/line";
 import { PuffyIcon, type PuffyName } from "@/components/icons/puffy";
@@ -59,12 +62,73 @@ const PUFFY: PuffyName[] = [
 
 export function Gallery() {
   const [sheet, setSheet] = useState(false);
+  const [unbox, setUnbox] = useState(false);
+  const moments = useMoments(null, null);
   return (
     <main
       data-player-color="blush"
       className="mx-auto flex w-full max-w-[430px] flex-col gap-8 px-4 py-8"
     >
       <Wordmark />
+
+      <MomentHost
+        queue={moments.queue}
+        onDone={moments.next}
+        cast={{
+          name: "Asha",
+          kind: "mochi",
+          color: "blush",
+          streak: 23,
+          tokensMax: 3,
+          partnerName: "Riya",
+        }}
+      />
+      <section className="flex flex-col gap-3">
+        <h2 className="font-display text-[22px] font-bold">Moments</h2>
+        <div className="flex flex-wrap gap-2">
+          {(
+            [
+              ["Day complete", { kind: "day", streak: 24 }],
+              ["Both done", { kind: "rainbow" }],
+              ["On ice", { kind: "ice", day: "2026-11-01" }],
+              ["Thaw", { kind: "thaw", day: "2026-11-01" }],
+              ["Shatter", { kind: "shatter", day: "2026-11-01", streak: 23 }],
+              ["Milestone", { kind: "milestone", milestone: 30 }],
+              ["Level up", { kind: "level", level: 7 }],
+            ] as const
+          ).map(([label, m]) => (
+            <Button
+              key={label}
+              variant="secondary"
+              className="h-11! text-sm"
+              onClick={() => enqueueMoments([m])}
+            >
+              {label}
+            </Button>
+          ))}
+          <Button
+            variant="secondary"
+            className="h-11! text-sm"
+            onClick={() => setUnbox(true)}
+          >
+            Unboxing
+          </Button>
+        </div>
+        {unbox && (
+          <Unboxing
+            milestone={30}
+            partnerName="Riya"
+            color="blush"
+            reveal={async () => ({
+              title: "A cozy weekend away",
+              details: "Pack light. Bring the board games.",
+              linkUrl: null,
+            })}
+            onReceived={async () => undefined}
+            onClose={() => setUnbox(false)}
+          />
+        )}
+      </section>
 
       <section className="flex flex-col gap-4">
         <h2 className="font-display text-[22px] font-bold">Companions</h2>

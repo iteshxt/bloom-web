@@ -2,6 +2,7 @@ import { Bloom } from "@/components/bloom/Bloom";
 import { Companion } from "@/components/companions/Companion";
 import { sparklePath } from "@/components/icons/geometry";
 import { PuffyIcon } from "@/components/icons/puffy";
+import { RollingNumber } from "@/components/moments/MomentOverlay";
 import { ProgressBar } from "@/components/ui/Progress";
 import { growthFor } from "@/lib/bloom";
 import type { CompanionMood, PlayerView } from "@/lib/dashboard/derive";
@@ -52,8 +53,8 @@ export function PlayerCard({
         {player.name}
       </p>
       <div>
-        <p className="font-display tabular text-[48px] leading-none font-extrabold">
-          {player.streak}
+        <p className="font-display text-[48px] leading-none font-extrabold">
+          <RollingNumber value={player.streak} />
         </p>
         <p
           className={`text-sm ${player.onIce ? "text-frost-deep font-semibold" : "text-ink-2"}`}

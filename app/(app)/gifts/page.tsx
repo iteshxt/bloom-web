@@ -2,9 +2,10 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { Companion } from "@/components/companions/Companion";
 import { GiftShelf } from "@/components/game/GiftShelf";
+import { Unboxing, type Revealed } from "@/components/moments/Unboxing";
 import { LineIcon } from "@/components/icons/line";
 import { PuffyIcon } from "@/components/icons/puffy";
 import { Button } from "@/components/ui/Button";
@@ -33,6 +34,7 @@ export default function GiftsPage() {
   const gifts = useGifts();
   const [tab, setTab] = useState<"mine" | "theirs">("mine");
   const [open, setOpen] = useState<number | null>(null);
+  const queryClient = useQueryClient();
 
   const partnerName = duel.data?.partner?.name ?? "your partner";
   if (!hydrated || !duel.data || !gifts.data) {
@@ -66,6 +68,7 @@ export default function GiftsPage() {
   const partnerKind = asKind(duel.data.partner.avatarKey);
   const partnerColor = duel.data.partner.color;
   const selected = gifts.data.receiving.find((g) => g.milestone === open);
+  const unboxing = selected?.canOpen ? selected : undefined;
 
   return (
     <PageShell
@@ -122,8 +125,34 @@ export default function GiftsPage() {
         </ul>
       )}
 
+      <AnimatePresence>
+        {unboxing?.id && (
+          <Unboxing
+            key={unboxing.id}
+            milestone={unboxing.milestone}
+            partnerName={partnerName}
+            color={duel.data.me.color}
+            reveal={async () => {
+              const res = await api<{ gift: Revealed }>(
+                `/api/gifts/${unboxing.id}/reveal`,
+                { body: {} },
+              );
+              return res.ok ? res.data.gift : null;
+            }}
+            onReceived={async () => {
+              await api(`/api/gifts/${unboxing.id}/received`, { body: {} });
+              toast("Marked as received", "check");
+            }}
+            onClose={() => {
+              setOpen(null);
+              queryClient.invalidateQueries({ queryKey: ["gifts"] });
+            }}
+          />
+        )}
+      </AnimatePresence>
+
       <Sheet
-        open={Boolean(selected)}
+        open={Boolean(selected) && !unboxing}
         onClose={() => setOpen(null)}
         title={selected ? `Your ${selected.milestone}-day gift` : ""}
         color={duel.data.me.color}

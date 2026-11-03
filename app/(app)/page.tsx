@@ -21,7 +21,15 @@ import { asKind } from "@/lib/companions";
 import { derivePlayer, moodFor, pickBanner } from "@/lib/dashboard/derive";
 import { useDuel } from "@/lib/dashboard/useDuel";
 import { useNow } from "@/lib/dashboard/useNow";
-import { useGifts } from "@/lib/game/queries";
+import { MomentHost } from "@/components/moments/Moments";
+import {
+  useAchievements,
+  useGifts,
+  useRestoreHistory,
+} from "@/lib/game/queries";
+import type { Snapshot } from "@/lib/moments";
+import { todayIST } from "@/lib/time";
+import { useMoments } from "@/lib/useMoments";
 
 // The duel dashboard (PRD 5.2, design §11.3): your island and your
 // partner's in the sky, today's quest on glass over the sky edge, then the
@@ -32,6 +40,15 @@ export default function HomePage() {
   const now = useNow();
   const { data, isPending, isError, refetch } = useDuel();
   const gifts = useGifts();
+  const restores = useRestoreHistory();
+  const achievements = useAchievements();
+  const snapshot = momentSnapshot(
+    data ?? null,
+    now,
+    restores.data,
+    achievements.data,
+  );
+  const moments = useMoments(data?.me.id ?? null, snapshot);
 
   // Cached data (e.g. offline) beats an error screen; only show the error
   // when there's nothing to show.
@@ -102,8 +119,22 @@ export default function HomePage() {
     };
   }
 
+  const celebrating = moments.queue[0]?.kind === "day";
+
   return (
     <main data-player-color={me.color} className="flex flex-1 flex-col">
+      <MomentHost
+        queue={moments.queue}
+        onDone={moments.next}
+        cast={{
+          name: me.name,
+          kind: myKind,
+          color: me.color,
+          streak: me.streak,
+          tokensMax: me.tokensMax,
+          partnerName: partner?.name ?? "your partner",
+        }}
+      />
       <ScreenSky petals={milestoneToday} className="pb-12">
         <header className="flex items-center justify-between gap-2 px-4 pt-4">
           <Link
@@ -157,6 +188,7 @@ export default function HomePage() {
 
         <div className="relative z-10 mt-4 px-4">
           <TodayQuestCard
+            celebrating={celebrating}
             me={me}
             partner={partner}
             startDate={data.pair.startDate}
@@ -221,6 +253,48 @@ export default function HomePage() {
       </div>
     </main>
   );
+}
+
+/** What the moment detector needs; null until everything has loaded, so a
+ *  half-loaded screen never records a wrong baseline. */
+function momentSnapshot(
+  data: ReturnType<typeof useDuel>["data"] | null,
+  now: Date | null,
+  restores: ReturnType<typeof useRestoreHistory>["data"],
+  achievements: ReturnType<typeof useAchievements>["data"],
+): Snapshot | null {
+  if (!data || !now || !restores || !achievements) return null;
+  const me = derivePlayer(data.me, data.pair, now);
+  const partner = data.partner
+    ? derivePlayer(data.partner, data.pair, now)
+    : null;
+  const doneToday = me.focus?.which === "today" && me.focus.done;
+  return {
+    today: todayIST(now),
+    doneToday,
+    bothDoneToday:
+      doneToday && partner?.focus?.which === "today" && partner.focus.done,
+    streak: me.streak,
+    onIceDay: me.atRiskDay,
+    level: data.me.level,
+    milestonesReached: achievements
+      .filter((a) => a.player_id === me.id)
+      .map((a) => a.milestone),
+    answered: restores
+      .filter(
+        (r) =>
+          r.playerId === me.id &&
+          (r.status === "approved" ||
+            r.status === "rejected" ||
+            r.status === "expired"),
+      )
+      .map((r) => ({
+        id: r.id,
+        day: r.missedDay,
+        status: r.status as "approved" | "rejected" | "expired",
+        streak: data.me.lastEndedRunLength ?? 0,
+      })),
+  };
 }
 
 // design §11.3 quick actions; badges and nudges join with the P1 features.

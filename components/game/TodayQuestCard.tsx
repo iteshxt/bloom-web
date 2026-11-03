@@ -15,7 +15,10 @@ export function TodayQuestCard({
   startDate,
   solves,
   sync,
+  celebrating = false,
 }: {
+  /** Day complete: a momentary mint glow (design §12.4, t = 120 ms). */
+  celebrating?: boolean;
   me: PlayerView;
   partner: PlayerView | null;
   startDate: string;
@@ -45,7 +48,7 @@ export function TodayQuestCard({
   const bothDone = f.done && partner?.focus?.done;
 
   return (
-    <Card done={f.done}>
+    <Card done={f.done} glow={celebrating}>
       <div className="flex items-center justify-between gap-3">
         <h2 className="font-display text-lg font-semibold">{title}</h2>
         <span className="font-display tabular text-lg font-semibold">
@@ -102,13 +105,17 @@ export function TodayQuestCard({
 
 function Card({
   done = false,
+  glow = false,
   children,
 }: {
   done?: boolean;
+  glow?: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <section className="glass relative flex flex-col gap-3 rounded-lg p-5">
+    <section
+      className={`glass relative flex flex-col gap-3 rounded-lg p-5 transition-shadow duration-[600ms] ${glow ? "shadow-glow-mint!" : ""}`}
+    >
       {done && (
         <span className="absolute -top-3 -right-2" aria-label="Done">
           <PuffyIcon name="check" size={44} />
