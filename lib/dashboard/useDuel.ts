@@ -188,11 +188,16 @@ async function fetchDuel(): Promise<DuelData | null> {
   };
 }
 
-/** Both players' dashboard data, kept live by Supabase Realtime. */
+/** Both players' dashboard data. <DuelRealtime /> keeps it live. */
 export function useDuel() {
+  return useQuery({ queryKey: DUEL_KEY, queryFn: fetchDuel });
+}
+
+/** Subscribes once (from the app layout) to the pair's Realtime changes and
+ *  invalidates every query when anything in the pair changes. */
+export function useDuelRealtime() {
   const queryClient = useQueryClient();
-  const query = useQuery({ queryKey: DUEL_KEY, queryFn: fetchDuel });
-  const pairId = query.data?.pair.id;
+  const pairId = useDuel().data?.pair.id;
 
   useEffect(() => {
     if (!pairId) return;
@@ -211,6 +216,4 @@ export function useDuel() {
       supabase.removeChannel(channel);
     };
   }, [pairId, queryClient]);
-
-  return query;
 }

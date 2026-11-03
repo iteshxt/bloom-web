@@ -8,6 +8,7 @@ import { PuffyIcon, type PuffyName } from "@/components/icons/puffy";
 import { useDuel } from "@/lib/dashboard/useDuel";
 import { useGifts } from "@/lib/game/queries";
 import { spring } from "@/lib/motion";
+import { useHydrated } from "@/lib/useHydrated";
 
 // design §10.7: a glass pill floating 16 px above the safe area. The active
 // item becomes a player-colour pill with a puffy icon and label that glides
@@ -52,15 +53,16 @@ const ITEMS: {
 
 export function FloatingNav() {
   const path = usePathname();
+  const hydrated = useHydrated();
   const duel = useDuel();
   const gifts = useGifts();
-  const me = duel.data?.me;
+  const me = hydrated ? duel.data?.me : undefined;
   // Profile pages for my own id count as "Me" too.
   const onMyProfile = me && path === `/player/${me.id}`;
 
   const dots: Record<string, boolean> = {
-    "/": Boolean(duel.data?.pendingRequestFromPartner),
-    "/gifts": Boolean(gifts.data?.receiving.some((g) => g.canOpen)),
+    "/": hydrated && Boolean(duel.data?.pendingRequestFromPartner),
+    "/gifts": hydrated && Boolean(gifts.data?.receiving.some((g) => g.canOpen)),
   };
 
   return (
