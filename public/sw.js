@@ -72,9 +72,10 @@ async function networkFirstPage(request) {
     }
     return response;
   } catch {
+    // The last copy of this page, else the offline page. (Opening the app
+    // lands on "/", which is cached once it has loaded online.)
     return (
       (await caches.match(request, { ignoreSearch: true })) ||
-      (await caches.match("/")) ||
       (await caches.match("/offline")) ||
       Response.error()
     );
