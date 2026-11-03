@@ -820,15 +820,15 @@ Errors use the shape `{ error: { code, message } }` with an HTTP status of 400, 
 | `POST /api/leetcode/link` | `{ username }` | Checks the account exists (404 `leetcode_not_found`), saves LeetCode's spelling, sets `leetcode_verified_at`; if already in a pair, runs one tick after the response (`after()`) so pre-season solves appear at once |
 | `POST /api/pair/create` | `{ startDate }` | `startDate` from today (IST) to +90 days. Creates a pair with a 6-character code (no ambiguous characters, retried on a clash) and joins the creator; 409 `already_paired`. Runs one tick after the response |
 | `POST /api/pair/join` | `{ code }` | Joins; 404 `pair_not_found`, 409 `pair_full` if the pair is full, 409 `color_taken` if the partner already has my colour (UI asks me to pick another). Runs one tick after the response |
-| `PATCH /api/pair` | `{ startDate? , addMilestone?, makeupEnabled? }` | startDate only before the start; milestones can only be added |
+| `PATCH /api/pair` | `{ startDate? , addMilestone?, makeupEnabled? }` | Any member. startDate only before the start (today to +90 days), and the players' not-yet-started runs move with it; milestones can only be added (409 `milestone_exists`) |
 | `POST /api/sync` | — | On-demand tick for me: sync, finalize overdue days, today's row, reminders. At most once per 60 s per player (429 `too_soon` with `Retry-After`); 409 `busy` if a tick holds the lock |
 | `GET /api/sync` | — | Last successful sync time for both pair members (`sync_state` is server-only) |
 | `POST /api/restore/request` | `{ message? }` | Section 7.6 |
 | `POST /api/restore/cancel` | `{ requestId }` | Section 7.6 |
 | `POST /api/restore/respond` | `{ requestId, approve, reply? }` | Section 7.6 (approver only) |
-| `POST /api/target` | `{ playerId, target }` | Partner only; effective tomorrow |
+| `POST /api/target` | `{ playerId, target }` | Partner only (403 otherwise); upserts `daily_targets` for tomorrow (IST) under the player's lock; feed row for both, `target_changed` push for the player |
 | `GET /api/gifts` | — | Gifts for the pair, with unrevealed fields masked for the receiver |
-| `PUT /api/gifts` | `{ milestone, title, hint?, details?, linkUrl? }` | Giver creates or edits a gift for the partner (only before reveal) |
+| `PUT /api/gifts` | `{ milestone, title, hint?, details?, linkUrl? }` | Giver creates or edits a gift for the partner (only before reveal; 409 `already_revealed`). A new gift for a milestone the partner already reached starts `unlocked`. Links must be http(s) |
 | `POST /api/gifts/:id/reveal` | — | Receiver only; status `unlocked` and `title` set → `revealed` |
 | `POST /api/gifts/:id/received` | — | Receiver only; `revealed` → `delivered` |
 | `POST /api/nudge` | `{ message }` | Limit of 3 per sender per IST day |
