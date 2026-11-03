@@ -126,7 +126,7 @@ const ICONS = {
         shape={(p) => (
           <>
             <rect x={10} y={24} width={28} height={16} rx={5} {...(p as object)} />
-            <rect x={9} y={10} width={30} height={8} rx={4} transform="rotate(-16 9 18)" {...(p as object)} />
+            <rect x={7} y={16} width={31} height={8} rx={4} transform="rotate(-24 9 24)" {...(p as object)} />
           </>
         )}
       />
@@ -510,13 +510,13 @@ const ICONS = {
         tone="white"
         shape={(p) => <circle cx={24} cy={24.5} r={16.5} {...(p as object)} />}
       />
-      <ellipse cx={18.5} cy={23} rx={2.1} ry={2.6} fill="var(--ink)" />
-      <ellipse cx={29.5} cy={23} rx={2.1} ry={2.6} fill="var(--ink)" />
+      <ellipse cx={18.5} cy={23} rx={2.1} ry={2.6} fill="var(--plum)" />
+      <ellipse cx={29.5} cy={23} rx={2.1} ry={2.6} fill="var(--plum)" />
       <circle cx={19.2} cy={22.1} r={0.8} fill="var(--white)" />
       <circle cx={30.2} cy={22.1} r={0.8} fill="var(--white)" />
       <ellipse cx={14.5} cy={28.5} rx={3} ry={1.8} fill="var(--blush)" opacity={0.6} />
       <ellipse cx={33.5} cy={28.5} rx={3} ry={1.8} fill="var(--blush)" opacity={0.6} />
-      <path d="M21.5 28.5Q24 30.8 26.5 28.5" stroke="var(--ink)" strokeWidth={1.8} strokeLinecap="round" fill="none" />
+      <path d="M21.5 28.5Q24 30.8 26.5 28.5" stroke="var(--plum)" strokeWidth={1.8} strokeLinecap="round" fill="none" />
       <Shine filter={s(u)} cx={16} cy={14} rx={3.5} ry={2} />
     </>
   ),

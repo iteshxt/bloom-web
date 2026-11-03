@@ -52,11 +52,14 @@
   --sky-deep-bottom: #2b2257;
   --hill-far: #d9cff0;
   --hill-near: #c6e8cf;
+  --hill-far-night: #3b3170;
+  --hill-near-night: #34506a;
   --soil: #c9a27e;
   --soil-deep: #8a6447;
   --wood: #f2c4a2;
   --wood-deep: #b97b52;
   --white: #ffffff;
+  --plum: #2e2547; /* creature eyes and art lines: plum ink in both themes */
   --body-mochi: #fff6f0;
   --body-tofu: #f4e3d3;
   --body-pip: #bfe7b5;
@@ -93,8 +96,6 @@
   --shadow-soft: 0 12px 32px -16px rgba(0, 0, 0, 0.35);
   --shadow-float: 0 20px 40px -18px rgba(0, 0, 0, 0.45);
   --player-glow: 1;
-  --hill-far: #3b3170;
-  --hill-near: #34506a;
 }
 
 /* Player scope: set on any element that belongs to a player */
@@ -253,12 +254,64 @@ body {
     opacity: 0.35;
   }
 }
+/* Sky art lives in a 390-unit-wide SVG, so these move in user units. */
 @keyframes drift {
   from {
-    transform: translateX(-30%);
+    transform: translateX(-130px);
   }
   to {
-    transform: translateX(130%);
+    transform: translateX(520px);
+  }
+}
+@keyframes sway {
+  0%,
+  100% {
+    transform: translateX(-10px);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+}
+@keyframes wave-shift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-8px);
+  }
+}
+@keyframes petal-fall {
+  from {
+    transform: translate(0, -30px) rotate(0deg);
+  }
+  to {
+    transform: translate(90px, 380px) rotate(320deg);
+  }
+}
+@keyframes flake-fall {
+  from {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(34px);
+    opacity: 0;
+  }
+}
+@keyframes float-up {
+  from {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-26px);
+    opacity: 0;
   }
 }
 @keyframes wiggle {
@@ -306,6 +359,9 @@ body {
 :root[data-hidden] *::before,
 :root[data-hidden] *::after {
   animation-play-state: paused !important;
+}
+:root[data-motion="reduce"] .particle {
+  display: none;
 }
 :root[data-motion="reduce"] *,
 :root[data-motion="reduce"] *::before,

@@ -48,7 +48,9 @@ export async function proxy(request: NextRequest) {
   if (
     path.startsWith("/api/") ||
     path.startsWith("/auth/") ||
-    path === "/offline"
+    path === "/offline" ||
+    // The art gallery for checking visuals; 404 outside development.
+    (process.env.NODE_ENV === "development" && path.startsWith("/dev/"))
   )
     return response;
 
