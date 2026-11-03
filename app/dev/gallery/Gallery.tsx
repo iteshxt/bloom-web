@@ -4,6 +4,7 @@ import { useState } from "react";
 import LoginPage from "@/app/(auth)/login/page";
 import { BadgeGrid } from "@/components/badges/BadgeGrid";
 import { Bloom } from "@/components/bloom/Bloom";
+import { CheckInSheet } from "@/components/game/CheckInSheet";
 import { BADGES } from "@/lib/badges/catalog";
 import { MomentHost } from "@/components/moments/Moments";
 import { Unboxing } from "@/components/moments/Unboxing";
@@ -66,6 +67,7 @@ const PUFFY: PuffyName[] = [
 export function Gallery() {
   const [sheet, setSheet] = useState(false);
   const [unbox, setUnbox] = useState(false);
+  const [checkIn, setCheckIn] = useState(false);
   const moments = useMoments(null, null);
   return (
     <main
@@ -134,7 +136,19 @@ export function Gallery() {
           >
             Unboxing
           </Button>
+          <Button
+            variant="secondary"
+            className="h-11! text-sm"
+            onClick={() => setCheckIn(true)}
+          >
+            Check-in sheet
+          </Button>
         </div>
+        <CheckInSheet
+          open={checkIn}
+          onClose={() => setCheckIn(false)}
+          partnerName="Riya"
+        />
         {unbox && (
           <Unboxing
             milestone={30}

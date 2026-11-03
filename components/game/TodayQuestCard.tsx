@@ -89,6 +89,11 @@ export function TodayQuestCard({
                   {istClock(s.submittedAt)}
                 </span>
               </span>
+              {s.manual && (
+                <span className="rounded-pill bg-peach-soft text-peach-deep shrink-0 px-2 py-0.5 text-xs font-semibold">
+                  Unverified
+                </span>
+              )}
               {s.xp > 0 && (
                 <span className="text-butter-ink shrink-0 font-semibold">
                   +{s.xp} XP

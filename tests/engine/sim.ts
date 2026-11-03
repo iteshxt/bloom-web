@@ -34,6 +34,8 @@ export interface SolveInput {
   at: Date;
   difficulty?: Difficulty;
   topics?: string[];
+  /** A manual check-in (PRD 5.13) rather than a synced LeetCode solve. */
+  manual?: boolean;
 }
 
 export class Sim {
@@ -70,6 +72,7 @@ export class Sim {
         submittedAt: s.at,
         difficulty: s.difficulty ?? "Easy",
         topics: s.topics ?? [],
+        ...(s.manual ? { manual: true } : {}),
       })),
       { now, newId: this.newId },
     );

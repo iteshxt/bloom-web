@@ -15,9 +15,12 @@ const TONES = {
 export function Banner({
   banner,
   partnerName,
+  onCheckIn,
 }: {
   banner: BannerKind;
   partnerName: string;
+  /** Opens manual check-in (the sync banner's action, PRD 5.13). */
+  onCheckIn?: () => void;
 }) {
   const { tone, icon, text, action } = content(banner, partnerName);
   return (
@@ -27,6 +30,15 @@ export function Banner({
     >
       <PuffyIcon name={icon} size={40} className="shrink-0" />
       <p className="flex-1">{text}</p>
+      {banner.kind === "sync_failing" && banner.checkIn && onCheckIn && (
+        <button
+          type="button"
+          onClick={onCheckIn}
+          className="bg-surface text-ink rounded-pill inline-flex h-11 shrink-0 items-center px-4"
+        >
+          Check in
+        </button>
+      )}
       {action && (
         <Link
           href={action.href}
@@ -78,7 +90,9 @@ function content(
       return {
         tone: "peach",
         icon: "code",
-        text: "Can’t reach LeetCode right now. We’ll keep trying.",
+        text: b.checkIn
+          ? "Can’t reach LeetCode. Manual check-in is on."
+          : "Can’t reach LeetCode right now. We’ll keep trying.",
       };
   }
 }

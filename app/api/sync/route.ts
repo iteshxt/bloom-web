@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { apiError } from "@/lib/api/http";
 import { requireProfile } from "@/lib/auth/session";
+import { checkInOpen } from "@/lib/checkin";
 import { tickPlayer } from "@/lib/services/tick";
 
 // "Sync now" (techspec §10): an on-demand tick for me, at most once per 60 s.
@@ -26,10 +27,11 @@ export async function GET() {
 
   const { data: rows, error: syncError } = await admin
     .from("sync_state")
-    .select("player_id, last_success_at, last_attempt_at")
+    .select("player_id, last_success_at, last_attempt_at, consecutive_failures")
     .in("player_id", ids);
   if (syncError) return apiError(500, "database", syncError.message);
 
+  const now = new Date();
   return NextResponse.json({
     players: ids.map((id) => {
       const row = rows?.find((r) => r.player_id === id);
@@ -37,6 +39,12 @@ export async function GET() {
         playerId: id,
         lastSuccessAt: row?.last_success_at ?? null,
         lastAttemptAt: row?.last_attempt_at ?? null,
+        // Manual check-in is open for this player (PRD 5.13).
+        checkInOpen: checkInOpen({
+          lastSuccessAt: row?.last_success_at ?? null,
+          consecutiveFailures: row?.consecutive_failures ?? 0,
+          now,
+        }),
       };
     }),
   });

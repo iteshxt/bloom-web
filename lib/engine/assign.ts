@@ -78,7 +78,13 @@ function processOne(tx: Tx, sub: Submission): ProcessedSubmission {
   day.solvedSlugs.push(sub.slug);
   recordHistory(tx, sub, assignedDay);
   addXp(tx, xp, "solve", sub.id);
-  activity(tx, "solve", { slug: sub.slug, day: assignedDay, xp, isResolve });
+  activity(tx, "solve", {
+    slug: sub.slug,
+    day: assignedDay,
+    xp,
+    isResolve,
+    ...(sub.manual ? { manual: true } : {}),
+  });
   badgesForSolve(tx, sub, day, minuteOfDay);
 
   const wasPending = day.status === "pending";

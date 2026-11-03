@@ -490,6 +490,36 @@ describe("recovery and pre-season", () => {
     expect(new Sim().solve("a", day(0), "00:30").assignedDay).toBe(day(0));
   });
 
+  it("#25 a manual check-in counts like a synced solve, marked unverified", () => {
+    const sim = new Sim();
+    const [sub] = sim.sync([
+      { slug: "two-sum", at: at(day(0), "20:00"), manual: true },
+    ]);
+
+    expect(sub).toMatchObject({
+      manual: true,
+      counted: true,
+      assignedDay: day(0),
+    });
+    expect(sim.day(day(0))?.status).toBe("complete");
+    expect(sim.state.xpTotal).toBeGreaterThan(0);
+    const solve = sim.effects.find(
+      (e) => e.kind === "activity" && e.type === "solve",
+    );
+    expect(solve).toMatchObject({ payload: { slug: "two-sum", manual: true } });
+  });
+
+  it("#26 the same problem synced later from LeetCode doesn't count twice", () => {
+    const sim = new Sim({}, [{ effectiveFrom: day(0), target: 2 }]);
+    sim.sync([{ slug: "two-sum", at: at(day(0), "20:00"), manual: true }]);
+    const xp = sim.state.xpTotal;
+    const [synced] = sim.sync([{ slug: "two-sum", at: at(day(0), "19:58") }]);
+
+    expect(synced).toMatchObject({ counted: false, xp: 0 });
+    expect(sim.state.xpTotal).toBe(xp);
+    expect(sim.day(day(0))?.status).toBe("pending");
+  });
+
   it("#24 make-up off: approve, then D+1 below its target reverts the restore", () => {
     const sim = new Sim({ makeupEnabled: false });
     sim.playDays(day(0), 5);

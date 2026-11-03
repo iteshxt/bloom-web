@@ -114,8 +114,9 @@ export function buildSavePayload(input: {
       responded_at: iso(r.respondedAt),
     })),
     submissions: input.submissions.map((s) => ({
-      source: "leetcode",
-      lc_submission_id: s.id,
+      source: s.manual ? "manual" : "leetcode",
+      // Manual check-ins have no LeetCode id; their engine id stays internal.
+      lc_submission_id: s.manual ? null : s.id,
       title_slug: s.slug,
       submitted_at: s.submittedAt.toISOString(),
       assigned_day: s.assignedDay,

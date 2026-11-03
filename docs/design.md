@@ -389,7 +389,7 @@ A glass or soft-fill rounded card (`r-md`) with a 40 px puffy icon, one line of 
 - "Your flower is frosted. Ask {Partner} for a restore." (frost)
 - "{Partner} is asking you for a restore." (frost, with a primary action)
 - "You owe {Partner} a gift for 30 days." (blush)
-- "Can't reach LeetCode. Manual check-in is on." (peach). Until manual check-in ships (P1), it reads "Can't reach LeetCode right now. We'll keep trying."
+- "Can't reach LeetCode. Manual check-in is on." (peach), with a "Check in" action that opens the check-in sheet: paste a problem link, see the slug it read, and check in. Before check-in opens (sync failing but not yet 3 hours), it reads "Can't reach LeetCode right now. We'll keep trying." While check-in is open the quest card also offers "LeetCode down? Check in by hand", and manual solves carry a peach "Unverified" chip in the quest card, activity and the heatmap's day sheet.
 
 Only **one** banner shows at a time, in priority order: request to you > your frost > gift owed > sync.
 

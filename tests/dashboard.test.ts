@@ -209,7 +209,17 @@ describe("dashboard view model", () => {
     );
     expect(
       pickBanner({ me: failing, pendingRequestFromPartner: null }),
-    ).toEqual({ kind: "sync_failing" });
+    ).toEqual({ kind: "sync_failing", checkIn: false });
+    // Once the server says check-in is open, the banner offers it.
+    const open = derivePlayer(
+      player({ lastSyncAt: at("2026-11-05", "01:00"), checkInOpen: true }),
+      pair,
+      now,
+    );
+    expect(pickBanner({ me: open, pendingRequestFromPartner: null })).toEqual({
+      kind: "sync_failing",
+      checkIn: true,
+    });
     expect(
       pickBanner({
         me: derivePlayer(player(), pair, now),

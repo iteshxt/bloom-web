@@ -21,12 +21,14 @@ export async function ensureProblems(
 
   const { data, error } = await admin
     .from("problems")
-    .select("title_slug, difficulty, topic_tags")
+    .select("title_slug, difficulty, topic_tags, frontend_id")
     .in("title_slug", unique);
   if (error) throw new Error(`Supabase query failed: ${error.message}`);
 
   const info: Record<string, ProblemInfo> = {};
-  for (const p of data ?? []) {
+  // A row without a frontend id is a placeholder from a manual check-in
+  // made while LeetCode was down: fetch it again to fill it in.
+  for (const p of (data ?? []).filter((p) => p.frontend_id !== null)) {
     info[p.title_slug] = {
       difficulty: p.difficulty ?? undefined,
       topics: p.topic_tags,
@@ -59,7 +61,7 @@ export async function ensureProblems(
   if (rows.length > 0) {
     const { error: upsertError } = await admin
       .from("problems")
-      .upsert(rows, { onConflict: "title_slug", ignoreDuplicates: true });
+      .upsert(rows, { onConflict: "title_slug" });
     if (upsertError)
       throw new Error(`Supabase upsert failed: ${upsertError.message}`);
   }

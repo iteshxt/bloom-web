@@ -110,6 +110,8 @@ export interface Submission {
   /** Unknown difficulty earns Easy XP (techspec §7.2). */
   difficulty?: Difficulty;
   topics: string[];
+  /** A manual check-in (PRD 5.13): counts normally, shown as unverified. */
+  manual?: boolean;
 }
 
 export interface ProcessedSubmission extends Submission {

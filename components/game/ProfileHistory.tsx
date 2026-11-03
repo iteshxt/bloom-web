@@ -161,6 +161,7 @@ export function ProfileHistory({
                           ? " · already counted"
                           : ""}
                         {s.day < startDate ? " · pre-season" : ""}
+                        {s.manual ? " · checked in by hand, unverified" : ""}
                       </span>
                     </span>
                     {s.difficulty && (

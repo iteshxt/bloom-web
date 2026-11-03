@@ -19,6 +19,8 @@ export interface Solve {
   difficulty: string | null;
   submittedAt: string;
   xp: number;
+  /** A manual check-in, shown as unverified (PRD 5.13). */
+  manual: boolean;
 }
 
 export interface ActivityItem {
@@ -103,7 +105,7 @@ async function fetchDuel(): Promise<DuelData | null> {
     supabase
       .from("submissions")
       .select(
-        "player_id, assigned_day, submitted_at, xp, problems(title, difficulty)",
+        "player_id, assigned_day, submitted_at, xp, source, problems(title, difficulty)",
       )
       .eq("counted", true)
       .in("assigned_day", days)
@@ -117,9 +119,13 @@ async function fetchDuel(): Promise<DuelData | null> {
       .select("id, actor_id, kind, payload, created_at")
       .order("created_at", { ascending: false })
       .limit(8),
-    api<{ players: { playerId: string; lastSuccessAt: string | null }[] }>(
-      "/api/sync",
-    ),
+    api<{
+      players: {
+        playerId: string;
+        lastSuccessAt: string | null;
+        checkInOpen?: boolean;
+      }[];
+    }>("/api/sync"),
   ]);
   for (const r of [
     pair,
@@ -156,11 +162,13 @@ async function fetchDuel(): Promise<DuelData | null> {
         difficulty: s.problems?.difficulty ?? null,
         submittedAt: s.submitted_at,
         xp: s.xp,
+        manual: s.source === "manual",
       });
     }
-    const lastSync = sync.ok
-      ? sync.data.players.find((p) => p.playerId === row.id)?.lastSuccessAt
-      : null;
+    const syncRow = sync.ok
+      ? sync.data.players.find((p) => p.playerId === row.id)
+      : undefined;
+    const lastSync = syncRow?.lastSuccessAt;
     return {
       id: row.id,
       name: row.display_name,
@@ -182,6 +190,7 @@ async function fetchDuel(): Promise<DuelData | null> {
         .map((t) => ({ effectiveFrom: t.effective_from, target: t.target })),
       // ISO text, not a Date, so the cache survives being saved offline.
       lastSyncAt: lastSync ?? null,
+      checkInOpen: syncRow?.checkInOpen ?? false,
       lastEndedRunLength:
         ended.data?.find((r) => r.player_id === row.id)?.length ?? null,
       recentSolves,

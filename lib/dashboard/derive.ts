@@ -40,6 +40,8 @@ export interface PlayerInput {
   lastSyncAt: Date | string | null;
   /** Length of the most recent run that ended, if any. */
   lastEndedRunLength?: number | null;
+  /** Manual check-in is open: sync has been failing (PRD 5.13). */
+  checkInOpen?: boolean;
 }
 
 export interface PairInput {
@@ -81,6 +83,7 @@ export interface PlayerView {
   /** Days until the challenge starts, when it hasn't yet. */
   startsInDays: number | null;
   syncFailing: boolean;
+  checkInOpen: boolean;
   /** A run ended and no day has been completed since (design §9.3 "sad"). */
   runJustEnded: boolean;
 }
@@ -124,6 +127,7 @@ export function derivePlayer(
     syncFailing:
       p.lastSyncAt !== null &&
       now.getTime() - new Date(p.lastSyncAt).getTime() > SYNC_FAILING_AFTER_MS,
+    checkInOpen: p.checkInOpen ?? false,
     runJustEnded: started && streak === 0 && (p.lastEndedRunLength ?? 0) > 0,
   };
 }
@@ -219,7 +223,7 @@ export type Banner =
   | { kind: "restore_request"; requestId: string }
   | { kind: "on_ice"; missedDay: DayKey }
   | { kind: "gift_owed"; milestone: number }
-  | { kind: "sync_failing" };
+  | { kind: "sync_failing"; checkIn: boolean };
 
 /** At most one banner, in priority order: a request to you, your frost,
  *  a gift you owe, then sync trouble (design §10.8). */
@@ -241,6 +245,8 @@ export function pickBanner(input: {
   if (input.giftOwed) {
     return { kind: "gift_owed", milestone: input.giftOwed.milestone };
   }
-  if (input.me.syncFailing) return { kind: "sync_failing" };
+  if (input.me.syncFailing || input.me.checkInOpen) {
+    return { kind: "sync_failing", checkIn: input.me.checkInOpen };
+  }
   return null;
 }

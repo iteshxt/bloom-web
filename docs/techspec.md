@@ -844,7 +844,7 @@ Errors use the shape `{ error: { code, message } }` with an HTTP status of 400, 
 | `POST /api/gifts/:id/reveal` | — | Receiver only; status `unlocked` and `title` set → `revealed` |
 | `POST /api/gifts/:id/received` | — | Receiver only; `revealed` → `delivered` |
 | `POST /api/nudge` | `{ message }` (preset or own words, 1–140 chars) | Limit of 3 per sender per IST day (429 `nudge_limit`); stores the nudge, adds a `nudge` activity row and pushes `nudge` to the partner after the response |
-| `POST /api/checkin/manual` | `{ problemUrl }` | Only if sync is failing for 3 h or more; parses the slug; source `manual` |
+| `POST /api/checkin/manual` | `{ problemUrl }` | Open only while sync is failing: at least one failure in a row and no success for over 3 h (or never). The slug comes from the strict regex (400 `invalid_url`); the URL is never fetched. Under the player's lock, the solve runs through the engine at the current time with `source = manual`. A slug LeetCode says doesn't exist is refused (404 `unknown_problem`); while LeetCode is unreachable the problem is taken on trust with a placeholder `problems` row (no `frontend_id`), which the next sync that sees the slug fills in. 409 `checkin_closed` / `busy`. `GET /api/sync` reports `checkInOpen` per player |
 | `POST /api/push/subscribe` | `PushSubscriptionJSON` | Upsert by endpoint |
 | `POST /api/push/unsubscribe` | `{ endpoint }` | Delete |
 | `POST /api/push/test` | — | Sends a test notification to my devices |
@@ -995,6 +995,8 @@ All tests use a fixed `now` and fixture states. Minimum scenarios:
 | 21 | Solves before the start date | Stored, `counted=false`, no streak effect |
 | 22 | Level formula | 0→1, 100→2, 299→2, 300→3, 4500→10 |
 | 23 | Each badge condition | Earned exactly once |
+| 25 | Manual check-in while sync is failing | Counts like a synced solve (day, XP, streak); stored with `source = manual`, no LeetCode id; its `solve` activity carries `manual: true` |
+| 26 | The same problem later arrives from LeetCode the same day | Stored, `counted = false`, no extra XP: never double-counted |
 | 24 | Make-up off: approve, then D+1 ends below its target | Same as #11 (D reverted, run ends `makeup_failed`, token stays spent, new run at D+2); D+1 never goes on ice |
 
 ### 14.2 Integration

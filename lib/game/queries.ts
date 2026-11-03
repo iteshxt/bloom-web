@@ -102,6 +102,8 @@ export interface HistorySolve {
   submittedAt: string;
   counted: boolean;
   xp: number;
+  /** A manual check-in, shown as unverified (PRD 5.13). */
+  manual: boolean;
 }
 
 /** Everything a profile's heatmap and stats need (PRD 5.4): every day row,
@@ -120,7 +122,7 @@ export function usePlayerHistory(playerId: string) {
         supabase
           .from("submissions")
           .select(
-            "title_slug, assigned_day, submitted_at, counted, xp, problems(title, difficulty, topic_tags)",
+            "title_slug, assigned_day, submitted_at, counted, xp, source, problems(title, difficulty, topic_tags)",
           )
           .eq("player_id", playerId)
           .order("submitted_at", { ascending: true }),
@@ -144,6 +146,7 @@ export function usePlayerHistory(playerId: string) {
           submittedAt: s.submitted_at,
           counted: s.counted,
           xp: s.xp,
+          manual: s.source === "manual",
         })),
         runLengths: (runs.data ?? []).map((r) => r.length),
       };

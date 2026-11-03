@@ -12,7 +12,10 @@ export function SyncButton({
   lastSyncAt,
   now,
   sync: shared,
+  onCheckIn,
 }: {
+  /** Manual check-in is open: offer it beside Sync now (PRD 5.13). */
+  onCheckIn?: () => void;
   lastSyncAt: Date | string | null;
   now: Date;
   /** The page's sync, when pull-to-refresh shares it. */
@@ -22,7 +25,7 @@ export function SyncButton({
   const { state, sync } = shared ?? own;
 
   return (
-    <div className="border-line flex items-center justify-between gap-3 border-t pt-3">
+    <div className="border-line flex flex-wrap items-center justify-between gap-3 border-t pt-3">
       <p className="text-ink-2 text-[13px]" role="status">
         {state.kind === "done" || state.kind === "error"
           ? state.text
@@ -46,6 +49,16 @@ export function SyncButton({
           </>
         )}
       </Button>
+      {onCheckIn && (
+        <Button
+          variant="soft"
+          tone="peach"
+          className="w-full"
+          onClick={onCheckIn}
+        >
+          LeetCode down? Check in by hand
+        </Button>
+      )}
     </div>
   );
 }

@@ -142,6 +142,11 @@ export default function FeedPage() {
                         >
                           {describe(a, who?.name ?? "Someone", people)}
                         </span>
+                        {a.kind === "solve" && a.payload.manual === true && (
+                          <span className="rounded-pill bg-peach-soft text-peach-deep shrink-0 px-2 py-0.5 text-xs font-semibold">
+                            Unverified
+                          </span>
+                        )}
                         {xp > 0 && (
                           <span className="rounded-pill bg-butter-soft text-butter-deep shrink-0 px-2 py-0.5 text-xs font-semibold">
                             +{xp} XP

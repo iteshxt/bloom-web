@@ -246,6 +246,7 @@ Delivered via Web Push to every device a player has installed and enabled. Playe
 - Available only when automatic sync has failed for more than 3 hours, or the LeetCode API is unreachable.
 - The player pastes a LeetCode problem URL, and the app records it as a solve at the current time.
 - Manual solves show an "unverified" mark to the partner. They count normally toward rules and XP.
+- If LeetCode later reports the same problem on the same day, it isn't counted again. A link to a problem LeetCode says doesn't exist is refused; while LeetCode is unreachable the link is taken on trust.
 
 ### 5.14 Activity feed (P1)
 A shared timeline of solves, day completions, restores, target changes, milestones, gifts, badges and nudges.

@@ -95,6 +95,26 @@ describe("buildSavePayload", () => {
     expect(solo.notifications.every((n) => n.player_id === "p1")).toBe(true);
   });
 
+  it("stores a manual check-in as source manual with no LeetCode id", () => {
+    const sim = new Sim();
+    const subs = sim.sync([
+      { slug: "two-sum", at: at(day(0), "20:00"), manual: true },
+    ]);
+    const p = buildSavePayload({
+      refs,
+      state: sim.state,
+      effects: sim.effects,
+      submissions: subs,
+      now: at(day(0), "20:00"),
+    });
+    expect(p.submissions[0]).toMatchObject({
+      source: "manual",
+      lc_submission_id: null,
+      title_slug: "two-sum",
+      counted: true,
+    });
+  });
+
   it("omits sync when it was skipped, so the database doesn't count a failure", () => {
     // JSON null is not SQL NULL: save_player_state treats any present `sync`
     // as an attempt, so a skipped sync must leave the key out entirely.

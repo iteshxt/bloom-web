@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { navigateWithTransition } from "@/lib/viewTransition";
 import { useState } from "react";
+import { CheckInSheet } from "@/components/game/CheckInSheet";
 import { NudgeSheet } from "@/components/game/NudgeSheet";
 import { ActivityList, type Person } from "@/components/game/ActivityList";
 import { Banner } from "@/components/game/Banner";
@@ -59,6 +60,7 @@ export default function HomePage() {
   );
   const moments = useMoments(data?.me.id ?? null, snapshot);
   const [nudging, setNudging] = useState(false);
+  const [checkingIn, setCheckingIn] = useState(false);
   const feedSeen = useFeedSeen(data?.me.id ?? null);
   const syncNow = useSyncNow();
   const pull = usePullToRefresh(syncNow.sync);
@@ -230,6 +232,9 @@ export default function HomePage() {
                 lastSyncAt={data.me.lastSyncAt}
                 now={now}
                 sync={syncNow}
+                onCheckIn={
+                  me.checkInOpen ? () => setCheckingIn(true) : undefined
+                }
               />
             }
           />
@@ -241,6 +246,7 @@ export default function HomePage() {
           <Banner
             banner={banner}
             partnerName={partner?.name ?? "your partner"}
+            onCheckIn={() => setCheckingIn(true)}
           />
         )}
 
@@ -268,6 +274,11 @@ export default function HomePage() {
             Nudge
           </button>
         </nav>
+        <CheckInSheet
+          open={checkingIn}
+          onClose={() => setCheckingIn(false)}
+          partnerName={partner?.name ?? "your partner"}
+        />
         {partner && data.partner && (
           <NudgeSheet
             open={nudging}
