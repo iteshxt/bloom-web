@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { apiError, readBody } from "@/lib/api/http";
 import { requirePair } from "@/lib/auth/session";
+import { syncAfterResponse } from "@/lib/pair/initial-sync";
 import { recordEvents } from "@/lib/services/events";
 import { todayIST } from "@/lib/time";
 import { pairPatchInput } from "@/lib/validation/game";
@@ -82,6 +83,24 @@ export async function PATCH(request: Request) {
       .is("ended_on", null)
       .eq("length", 0);
     if (runError) return apiError(500, "database", runError.message);
+
+    // Solves already synced on or after the new day 1 were stored as
+    // pre-season (no XP, no streak). Forget them and sync again, so they
+    // count under the new start: starting today counts today's solves.
+    const { error: subError } = await admin
+      .from("submissions")
+      .delete()
+      .eq("pair_id", pair.id)
+      .eq("counted", false)
+      .gte("assigned_day", update.start_date);
+    if (subError) return apiError(500, "database", subError.message);
+    const { data: members } = await admin
+      .from("profiles")
+      .select("id, leetcode_username")
+      .eq("pair_id", pair.id);
+    for (const m of members ?? []) {
+      if (m.leetcode_username) syncAfterResponse(admin, m.id);
+    }
   }
 
   await recordEvents(admin, { pairId: pair.id, actorId: profile.id, activity });

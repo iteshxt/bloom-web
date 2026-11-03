@@ -62,7 +62,7 @@ These rules are the source of truth. `techspec.md` implements them exactly, and 
 ### 4.1 Time
 - All game time is **Indian Standard Time (IST, UTC+05:30)**, regardless of where the phone is or what timezone it's set to. India has no daylight saving time.
 - A challenge day `D` runs from **00:00 IST on D** to **01:00 IST on D+1**, which includes the grace hour.
-- The challenge starts on the pair's **start date**, chosen when the pair is created: any day from today up to 90 days out (IST), defaulting to tomorrow. Days before the start date are not tracked.
+- The challenge starts on the pair's **start date**, chosen when the pair is created: any day from today up to 90 days out (IST), defaulting to today, so a pair can begin the day it forms (solves already made that day count). Days before the start date are not tracked.
 
 ### 4.2 What counts as a solve
 - A solve is an **Accepted** submission on leetcode.com by the player's linked LeetCode account.
@@ -172,7 +172,7 @@ Priority: **P0** = required for v1 launch, **P1** = v1 if time allows, **P2** = 
 - I set a display name, pick a companion creature from a built-in set, and pick my player colour (blush, sky or lilac). The two players can't share a colour.
 - I enter my **LeetCode username**. The app checks it exists and shows my LeetCode avatar and solved count to confirm.
 - The first player creates a pair and gets a **6-character invite code** to share. The second player enters the code to join. A pair is locked at 2 players.
-- The pair creator picks the **start date**, from today up to 90 days out, which defaults to tomorrow.
+- The pair creator picks the **start date**, from today up to 90 days out, which defaults to today. "Today" and "Tomorrow" shortcuts sit above the picker, and until the challenge begins either player can bring it forward to today from Settings.
 - After setup, I'm prompted to **install the app** with platform-specific instructions (Android install prompt; iOS "Share → Add to Home Screen"), then to **enable notifications**.
 
 **Acceptance:** two accounts can pair, set a start date, link valid LeetCode usernames, and both land on the dashboard. An invalid LeetCode username is rejected with a clear message. A third account can't join the pair.

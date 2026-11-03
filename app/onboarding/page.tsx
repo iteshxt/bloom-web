@@ -70,7 +70,7 @@ export default function OnboardingPage() {
       const { data } = await supabase.auth.getClaims();
       const now = todayIST(new Date());
       setToday(now);
-      setStartDate(addDays(now, 1)); // default: tomorrow
+      setStartDate(now); // default: today, so the pair can begin at once
       const userId = data?.claims?.sub;
       if (!userId) return;
       const { data: profile } = await supabase
@@ -334,6 +334,34 @@ export default function OnboardingPage() {
                 });
               }}
             >
+              {today && (
+                <div
+                  className="flex gap-2"
+                  role="group"
+                  aria-label="Quick start"
+                >
+                  {(
+                    [
+                      ["Today", today],
+                      ["Tomorrow", addDays(today, 1)],
+                    ] as const
+                  ).map(([label, day]) => (
+                    <button
+                      key={label}
+                      type="button"
+                      aria-pressed={startDate === day}
+                      onClick={() => setStartDate(day)}
+                      className={`rounded-pill h-11 px-4 text-sm font-semibold ${
+                        startDate === day
+                          ? "bg-p text-p-deep shadow-player"
+                          : "bg-surface text-ink-2 shadow-soft"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
               <TextField
                 id="start"
                 label="Start date"
@@ -342,7 +370,11 @@ export default function OnboardingPage() {
                 min={today ?? undefined}
                 max={today ? addDays(today, MAX_START_DAYS_AHEAD) : undefined}
                 onChange={(e) => setStartDate(e.target.value)}
-                hint="Day 1 of the challenge. Solves before it count as pre-season."
+                hint={
+                  startDate === today
+                    ? "Starting today: anything you've already solved today counts."
+                    : "Day 1 of the challenge. Solves before it count as pre-season."
+                }
               />
               {error && <ErrorText>{error}</ErrorText>}
               <Button type="submit" disabled={busy}>

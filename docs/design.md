@@ -463,7 +463,7 @@ A step-by-step flow on a single calm panel. Progress is shown as **five little s
 2. **Companion and colour:** a horizontal carousel of the six creatures (big, 140 px, idle animations) plus three colour dots. The chosen colour instantly dresses the creature's scarf.
 3. **LeetCode:** the username field with live verification (section 10.10).
 4. **Pair up:**
-   - *Create:* shows a big 6-character code in Baloo 2, with "Copy code" and "Share" (Web Share API) buttons, and a start-date picker (default tomorrow).
+   - *Create:* shows a big 6-character code in Baloo 2, with "Copy code" and "Share" (Web Share API) buttons, and a start-date picker (default today) with "Today" and "Tomorrow" shortcut chips.
    - *Join:* six character slots (the code input, 10.10).
    - When the partner joins, their island and creature float into the sky with a little chime.
 5. **Install and notifications:**

@@ -539,7 +539,11 @@ function StartDate({ current, today }: { current: string; today: string }) {
       <ConfirmDialog
         open={confirm}
         title="Change the start date?"
-        body={`Day 1 moves to ${shortDate(value)} for both of you.`}
+        body={
+          value === today
+            ? "Day 1 becomes today for both of you, and today's solves count."
+            : `Day 1 moves to ${shortDate(value)} for both of you.`
+        }
         confirmLabel="Change it"
         onConfirm={save}
         onCancel={() => setConfirm(false)}
@@ -566,8 +570,20 @@ function StartDate({ current, today }: { current: string; today: string }) {
           Save
         </Button>
       </div>
+      <Button
+        type="button"
+        variant="soft"
+        className="self-start"
+        onClick={() => {
+          setValue(today);
+          setConfirm(true);
+        }}
+      >
+        Start today
+      </Button>
       <p className="text-ink-2 text-sm" role="status">
-        {message ?? "You can change this until the challenge begins."}
+        {message ??
+          "You can change this until the challenge begins. Starting today counts what you've already solved today."}
       </p>
     </form>
   );

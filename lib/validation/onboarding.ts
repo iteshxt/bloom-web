@@ -40,7 +40,7 @@ export const joinInput = z.object({ code: z.string().min(1).max(20) });
 /** How far ahead a start date may be set. */
 export const MAX_START_DAYS_AHEAD = 90;
 
-/** Start date: today (IST) up to 90 days out. Defaults to tomorrow in the UI. */
+/** Start date: today (IST) up to 90 days out. Defaults to today in the UI. */
 export function startDateInput(now: Date) {
   const today = todayIST(now);
   const latest = addDays(today, MAX_START_DAYS_AHEAD);
