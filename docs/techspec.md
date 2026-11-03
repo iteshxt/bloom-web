@@ -131,6 +131,9 @@ On the Hobby plan, Vercel Cron only allows schedules that run at most **once per
   sky.ts                         # IST sky bands (pure) + the theme boot script
   bloom.ts                       # flower growth stages (pure)
   moments.ts                     # which signature moments to play (pure)
+  nudges.ts                      # nudge presets and the daily limit (pure)
+  /game/heatmap.ts               # heatmap tiles, grids and profile stats (pure)
+  presence.ts                    # partner-opened wave, once an hour
   prefs.ts  motion.ts  sound.ts  haptics.ts  confetti.ts
 /components
   /sky /bloom /companions /icons /ui /game /moments   # hand-built SVG art and UI (design §16.3)
@@ -840,7 +843,7 @@ Errors use the shape `{ error: { code, message } }` with an HTTP status of 400, 
 | `PUT /api/gifts` | `{ milestone, title, hint?, details?, linkUrl? }` | Giver creates or edits a gift for the partner (only before reveal; 409 `already_revealed`). A new gift for a milestone the partner already reached starts `unlocked`. Links must be http(s) |
 | `POST /api/gifts/:id/reveal` | — | Receiver only; status `unlocked` and `title` set → `revealed` |
 | `POST /api/gifts/:id/received` | — | Receiver only; `revealed` → `delivered` |
-| `POST /api/nudge` | `{ message }` | Limit of 3 per sender per IST day |
+| `POST /api/nudge` | `{ message }` (preset or own words, 1–140 chars) | Limit of 3 per sender per IST day (429 `nudge_limit`); stores the nudge, adds a `nudge` activity row and pushes `nudge` to the partner after the response |
 | `POST /api/checkin/manual` | `{ problemUrl }` | Only if sync is failing for 3 h or more; parses the slug; source `manual` |
 | `POST /api/push/subscribe` | `PushSubscriptionJSON` | Upsert by endpoint |
 | `POST /api/push/unsubscribe` | `{ endpoint }` | Delete |
@@ -942,6 +945,10 @@ Icons are generated from one SVG by `scripts/generate-icons.mjs` (192, 512, mask
 - **Theme.** `lib/sky.ts` maps the IST time to a sky band (tested). `useDocumentTheme()` keeps `data-theme` (day/night palette), `data-band`, `data-motion` (reduced or full) and `data-hidden` (app in the background) on `<html>`; a small boot script in the root layout sets theme and motion before first paint so a night visit never flashes day. Ambient CSS loops stop under `data-motion="reduce"` and pause under `data-hidden`; Motion's `MotionConfig` keeps only fades when motion is reduced.
 - **Signature moments.** `lib/moments.ts` compares the current state (today done, both done, on ice, level, milestones reached, answered restore requests) with what this device has already shown, kept in `localStorage` under `bloom:seen:<playerId>`. The first run only records a baseline, so a fresh install never replays history. `components/moments` plays them one at a time; gift unboxing runs from the Gifts shelf.
 - **Sounds.** `scripts/generate-sounds.sh` synthesizes the eight sounds with ffmpeg into `public/sounds` (`.mp3` and `.ogg`, each under 20 KB). `lib/sound.ts` plays them through one Web Audio context after a user gesture, so nothing sounds on launch.
+- **Profiles.** `lib/game/heatmap.ts` (tested) turns day rows and submissions into heatmap tiles (year of Monday-first weeks or a month grid) and stats: distinct problems, Easy/Medium/Hard, best streak (longest run), days done (completed or restored among finished days) and top topics.
+- **Card → profile.** The home player cards and the profile share a `view-transition-name`; `lib/viewTransition.ts` wraps the route change in `document.startViewTransition` and the `(app)` template ends it once the new screen renders. Without support, or with reduced motion, it's the normal tab transition.
+- **Presence.** The pair's Realtime channel also tracks presence keyed by player. When the partner joins, their creature waves on home, at most once an hour per device (`lib/presence.ts`).
+- **Pull to refresh.** On home, pulling down from the top stretches your flower and runs the same sync as "Sync now" on release; the page sets `overscroll-behavior-y: contain` so the browser's own pull-to-refresh stays out of the way.
 - **Hydration.** Screens read the restored offline cache only after hydration (`useHydrated`, `useNow`), so the first client render matches the server HTML. Art coordinates are rounded so server and browser render identical SVG attributes, and every SVG id comes from `useId()`.
 
 ---

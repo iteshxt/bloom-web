@@ -939,7 +939,7 @@ Extend the theme to read the variables: colours (`cloud`, `ink`, `ink-2`, `p`, `
 - [x] Puffy icons (20, plus home, face, heart and lock for the nav and states) and line icons (nav + inline)
 - [x] Journey road scenes (5 stage sections), gift pedestals, flags
 - [x] Gift box (closed, wiggle, open, lid, ribbon), keepsake card
-- [ ] Badge medallions (16), with the badges screen (P1)
+- [x] Badge medallions (16), with the badges screen
 - [x] Wooden gift shelf
 - [ ] Empty-state illustrations: broken pot, rain cloud, gift wrapping (the rain cloud is done; the others use companions for now)
 - [x] Eight sounds (synthesized by `scripts/generate-sounds.sh`)
