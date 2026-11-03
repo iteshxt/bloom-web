@@ -5,7 +5,10 @@ import { api } from "@/lib/api/client";
 // Browser side of Web Push (techspec §11.2). Permission is requested only
 // from a user tap (CLAUDE.md "Push and PWA").
 
-export type PushState = "unsupported" | "denied" | "off" | "on";
+/** "unconfigured": this build has no VAPID public key, so nothing can
+ *  subscribe; the reminder prompt hides rather than offer a dead button. */
+export type PushState =
+  "unconfigured" | "unsupported" | "denied" | "off" | "on";
 
 export const pushSupported = (): boolean =>
   typeof window !== "undefined" &&
@@ -29,6 +32,7 @@ export function registerServiceWorker(): Promise<ServiceWorkerRegistration | nul
 
 export async function pushState(): Promise<PushState> {
   if (!pushSupported()) return "unsupported";
+  if (!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) return "unconfigured";
   if (Notification.permission === "denied") return "denied";
   const reg = await navigator.serviceWorker.getRegistration("/");
   const sub = await reg?.pushManager.getSubscription();

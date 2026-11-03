@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useNow } from "@/lib/dashboard/useNow";
 import { usePrefs, useReducedMotionPref } from "@/lib/prefs";
-import { isNightBand, skyBand, type SkyBand } from "@/lib/sky";
+import { THEME_COLORS, isNightBand, skyBand, type SkyBand } from "@/lib/sky";
 
 /** The current IST sky band; null before mount (no time in prerendered HTML). */
 export function useSkyBand(): SkyBand | null {
@@ -25,10 +25,16 @@ export function useDocumentTheme() {
     const root = document.documentElement;
     root.dataset.theme = night ? "night" : "day";
     root.dataset.band = band;
-    // The browser's status bar follows the palette's background.
-    const meta = document.querySelector('meta[name="theme-color"]');
-    const cloud = getComputedStyle(root).getPropertyValue("--cloud").trim();
-    if (meta && cloud) meta.setAttribute("content", cloud);
+    // The phone's status bar follows the palette (Android reads this tag).
+    let meta = document.querySelector<HTMLMetaElement>(
+      'meta[name="theme-color"]',
+    );
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.name = "theme-color";
+      document.head.appendChild(meta);
+    }
+    meta.content = THEME_COLORS[night ? "night" : "day"];
   }, [band, theme]);
 
   useEffect(() => {

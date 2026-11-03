@@ -49,6 +49,14 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: "monochrome",
       },
     ],
+    // Lets the site know when its own app is installed on this phone
+    // (navigator.getInstalledRelatedApps), so it can say so.
+    related_applications: [
+      {
+        platform: "webapp",
+        url: `${process.env.APP_URL ?? "http://localhost:3000"}/manifest.webmanifest`,
+      },
+    ],
     // Long-press the home-screen icon for these.
     shortcuts: [
       {

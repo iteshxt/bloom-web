@@ -404,6 +404,14 @@ function DevicePush() {
   const [test, setTest] = useState<string | null>(null);
 
   if (state === null) return null;
+  if (state === "unconfigured") {
+    return (
+      <p className="text-ink-2 text-sm">
+        Reminders aren’t switched on for Bloom yet. They’ll appear here once
+        they are.
+      </p>
+    );
+  }
   if (state === "unsupported") {
     return (
       <p className="text-ink-2 text-sm">

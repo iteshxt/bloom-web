@@ -226,6 +226,15 @@
   --animate-spin-slow: spin 1.4s linear infinite;
 }
 
+/* Built-in controls, scrollbars and the overscroll area follow the palette. */
+:root {
+  color-scheme: light;
+}
+:root[data-theme="night"] {
+  color-scheme: dark;
+}
+
+html,
 body {
   background: var(--cloud);
   color: var(--ink);

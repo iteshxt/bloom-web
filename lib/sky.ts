@@ -35,6 +35,11 @@ export const SKY_GRADIENTS: Record<SkyBand, [string, string]> = {
   deep: ["var(--sky-deep-top)", "var(--sky-deep-bottom)"],
 };
 
+/** The browser and phone status bar colour: Cloud in each palette (design
+ *  §3.1, §3.3). Set on <meta name="theme-color"> by us, not Next, so a page
+ *  change never resets it. */
+export const THEME_COLORS = { day: "#F6F4FC", night: "#1D1836" } as const;
+
 /** Runs before first paint (root layout) so a night visit never flashes the
  *  day palette. Mirrors skyBand() and lib/prefs.ts. */
-export const THEME_BOOT_SCRIPT = `(function(){try{var p=JSON.parse(localStorage.getItem("bloom:prefs")||"{}");var t=p.theme||"sky";var m=Math.floor(((Date.now()/60000)+330)%1440);var n=m<300||m>=1260;var d=document.documentElement;d.dataset.theme=t==="night"||(t==="sky"&&n)?"night":"day";var r=p.motion==="reduce"||(p.motion!=="full"&&matchMedia("(prefers-reduced-motion: reduce)").matches);d.dataset.motion=r?"reduce":"full";}catch(e){}})();`;
+export const THEME_BOOT_SCRIPT = `(function(){try{var p=JSON.parse(localStorage.getItem("bloom:prefs")||"{}");var t=p.theme||"sky";var m=Math.floor(((Date.now()/60000)+330)%1440);var n=m<300||m>=1260;var d=document.documentElement;var k=t==="night"||(t==="sky"&&n)?"night":"day";d.dataset.theme=k;var mt=document.querySelector('meta[name="theme-color"]');if(!mt){mt=document.createElement("meta");mt.name="theme-color";document.head.appendChild(mt);}mt.content=k==="night"?"#1D1836":"#F6F4FC";var r=p.motion==="reduce"||(p.motion!=="full"&&matchMedia("(prefers-reduced-motion: reduce)").matches);d.dataset.motion=r?"reduce":"full";}catch(e){}})();`;

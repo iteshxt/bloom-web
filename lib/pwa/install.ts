@@ -11,10 +11,16 @@ interface InstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
-export type InstallMode = "installed" | "prompt" | "ios" | "unavailable";
+/** installed: running as the installed app. elsewhere: installed on this
+ *  phone but opened in the browser. prompt: Chrome's install dialog is
+ *  ready. manual: Android without the dialog (Chrome hasn't offered it
+ *  yet), so we show the menu steps. ios: Safari's Share steps. */
+export type InstallMode =
+  "installed" | "elsewhere" | "prompt" | "manual" | "ios" | "unavailable";
 
 let deferred: InstallPromptEvent | null = null;
 let installed = false;
+let installedElsewhere = false;
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
 
@@ -29,6 +35,20 @@ if (typeof window !== "undefined") {
     deferred = null;
     emit();
   });
+  // Chrome on Android can tell a page its own installed app exists (the
+  // manifest lists itself under related_applications).
+  const nav = navigator as Navigator & {
+    getInstalledRelatedApps?: () => Promise<unknown[]>;
+  };
+  nav
+    .getInstalledRelatedApps?.()
+    .then((apps) => {
+      if (apps.length > 0) {
+        installedElsewhere = true;
+        emit();
+      }
+    })
+    .catch(() => undefined);
 }
 
 function mode(): InstallMode {
@@ -37,11 +57,13 @@ function mode(): InstallMode {
     (navigator as Navigator & { standalone?: boolean }).standalone === true;
   if (standalone || installed) return "installed";
   if (deferred) return "prompt";
+  if (installedElsewhere) return "elsewhere";
   const ua = navigator.userAgent;
   const iOS =
     /iPad|iPhone|iPod/.test(ua) ||
     (ua.includes("Mac") && "ontouchend" in document);
   if (iOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua)) return "ios";
+  if (/Android/.test(ua)) return "manual";
   return "unavailable";
 }
 

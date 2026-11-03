@@ -65,7 +65,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F6F4FC", // Cloud (design.md §2.3)
+  // theme-color is set by the boot script and useDocumentTheme instead, so
+  // it follows the day/night palette and page changes don't reset it.
   viewportFit: "cover",
 };
 

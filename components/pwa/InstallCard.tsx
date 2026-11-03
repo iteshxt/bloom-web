@@ -15,8 +15,10 @@ function readDismissed(): boolean {
   }
 }
 
-// design §11.2 step 5: "Install Bloom" on Android, the three-step
-// "Share → Add to Home Screen" note on iPhone Safari. Hidden once installed.
+// design §11.2 step 5: "Install Bloom" on Android, Chrome's menu steps
+// when its install dialog isn't offered, the three-step "Share → Add to
+// Home Screen" note on iPhone Safari, and a "you have it" note when the app
+// is installed but opened in the browser. Hidden inside the installed app.
 // On home it can be dismissed; in Settings it always shows.
 
 export function InstallCard({
@@ -62,12 +64,27 @@ export function InstallCard({
             )}
           </div>
         </>
+      ) : mode === "elsewhere" ? (
+        <p className="text-sm">
+          Bloom is already on this phone. Open it from your home screen for full
+          screen and reminders.
+        </p>
       ) : (
         <>
           <ol className="list-decimal pl-5 text-sm">
-            <li>Tap the Share button in Safari</li>
-            <li>Choose “Add to Home Screen”</li>
-            <li>Open Bloom from your home screen</li>
+            {mode === "manual" ? (
+              <>
+                <li>Tap Chrome’s ⋮ menu (top right)</li>
+                <li>Choose “Install app” or “Add to Home screen”</li>
+                <li>Open Bloom from your home screen</li>
+              </>
+            ) : (
+              <>
+                <li>Tap the Share button in Safari</li>
+                <li>Choose “Add to Home Screen”</li>
+                <li>Open Bloom from your home screen</li>
+              </>
+            )}
           </ol>
           {dismissible && (
             <Button variant="ghost" className="self-start" onClick={dismiss}>
