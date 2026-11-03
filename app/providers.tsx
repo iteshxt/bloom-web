@@ -1,7 +1,8 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { syncPushOnStart } from "@/lib/push/client";
 
 export function Providers({ children }: { children: ReactNode }) {
   const [client] = useState(
@@ -13,5 +14,10 @@ export function Providers({ children }: { children: ReactNode }) {
         },
       }),
   );
+  // Register the service worker and keep this device's push subscription
+  // known to the server (techspec §11.2).
+  useEffect(() => {
+    syncPushOnStart().catch(() => undefined);
+  }, []);
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }
