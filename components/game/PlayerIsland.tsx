@@ -4,7 +4,7 @@ import { Bloom } from "@/components/bloom/Bloom";
 import { Companion, type Mood } from "@/components/companions/Companion";
 import { Island } from "@/components/sky/Island";
 import { bloomLabel } from "@/lib/bloom";
-import type { Companion as Kind } from "@/lib/validation/onboarding";
+import type { Companion as Kind } from "@/lib/players";
 
 // One player's floating island in the sky (design §6.2, layer 5): their
 // flower and their companion, side by side.

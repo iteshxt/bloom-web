@@ -14,7 +14,7 @@ import { asKind } from "@/lib/companions";
 import { useDuel } from "@/lib/dashboard/useDuel";
 import { useHydrated } from "@/lib/useHydrated";
 import { useAchievements } from "@/lib/game/queries";
-import { MAX_MILESTONE } from "@/lib/validation/game";
+import { MAX_MILESTONE } from "@/lib/game/limits";
 
 // The journey (design §11.5, PRD 5.7): stat chips on the sky, the winding
 // garden road with a gift at every milestone, and a bottom card with the

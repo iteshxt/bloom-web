@@ -1,4 +1,4 @@
-import type { Companion, PlayerColor } from "@/lib/validation/onboarding";
+import type { Companion, PlayerColor } from "@/lib/players";
 
 // design.md §9.1. The illustrated creatures arrive with the design pass.
 export const COMPANION_INFO: Record<

@@ -1,18 +1,8 @@
 import { z } from "zod";
 import { addDays, todayIST, type DayKey } from "@/lib/time";
 
-export const COMPANIONS = [
-  "mochi",
-  "tofu",
-  "pip",
-  "bun",
-  "puff",
-  "sprig",
-] as const;
-export const PLAYER_COLORS = ["blush", "sky", "lilac"] as const;
-
-export type Companion = (typeof COMPANIONS)[number];
-export type PlayerColor = (typeof PLAYER_COLORS)[number];
+import { MAX_START_DAYS_AHEAD } from "@/lib/game/limits";
+import { COMPANIONS, PLAYER_COLORS } from "@/lib/players";
 
 export const profileInput = z.object({
   displayName: z
@@ -36,9 +26,6 @@ export const leetcodeUsername = z
 export const linkInput = z.object({ username: leetcodeUsername });
 
 export const joinInput = z.object({ code: z.string().min(1).max(20) });
-
-/** How far ahead a start date may be set. */
-export const MAX_START_DAYS_AHEAD = 90;
 
 /** Start date: today (IST) up to 90 days out. Defaults to today in the UI. */
 export function startDateInput(now: Date) {

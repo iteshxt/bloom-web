@@ -10,7 +10,7 @@ import { RollingNumber } from "@/components/moments/MomentOverlay";
 import { ProgressBar } from "@/components/ui/Progress";
 import { growthFor } from "@/lib/bloom";
 import type { PlayerView } from "@/lib/dashboard/derive";
-import type { Companion as Kind } from "@/lib/validation/onboarding";
+import type { Companion as Kind } from "@/lib/players";
 import { TokenPouch } from "./TokenPouch";
 
 // design §10.5–10.6 and §10.12: companion and flower stage, streak, heart-coin

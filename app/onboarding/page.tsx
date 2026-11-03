@@ -23,11 +23,8 @@ import { shortDate } from "@/lib/format/ist";
 import { createClient } from "@/lib/supabase/browser";
 import { addDays, todayIST } from "@/lib/time";
 import { toast } from "@/lib/toast";
-import {
-  MAX_START_DAYS_AHEAD,
-  type Companion,
-  type PlayerColor,
-} from "@/lib/validation/onboarding";
+import { MAX_START_DAYS_AHEAD } from "@/lib/game/limits";
+import type { Companion, PlayerColor } from "@/lib/players";
 
 // Onboarding (design §11.2): name → companion and colour → LeetCode → pair
 // up → install and reminders, on one calm panel under a little sky, with

@@ -1,11 +1,12 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Companion } from "@/components/companions/Companion";
 import { GiftShelf } from "@/components/game/GiftShelf";
-import { Unboxing, type Revealed } from "@/components/moments/Unboxing";
+import type { Revealed } from "@/components/moments/Unboxing";
 import { LineIcon } from "@/components/icons/line";
 import { PuffyIcon } from "@/components/icons/puffy";
 import { Button } from "@/components/ui/Button";
@@ -21,6 +22,12 @@ import { useDuel } from "@/lib/dashboard/useDuel";
 import { useHydrated } from "@/lib/useHydrated";
 import type { GivingGift, ReceivingGift } from "@/lib/gifts/view";
 import { useGifts } from "@/lib/game/queries";
+
+// The unboxing loads after the page; it only plays when a gift is opened.
+const Unboxing = dynamic(
+  () => import("@/components/moments/Unboxing").then((m) => m.Unboxing),
+  { ssr: false },
+);
 
 // Gifts (design §11.7, PRD 5.8): a "For me / For {Partner}" toggle. For me
 // is the wooden shelf; tapping an unlocked box opens it, tapping an opened

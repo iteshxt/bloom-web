@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
-import {
-  NUDGE_PRESETS,
-  NUDGES_PER_DAY,
-  nudgeInput,
-  nudgesLeft,
-} from "@/lib/nudges";
+import { NUDGE_PRESETS, NUDGES_PER_DAY, nudgesLeft } from "@/lib/nudges";
+import { nudgeInput } from "@/lib/validation/game";
 
 const emoji = (s: string) => [...s.matchAll(/\p{Extended_Pictographic}/gu)];
 

@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -12,7 +13,6 @@ import { PuffyIcon } from "@/components/icons/puffy";
 import { Island } from "@/components/sky/Island";
 import { Button } from "@/components/ui/Button";
 import { BadgesPreview } from "@/components/badges/BadgeGrid";
-import { NudgeSheet } from "@/components/game/NudgeSheet";
 import { ProfileHistory } from "@/components/game/ProfileHistory";
 import { PageShell, SectionTitle } from "@/components/ui/PageShell";
 import { ProgressBar, Skeleton } from "@/components/ui/Progress";
@@ -27,6 +27,12 @@ import { useNow } from "@/lib/dashboard/useNow";
 import { shortDate } from "@/lib/format/ist";
 import { useTargetHistory } from "@/lib/game/queries";
 import { addDays, todayIST } from "@/lib/time";
+
+// The nudge sheet loads after the page; it only opens on a tap.
+const NudgeSheet = dynamic(
+  () => import("@/components/game/NudgeSheet").then((m) => m.NudgeSheet),
+  { ssr: false },
+);
 
 // Player profile (design §11.4): the sky zooms in on that player's island,
 // then their stats and the daily target, which only the partner can change

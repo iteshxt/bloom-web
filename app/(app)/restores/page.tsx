@@ -17,7 +17,7 @@ import { shortDate, weekday } from "@/lib/format/ist";
 import { useRestoreHistory, type RestoreRow } from "@/lib/game/queries";
 import { toast } from "@/lib/toast";
 import { addDays, dayEndsAt } from "@/lib/time";
-import type { Companion as Kind } from "@/lib/validation/onboarding";
+import type { Companion as Kind } from "@/lib/players";
 
 // Restores (design §11.6, PRD 5.5): a frost-themed card for the player who
 // missed, a chat-like card for the partner deciding, and the history

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { apiError, readBody } from "@/lib/api/http";
 import { requirePair } from "@/lib/auth/session";
-import { NUDGES_PER_DAY, nudgeInput } from "@/lib/nudges";
+import { NUDGES_PER_DAY } from "@/lib/nudges";
+import { nudgeInput } from "@/lib/validation/game";
 import { sendNudge } from "@/lib/services/nudges";
 
 /** I nudge my partner (PRD 5.12): a preset or my own words, 3 a day. */

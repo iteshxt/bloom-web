@@ -4,7 +4,7 @@ import { spring } from "@/lib/motion";
 import { SectionTitle } from "@/components/ui/PageShell";
 import type { ActivityItem } from "@/lib/dashboard/useDuel";
 import { ago, humanizeSlug } from "@/lib/format/ist";
-import type { Companion as Kind } from "@/lib/validation/onboarding";
+import type { Companion as Kind } from "@/lib/players";
 
 // The "Recent" list on home (design §11.3, §11.12): the last few pair
 // events, each with its owner's 36 px companion in their colour.

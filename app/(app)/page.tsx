@@ -1,11 +1,10 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { navigateWithTransition } from "@/lib/viewTransition";
 import { useState } from "react";
-import { CheckInSheet } from "@/components/game/CheckInSheet";
-import { NudgeSheet } from "@/components/game/NudgeSheet";
 import { ActivityList, type Person } from "@/components/game/ActivityList";
 import { Banner } from "@/components/game/Banner";
 import { CountdownPill } from "@/components/game/CountdownPill";
@@ -26,7 +25,6 @@ import { asKind } from "@/lib/companions";
 import { derivePlayer, moodFor, pickBanner } from "@/lib/dashboard/derive";
 import { useDuel } from "@/lib/dashboard/useDuel";
 import { useNow } from "@/lib/dashboard/useNow";
-import { MomentHost } from "@/components/moments/Moments";
 import {
   useAchievements,
   useGifts,
@@ -40,6 +38,21 @@ import { PetalSpinner } from "@/components/ui/Progress";
 import { usePartnerWave } from "@/lib/presence";
 import { usePullToRefresh } from "@/lib/usePullToRefresh";
 import { useSyncNow } from "@/lib/useSyncNow";
+
+// Overlays that only appear on a tap or an event load after the page,
+// keeping them out of the first paint's JavaScript.
+const CheckInSheet = dynamic(
+  () => import("@/components/game/CheckInSheet").then((m) => m.CheckInSheet),
+  { ssr: false },
+);
+const NudgeSheet = dynamic(
+  () => import("@/components/game/NudgeSheet").then((m) => m.NudgeSheet),
+  { ssr: false },
+);
+const MomentHost = dynamic(
+  () => import("@/components/moments/Moments").then((m) => m.MomentHost),
+  { ssr: false },
+);
 
 // The duel dashboard (PRD 5.2, design §11.3): your island and your
 // partner's in the sky, today's quest on glass over the sky edge, then the

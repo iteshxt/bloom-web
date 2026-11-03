@@ -9,7 +9,7 @@ import {
   PLAYER_COLORS,
   type Companion as Kind,
   type PlayerColor,
-} from "@/lib/validation/onboarding";
+} from "@/lib/players";
 import { Companion } from "./Companion";
 
 // design §11.2 step 2: a horizontal carousel of the six creatures (140 px,

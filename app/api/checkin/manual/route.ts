@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { apiError, readBody } from "@/lib/api/http";
 import { requirePair } from "@/lib/auth/session";
-import { checkInInput, parseProblemUrl } from "@/lib/checkin";
+import { parseProblemUrl } from "@/lib/checkin";
+import { checkInInput } from "@/lib/validation/game";
 import { manualCheckIn } from "@/lib/services/checkin";
 
 /** Manual check-in (PRD 5.13): I paste a LeetCode problem URL while sync is

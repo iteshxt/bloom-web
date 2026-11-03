@@ -11,7 +11,7 @@ import { useNudgesLeft } from "@/lib/game/queries";
 import { NUDGE_MAX_LENGTH, NUDGE_PRESETS } from "@/lib/nudges";
 import { playSound } from "@/lib/sound";
 import { toast } from "@/lib/toast";
-import type { Companion as Kind } from "@/lib/validation/onboarding";
+import type { Companion as Kind } from "@/lib/players";
 
 // Nudge your partner (PRD 5.12, design §14.3): tap a preset or write your
 // own; it arrives as a push and their creature waves. 3 a day.

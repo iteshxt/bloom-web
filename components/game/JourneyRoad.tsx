@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { Companion } from "@/components/companions/Companion";
 import { PuffyIcon } from "@/components/icons/puffy";
 import { prefersReducedMotion } from "@/lib/prefs";
-import type { Companion as Kind } from "@/lib/validation/onboarding";
+import type { Companion as Kind } from "@/lib/players";
 
 // The journey as a garden road (design §11.5): a long vertical scene that
 // winds upward from the start. Its scenery changes by stage (meadow, flower

@@ -18,7 +18,7 @@ import { levelTitle } from "@/lib/push/copy";
 import { playSound } from "@/lib/sound";
 import { toast } from "@/lib/toast";
 import type { Moment } from "@/lib/moments";
-import type { Companion as Kind } from "@/lib/validation/onboarding";
+import type { Companion as Kind } from "@/lib/players";
 import { MomentOverlay, RollingNumber } from "./MomentOverlay";
 
 // The signature moments (design §12.4), played one at a time by

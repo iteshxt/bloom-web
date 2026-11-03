@@ -25,7 +25,7 @@ import {
   type ThemePref,
 } from "@/lib/prefs";
 import { toast } from "@/lib/toast";
-import type { PlayerColor } from "@/lib/validation/onboarding";
+import type { PlayerColor } from "@/lib/players";
 import { api } from "@/lib/api/client";
 import { useNow } from "@/lib/dashboard/useNow";
 import { shortDate } from "@/lib/format/ist";
@@ -35,7 +35,7 @@ import {
 } from "@/lib/push/categories";
 import { createClient } from "@/lib/supabase/browser";
 import { addDays, todayIST } from "@/lib/time";
-import { MAX_START_DAYS_AHEAD } from "@/lib/validation/onboarding";
+import { MAX_START_DAYS_AHEAD } from "@/lib/game/limits";
 
 // Settings (PRD 5.17, design §11.14): grouped white cards for the profile,
 // reminders, appearance (per-device, kept in localStorage), the shared

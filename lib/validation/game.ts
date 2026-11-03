@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { MAX_MILESTONE } from "@/lib/game/limits";
+import { NUDGE_MAX_LENGTH } from "@/lib/nudges";
 
 // Input schemas for the game routes (techspec §10).
 
@@ -48,8 +50,6 @@ export const giftInput = z.object({
     ),
 });
 
-export const MAX_MILESTONE = 3650;
-
 export const pairPatchInput = z
   .object({
     addMilestone: z.number().int().min(1).max(MAX_MILESTONE).optional(),
@@ -63,3 +63,15 @@ export const pairPatchInput = z
       v.startDate !== undefined,
     "Nothing to change",
   );
+
+export const nudgeInput = z.object({
+  message: z
+    .string()
+    .trim()
+    .min(1, "Pick a nudge or write one")
+    .max(NUDGE_MAX_LENGTH, `Keep it under ${NUDGE_MAX_LENGTH} characters`),
+});
+
+export const checkInInput = z.object({
+  problemUrl: z.string().max(500),
+});

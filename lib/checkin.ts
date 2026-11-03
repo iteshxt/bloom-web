@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { SYNC_FAILING_AFTER_MS } from "@/lib/engine";
 
 // Manual check-in (PRD 5.13): when LeetCode sync has been failing, a player
@@ -13,10 +12,6 @@ export function parseProblemUrl(input: string): string | null {
   const m = PROBLEM_URL.exec(input.trim());
   return m ? m[1] : null;
 }
-
-export const checkInInput = z.object({
-  problemUrl: z.string().max(500),
-});
 
 /** Check-in opens when sync is failing: at least one failure in a row, and
  *  no success for more than 3 hours (or never, when LeetCode has been
