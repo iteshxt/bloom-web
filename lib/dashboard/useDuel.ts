@@ -201,7 +201,8 @@ export function useDuel() {
       channel.on(
         "postgres_changes",
         { event: "*", schema: "public", table, filter: `pair_id=eq.${pairId}` },
-        () => queryClient.invalidateQueries({ queryKey: DUEL_KEY }),
+        // Any pair change can affect any screen (gifts signal through activity).
+        () => queryClient.invalidateQueries(),
       );
     }
     channel.subscribe();
