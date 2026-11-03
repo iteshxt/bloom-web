@@ -43,7 +43,14 @@ export async function proxy(request: NextRequest) {
   const userId = data?.claims?.sub;
   const path = request.nextUrl.pathname;
 
-  if (path.startsWith("/api/") || path.startsWith("/auth/")) return response;
+  // API routes answer for themselves; /offline is the service worker's
+  // fallback and must load for anyone.
+  if (
+    path.startsWith("/api/") ||
+    path.startsWith("/auth/") ||
+    path === "/offline"
+  )
+    return response;
 
   // Redirects keep any refreshed session cookies.
   const redirect = (to: string) => {

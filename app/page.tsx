@@ -23,7 +23,9 @@ export default function HomePage() {
   const { data, isPending, isError, refetch } = useDuel();
   const gifts = useGifts();
 
-  if (isError) {
+  // Cached data (e.g. offline) beats an error screen; only show the error
+  // when there's nothing to show.
+  if (isError && !data) {
     return (
       <Shell>
         <p className="text-ink-2">
@@ -39,7 +41,7 @@ export default function HomePage() {
       </Shell>
     );
   }
-  if (isPending || !now || !data) {
+  if ((isPending && !data) || !now || !data) {
     return (
       <Shell>
         <p className="text-ink-2">Loading…</p>

@@ -36,7 +36,8 @@ export interface PlayerInput {
   /** Day rows keyed by day; only today's and yesterday's are needed. */
   days: Record<DayKey, DayRow>;
   targets: TargetChange[];
-  lastSyncAt: Date | null;
+  /** A Date, or its ISO string after the cache round-trips through storage. */
+  lastSyncAt: Date | string | null;
 }
 
 export interface PairInput {
@@ -118,7 +119,7 @@ export function derivePlayer(
     startsInDays: started ? null : daysBetween(today, pair.startDate),
     syncFailing:
       p.lastSyncAt !== null &&
-      now.getTime() - p.lastSyncAt.getTime() > SYNC_FAILING_AFTER_MS,
+      now.getTime() - new Date(p.lastSyncAt).getTime() > SYNC_FAILING_AFTER_MS,
   };
 }
 

@@ -156,7 +156,8 @@ async function fetchDuel(): Promise<DuelData | null> {
       targets: (targets.data ?? [])
         .filter((t) => t.player_id === row.id)
         .map((t) => ({ effectiveFrom: t.effective_from, target: t.target })),
-      lastSyncAt: lastSync ? new Date(lastSync) : null,
+      // ISO text, not a Date, so the cache survives being saved offline.
+      lastSyncAt: lastSync ?? null,
       recentSolves,
     };
   };

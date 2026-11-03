@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { clearOfflineCache } from "@/lib/offline/cache";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { usePushState } from "@/components/push/usePushState";
@@ -48,11 +49,15 @@ function useSettings() {
 
 export default function SettingsPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const now = useNow();
   const settings = useSettings();
 
   async function signOut() {
     await createClient().auth.signOut();
+    // Don't leave this account's data on the device.
+    queryClient.clear();
+    clearOfflineCache();
     router.replace("/login");
     router.refresh();
   }

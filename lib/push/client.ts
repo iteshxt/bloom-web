@@ -15,9 +15,16 @@ export const pushSupported = (): boolean =>
 
 export function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
   if (!pushSupported()) return Promise.resolve(null);
-  return navigator.serviceWorker
-    .register("/sw.js", { scope: "/", updateViaCache: "none" })
-    .catch(() => null);
+  return (
+    navigator.serviceWorker
+      // The dev server's files change on every edit, so the worker skips
+      // offline caching there (public/sw.js).
+      .register(
+        process.env.NODE_ENV === "development" ? "/sw.js?mode=dev" : "/sw.js",
+        { scope: "/", updateViaCache: "none" },
+      )
+      .catch(() => null)
+  );
 }
 
 export async function pushState(): Promise<PushState> {

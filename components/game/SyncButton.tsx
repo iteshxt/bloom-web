@@ -13,7 +13,7 @@ export function SyncButton({
   lastSyncAt,
   now,
 }: {
-  lastSyncAt: Date | null;
+  lastSyncAt: Date | string | null;
   now: Date;
 }) {
   const queryClient = useQueryClient();
@@ -52,7 +52,7 @@ export function SyncButton({
         {state.kind === "done" || state.kind === "error"
           ? state.text
           : lastSyncAt
-            ? `Synced ${ago(lastSyncAt, now)}`
+            ? `Synced ${ago(new Date(lastSyncAt), now)}`
             : "Not synced yet"}
       </p>
       <Button
