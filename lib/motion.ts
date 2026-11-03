@@ -24,6 +24,3 @@ export const ease = {
 } as const;
 
 export const press = { scale: 0.96, y: 1, transition: spring.snappy } as const;
-
-/** design §12.5: with reduced motion every spring becomes a 160 ms fade. */
-export const reducedFade = { duration: 0.16 } as const;
