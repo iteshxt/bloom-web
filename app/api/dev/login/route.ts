@@ -39,7 +39,10 @@ export async function POST(request: NextRequest) {
     const { data, error } = await admin.auth.admin.listUsers({ perPage: 1000 });
     const existing = data?.users.find((u) => u.email === email);
     if (error || !existing) {
-      return apiError(500, "dev_login", created.error.message);
+      const why = error
+        ? `couldn't list users: ${error.message}`
+        : `no existing user ${email} after: ${created.error.message}`;
+      return apiError(500, "dev_login", why);
     }
     const updated = await admin.auth.admin.updateUserById(existing.id, {
       password,
