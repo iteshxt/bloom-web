@@ -1,6 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
+import * as m from "motion/react-m";
 import { useRef, useState } from "react";
 import { spring } from "@/lib/motion";
 
@@ -73,7 +74,7 @@ export function CodeSeeds({
               >
                 <AnimatePresence>
                   {ch && (
-                    <motion.svg
+                    <m.svg
                       key="leaf"
                       viewBox="0 0 16 12"
                       className="svg-origin-bottom absolute -top-2.5 left-1/2 w-4 -translate-x-1/2"
@@ -90,7 +91,7 @@ export function CodeSeeds({
                         d="M8 12C8 8 5.5 5 1 4.5C1 9 4 12 8 12Z"
                         fill="var(--leaf)"
                       />
-                    </motion.svg>
+                    </m.svg>
                   )}
                 </AnimatePresence>
                 {ch ?? ""}

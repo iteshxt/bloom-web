@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import * as m from "motion/react-m";
 import Link from "next/link";
 import { useState } from "react";
 import { Chip } from "@/components/ui/Chip";
@@ -68,13 +68,13 @@ export function BadgeGrid({
       >
         {open && info && (
           <div className="flex flex-col items-center gap-3 pb-4 text-center">
-            <motion.div
+            <m.div
               style={{ transformPerspective: 600 }}
               animate={{ rotateY: [-12, 12, -12] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             >
               <Medallion badge={open} size={160} locked={!earned[open]} />
-            </motion.div>
+            </m.div>
             {earned[open] ? (
               <Chip tone="mint" icon="check">
                 Earned {shortDate(istParts(new Date(earned[open])).day)}

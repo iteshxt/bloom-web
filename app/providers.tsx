@@ -9,13 +9,16 @@ import {
   createOfflinePersister,
   useOnline,
 } from "@/lib/offline/cache";
-import { MotionConfig } from "motion/react";
+import { LazyMotion, MotionConfig } from "motion/react";
 import { Toaster } from "@/components/ui/Toaster";
 import { useReducedMotionPref } from "@/lib/prefs";
 import { syncPushOnStart } from "@/lib/push/client";
 import { useDocumentTheme } from "@/lib/useSkyBand";
 // Loaded early so Chrome's one-time install event is never missed.
 import "@/lib/pwa/install";
+
+const loadMotionFeatures = () =>
+  import("@/lib/motionFeatures").then((m) => m.default);
 
 export function Providers({ children }: { children: ReactNode }) {
   const [client] = useState(
@@ -53,9 +56,13 @@ export function Providers({ children }: { children: ReactNode }) {
     >
       {/* design §12.5: with reduced motion, Motion keeps only fades. */}
       <MotionConfig reducedMotion={reduced ? "always" : "never"}>
-        <OfflinePill />
-        <Toaster />
-        {children}
+        {/* strict: a full `motion` element anywhere would throw, so the
+            features stay out of the first load. */}
+        <LazyMotion features={loadMotionFeatures} strict>
+          <OfflinePill />
+          <Toaster />
+          {children}
+        </LazyMotion>
       </MotionConfig>
     </PersistQueryClientProvider>
   );

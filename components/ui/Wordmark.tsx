@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import * as m from "motion/react-m";
 import { spring } from "@/lib/motion";
 
 // The wordmark (design §2.1): lowercase "bloom" in Baloo 2 ExtraBold, the
@@ -42,15 +42,15 @@ export function Wordmark({
         style={{ height: height * 0.56, width: height * 1.0 }}
         className="mx-[0.02em] self-baseline overflow-visible"
       >
-        <motion.g className="svg-origin-center" {...roll(-60)}>
+        <m.g className="svg-origin-center" {...roll(-60)}>
           <circle cx={28} cy={28} r={25} fill="var(--blush)" />
           <circle cx={20} cy={18} r={5} fill="var(--white)" opacity={0.5} />
-        </motion.g>
-        <motion.g className="svg-origin-center" {...roll(60)}>
+        </m.g>
+        <m.g className="svg-origin-center" {...roll(60)}>
           <circle cx={72} cy={28} r={25} fill="var(--sky)" />
           <circle cx={64} cy={18} r={5} fill="var(--white)" opacity={0.5} />
-        </motion.g>
-        <motion.path
+        </m.g>
+        <m.path
           d="M50 16.13A25 25 0 0 1 50 39.87A25 25 0 0 1 50 16.13Z"
           fill="var(--overlap)"
           initial={rollIn ? { opacity: 0 } : undefined}

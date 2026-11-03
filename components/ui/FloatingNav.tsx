@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import * as m from "motion/react-m";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
@@ -134,7 +134,7 @@ export function FloatingNav({
         ref={list}
         className="bg-dock pointer-events-auto relative box-content flex h-16 items-center justify-between px-3 pb-[env(safe-area-inset-bottom)] md:rounded-b-xl"
       >
-        <motion.span
+        <m.span
           aria-hidden
           className="bg-p rounded-pill pointer-events-none absolute top-0 left-0 shadow-[0_8px_24px_-10px_rgb(var(--p-rgb)/0.9)]"
           initial={false}

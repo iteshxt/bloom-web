@@ -1,6 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
+import * as m from "motion/react-m";
 import { useEffect } from "react";
 import { describe, type Person } from "@/components/game/ActivityList";
 import { Companion } from "@/components/companions/Companion";
@@ -104,7 +105,7 @@ export default function FeedPage() {
                   const big = BIG[a.kind];
                   const xp = a.kind === "solve" ? Number(a.payload.xp) : 0;
                   return (
-                    <motion.li
+                    <m.li
                       key={a.id}
                       layout
                       initial={{ opacity: 0, scale: 0.96 }}
@@ -156,7 +157,7 @@ export default function FeedPage() {
                           {istClock(a.createdAt)}
                         </span>
                       </div>
-                    </motion.li>
+                    </m.li>
                   );
                 })}
               </AnimatePresence>

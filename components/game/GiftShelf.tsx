@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import * as m from "motion/react-m";
 import { PuffyIcon } from "@/components/icons/puffy";
 import { press } from "@/lib/motion";
 import type { ReceivingGift } from "@/lib/gifts/view";
@@ -70,7 +70,7 @@ function Box({
           : `${daysToGo} days to go`
   }`;
   return (
-    <motion.button
+    <m.button
       type="button"
       aria-label={label}
       whileTap={press}
@@ -135,6 +135,6 @@ function Box({
                   ? "1 day to go"
                   : `${daysToGo} days to go`}
       </span>
-    </motion.button>
+    </m.button>
   );
 }

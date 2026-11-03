@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, type HTMLMotionProps } from "motion/react";
+import { type HTMLMotionProps } from "motion/react";
+import * as m from "motion/react-m";
 import { forwardRef } from "react";
 import { haptic } from "@/lib/haptics";
 import { press, spring } from "@/lib/motion";
@@ -41,7 +42,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) {
     return (
-      <motion.button
+      <m.button
         ref={ref}
         whileTap={props.disabled ? undefined : press}
         transition={spring.bouncy}

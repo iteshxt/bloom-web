@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import * as m from "motion/react-m";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { dur } from "@/lib/motion";
@@ -45,7 +45,7 @@ export function MomentOverlay({
 
   if (typeof document === "undefined") return null;
   return createPortal(
-    <motion.div
+    <m.div
       className="fixed inset-0 z-[70] flex items-center justify-center overflow-hidden px-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -68,7 +68,7 @@ export function MomentOverlay({
       <div className="relative flex w-full max-w-[398px] flex-col items-center">
         {children}
       </div>
-    </motion.div>,
+    </m.div>,
     document.body,
   );
 }
@@ -86,7 +86,7 @@ export function RollingNumber({
     <span className={`tabular inline-flex overflow-hidden ${className}`}>
       {digits.map((d, i) => (
         <span key={`${digits.length}-${i}`} className="relative inline-block">
-          <motion.span
+          <m.span
             key={d}
             className="inline-block"
             initial={{ y: "-100%", opacity: 0 }}
@@ -99,7 +99,7 @@ export function RollingNumber({
             }}
           >
             {d}
-          </motion.span>
+          </m.span>
         </span>
       ))}
     </span>

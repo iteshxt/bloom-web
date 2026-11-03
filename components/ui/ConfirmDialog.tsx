@@ -1,6 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
+import * as m from "motion/react-m";
 import { useEffect, useId } from "react";
 import { createPortal } from "react-dom";
 import { dur, spring } from "@/lib/motion";
@@ -41,7 +42,7 @@ export function ConfirmDialog({
     <AnimatePresence>
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-6">
-          <motion.div
+          <m.div
             className="bg-ink/20 absolute inset-0 backdrop-blur-[6px]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -49,7 +50,7 @@ export function ConfirmDialog({
             transition={{ duration: dur.fast }}
             onClick={onCancel}
           />
-          <motion.section
+          <m.section
             role="alertdialog"
             aria-modal="true"
             aria-labelledby={id}
@@ -80,7 +81,7 @@ export function ConfirmDialog({
                 {cancelLabel}
               </Button>
             </div>
-          </motion.section>
+          </m.section>
         </div>
       )}
     </AnimatePresence>,

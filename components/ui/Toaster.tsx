@@ -1,6 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
+import * as m from "motion/react-m";
 import { PuffyIcon } from "@/components/icons/puffy";
 import { spring } from "@/lib/motion";
 import { dismissToast, useToast } from "@/lib/toast";
@@ -17,7 +18,7 @@ export function Toaster() {
     >
       <AnimatePresence>
         {t && (
-          <motion.div
+          <m.div
             key={t.id}
             className="glass rounded-pill pointer-events-auto flex max-w-[398px] items-center gap-2 py-1.5 pr-5 pl-2 text-sm font-semibold"
             initial={{ y: -24, opacity: 0 }}
@@ -34,7 +35,7 @@ export function Toaster() {
               <span className="w-2" />
             )}
             <span className="line-clamp-2">{t.text}</span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

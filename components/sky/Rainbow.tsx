@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import * as m from "motion/react-m";
 import { dur, ease } from "@/lib/motion";
 
 // Both done today: a faint rainbow arcs between the two islands (§6.3). It
@@ -23,7 +23,7 @@ export function Rainbow({ className = "" }: { className?: string }) {
       aria-hidden
     >
       {BANDS.map((c, i) => (
-        <motion.path
+        <m.path
           key={c}
           d={`M${10 + i * 6} 108A${100 - i * 6} ${96 - i * 6} 0 0 1 ${210 - i * 6} 108`}
           stroke={c}

@@ -1,11 +1,7 @@
 "use client";
 
-import {
-  AnimatePresence,
-  motion,
-  useDragControls,
-  type PanInfo,
-} from "motion/react";
+import { AnimatePresence, useDragControls, type PanInfo } from "motion/react";
+import * as m from "motion/react-m";
 import { useEffect, useId, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { dur, spring } from "@/lib/motion";
@@ -54,7 +50,7 @@ export function Sheet({
     <AnimatePresence>
       {open && (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
-          <motion.div
+          <m.div
             className="bg-ink/20 absolute inset-0 backdrop-blur-[6px]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -62,7 +58,7 @@ export function Sheet({
             transition={{ duration: dur.fast }}
             onClick={onClose}
           />
-          <motion.section
+          <m.section
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
@@ -101,7 +97,7 @@ export function Sheet({
             <div className="flex flex-col gap-4 overflow-x-hidden overflow-y-auto px-4 pb-2">
               {children}
             </div>
-          </motion.section>
+          </m.section>
         </div>
       )}
     </AnimatePresence>,

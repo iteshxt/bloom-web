@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import * as m from "motion/react-m";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { spring } from "@/lib/motion";
 import { useHydrated } from "@/lib/useHydrated";
@@ -41,7 +41,7 @@ export default function AppTemplate({
   }, []);
 
   return (
-    <motion.div
+    <m.div
       className="flex flex-1 flex-col"
       initial={
         hydrated && !morphing ? { opacity: 0, x: direction * 12 } : false
@@ -50,6 +50,6 @@ export default function AppTemplate({
       transition={{ ...spring.soft, opacity: { duration: 0.2 } }}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }

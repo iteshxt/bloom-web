@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { motion } from "motion/react";
+import * as m from "motion/react-m";
 import { clearOfflineCache } from "@/lib/offline/cache";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -313,7 +313,7 @@ function Segmented<T extends string>({
             className={`rounded-pill relative min-h-11 px-2 text-sm font-semibold ${value === v ? "text-p-deep" : "text-ink-2"}`}
           >
             {value === v && (
-              <motion.span
+              <m.span
                 layoutId={`seg-${label}`}
                 className="bg-p rounded-pill absolute inset-0"
                 transition={spring.soft}

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import * as m from "motion/react-m";
 import { spring } from "@/lib/motion";
 
 // design §10.12: 10 px pill track in the soft shade, fill in the colour,
@@ -37,7 +37,7 @@ export function ProgressBar({
       aria-valuenow={value}
       className={`rounded-pill relative h-2.5 overflow-hidden ${t.track} ${className}`}
     >
-      <motion.div
+      <m.div
         className={`rounded-pill absolute inset-y-0 left-0 w-full origin-left ${t.fill}`}
         initial={{ scaleX: 0 }}
         animate={{ scaleX: pct, scaleY: [1, 1.15, 1] }}
@@ -49,7 +49,7 @@ export function ProgressBar({
         {tone === "butter" && (
           <span className="rounded-pill absolute inset-x-1 top-[1.5px] h-[2px] bg-white/70" />
         )}
-      </motion.div>
+      </m.div>
     </div>
   );
 }

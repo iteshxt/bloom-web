@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useAnimationControls } from "motion/react";
+import { useAnimationControls } from "motion/react";
+import * as m from "motion/react-m";
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { sparklePath } from "@/components/icons/geometry";
 import { Puff, svgId } from "@/components/icons/Puff";
@@ -116,10 +117,7 @@ export function Companion({
           opacity={0.12}
         />
       </svg>
-      <motion.span
-        animate={hop}
-        className="absolute inset-0 block origin-bottom"
-      >
+      <m.span animate={hop} className="absolute inset-0 block origin-bottom">
         <span
           className={`absolute inset-0 block ${k.floats ? "animate-bob" : ""}`}
           style={k.floats ? { animationDuration: "3.6s" } : undefined}
@@ -142,7 +140,7 @@ export function Companion({
             </svg>
           </span>
         </span>
-      </motion.span>
+      </m.span>
       <svg viewBox="0 0 120 120" className={svg}>
         <Extras k={k} mood={mood} />
         {mood === "frozen" && <IceCube />}

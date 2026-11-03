@@ -1,6 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion, useAnimationControls } from "motion/react";
+import { AnimatePresence, useAnimationControls } from "motion/react";
+import * as m from "motion/react-m";
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { sparklePath } from "@/components/icons/geometry";
@@ -88,7 +89,7 @@ export function Unboxing({
 
   if (typeof document === "undefined") return null;
   return createPortal(
-    <motion.div
+    <m.div
       className="fixed inset-0 z-[70] flex flex-col items-center justify-center overflow-hidden px-6"
       data-player-color={color}
       initial={{ opacity: 0 }}
@@ -118,13 +119,13 @@ export function Unboxing({
 
       <AnimatePresence mode="wait">
         {!gift ? (
-          <motion.div
+          <m.div
             key="box"
             className="relative flex flex-col items-center gap-6"
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: dur.fast }}
           >
-            <motion.button
+            <m.button
               type="button"
               aria-label={`Tap to open (${3 - Math.min(taps, 3)} more)`}
               className="relative"
@@ -141,13 +142,13 @@ export function Unboxing({
               {taps >= 2 && (
                 <span className="bg-butter/40 absolute inset-0 -z-10 scale-125 rounded-full blur-2xl" />
               )}
-              <motion.div
+              <m.div
                 animate={box}
                 className={`svg-origin-bottom ${taps === 0 ? "animate-wiggle" : ""}`}
               >
                 <GiftBox size={180} glow={taps >= 2} untie={taps >= 3} />
-              </motion.div>
-            </motion.button>
+              </m.div>
+            </m.button>
             <div className="flex flex-col items-center gap-2 text-white">
               <p className="font-display text-xl font-bold">
                 {taps >= 3 ? "Opening…" : "Tap to open"}
@@ -166,9 +167,9 @@ export function Unboxing({
                 </p>
               )}
             </div>
-          </motion.div>
+          </m.div>
         ) : (
-          <motion.section
+          <m.section
             key="card"
             className="bg-surface shadow-float relative flex w-full max-w-[360px] flex-col gap-3 rounded-xl p-6"
             style={{ transformPerspective: 900 }}
@@ -220,10 +221,10 @@ export function Unboxing({
                 Done
               </Button>
             </div>
-          </motion.section>
+          </m.section>
         )}
       </AnimatePresence>
-    </motion.div>,
+    </m.div>,
     document.body,
   );
 }
@@ -281,10 +282,7 @@ function GiftBox({
           />
         )}
       />
-      <motion.g
-        animate={{ opacity: untie ? 0 : 1 }}
-        transition={{ duration: 0.3 }}
-      >
+      <m.g animate={{ opacity: untie ? 0 : 1 }} transition={{ duration: 0.3 }}>
         <rect
           x={54}
           y={54}
@@ -293,8 +291,8 @@ function GiftBox({
           rx={3}
           fill="var(--butter)"
         />
-      </motion.g>
-      <motion.g
+      </m.g>
+      <m.g
         className="svg-origin-center"
         animate={
           untie
@@ -325,7 +323,7 @@ function GiftBox({
           rx={3}
           fill="var(--butter)"
         />
-        <motion.g
+        <m.g
           animate={untie ? { x: -16, opacity: 0 } : { x: 0, opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
@@ -337,8 +335,8 @@ function GiftBox({
             transform="rotate(20 46 30)"
             fill="var(--butter)"
           />
-        </motion.g>
-        <motion.g
+        </m.g>
+        <m.g
           animate={untie ? { x: 16, opacity: 0 } : { x: 0, opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
@@ -350,10 +348,10 @@ function GiftBox({
             transform="rotate(-20 74 30)"
             fill="var(--butter)"
           />
-        </motion.g>
+        </m.g>
         <circle cx={60} cy={34} r={7} fill="var(--butter)" />
         <Shine filter="ub-s" cx={30} cy={44} rx={8} ry={3} rotate={0} />
-      </motion.g>
+      </m.g>
       <path
         d={sparklePath(102, 30, 6)}
         fill="var(--butter)"

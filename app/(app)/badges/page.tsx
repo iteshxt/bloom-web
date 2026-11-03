@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import * as m from "motion/react-m";
 import { useState } from "react";
 import { BadgeGrid } from "@/components/badges/BadgeGrid";
 import { PageShell } from "@/components/ui/PageShell";
@@ -65,7 +65,7 @@ export default function BadgesPage() {
                   className={`rounded-pill relative h-11 font-semibold ${whose === t ? "text-p-deep" : "text-ink-2"}`}
                 >
                   {whose === t && (
-                    <motion.span
+                    <m.span
                       layoutId="badge-tab"
                       className="bg-p rounded-pill absolute inset-0"
                       transition={spring.soft}

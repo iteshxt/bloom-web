@@ -3,7 +3,8 @@
 import dynamic from "next/dynamic";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
+import * as m from "motion/react-m";
 import { Companion } from "@/components/companions/Companion";
 import { GiftShelf } from "@/components/game/GiftShelf";
 import type { Revealed } from "@/components/moments/Unboxing";
@@ -97,7 +98,7 @@ export default function GiftsPage() {
               className={`rounded-pill relative h-11 font-semibold ${tab === t ? "text-p-deep" : "text-ink-2"}`}
             >
               {tab === t && (
-                <motion.span
+                <m.span
                   layoutId="gift-tab"
                   className="bg-p rounded-pill absolute inset-0"
                   transition={spring.soft}

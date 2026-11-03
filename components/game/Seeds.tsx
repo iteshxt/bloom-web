@@ -1,6 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
+import * as m from "motion/react-m";
 import { spring } from "@/lib/motion";
 
 // design §10.4: one seed per required problem. Empty seeds are outlined in
@@ -68,7 +69,7 @@ function Seed({ on, makeup }: { on: boolean; makeup: boolean }) {
       />
       <AnimatePresence>
         {on && (
-          <motion.g
+          <m.g
             key="on"
             className="svg-origin-center"
             initial={{ scale: 0 }}
@@ -95,7 +96,7 @@ function Seed({ on, makeup }: { on: boolean; makeup: boolean }) {
               strokeWidth={1.6}
               strokeLinecap="round"
             />
-          </motion.g>
+          </m.g>
         )}
       </AnimatePresence>
     </svg>

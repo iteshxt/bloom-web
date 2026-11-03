@@ -1,6 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
+import * as m from "motion/react-m";
 import { useId, type ReactNode } from "react";
 import { svgId } from "@/components/icons/Puff";
 import { useReducedMotionPref } from "@/lib/prefs";
@@ -74,7 +75,7 @@ export function SkyScene({
       >
         <AnimatePresence initial={false}>
           {band && (
-            <motion.g
+            <m.g
               key={band}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -85,7 +86,7 @@ export function SkyScene({
               }}
             >
               <BandLayer band={band} u={u} />
-            </motion.g>
+            </m.g>
           )}
         </AnimatePresence>
         <Hills night={band !== null && isDark(band)} />

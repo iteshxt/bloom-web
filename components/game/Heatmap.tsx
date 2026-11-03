@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import * as m from "motion/react-m";
 import { useEffect, useRef, useState } from "react";
 import { heartPath, sparklePath } from "@/components/icons/geometry";
 import { LineIcon } from "@/components/icons/line";
@@ -95,24 +95,24 @@ export function Heatmap({
           aria-label="Heatmap view"
           className="bg-cloud rounded-pill flex gap-1 p-1"
         >
-          {(["month", "year"] as const).map((m) => (
+          {(["month", "year"] as const).map((opt) => (
             <button
-              key={m}
+              key={opt}
               type="button"
               role="radio"
-              aria-checked={mode === m}
-              onClick={() => setMode(m)}
-              className={`rounded-pill relative h-9 px-3 text-sm font-semibold ${mode === m ? "text-p-deep" : "text-ink-2"}`}
+              aria-checked={mode === opt}
+              onClick={() => setMode(opt)}
+              className={`rounded-pill relative h-9 px-3 text-sm font-semibold ${mode === opt ? "text-p-deep" : "text-ink-2"}`}
             >
-              {mode === m && (
-                <motion.span
+              {mode === opt && (
+                <m.span
                   layoutId="heat-mode"
                   className="bg-p rounded-pill absolute inset-0"
                   transition={spring.soft}
                 />
               )}
               <span className="relative">
-                {m === "year" ? "Year" : "Month"}
+                {opt === "year" ? "Year" : "Month"}
               </span>
             </button>
           ))}
@@ -270,7 +270,7 @@ function MonthGrid({
         </button>
       </div>
       {/* swipe sideways to change month */}
-      <motion.div
+      <m.div
         key={month}
         className="grid touch-pan-y grid-cols-7 gap-1.5 px-11"
         drag="x"
@@ -309,7 +309,7 @@ function MonthGrid({
             <span key={i} />
           ),
         )}
-      </motion.div>
+      </m.div>
     </div>
   );
 }

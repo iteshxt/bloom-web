@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useAnimationControls } from "motion/react";
+import { useAnimationControls } from "motion/react";
+import * as m from "motion/react-m";
 import { useEffect, useRef } from "react";
 import { Bloom } from "@/components/bloom/Bloom";
 import { Companion, type Mood } from "@/components/companions/Companion";
@@ -33,7 +34,7 @@ export function PlayerCard({
     `${player.streak}:${player.focus?.solved ?? 0}:${player.onIce}`,
   );
   return (
-    <motion.section
+    <m.section
       animate={nudge}
       data-player-color={player.color}
       aria-label={`${label}: ${player.name}, ${player.streak}-day streak${player.onIce ? ", on ice" : ""}`}
@@ -98,7 +99,7 @@ export function PlayerCard({
           Lv {player.level}
         </span>
       </div>
-    </motion.section>
+    </m.section>
   );
 }
 

@@ -1,4 +1,5 @@
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
+import * as m from "motion/react-m";
 import { Companion } from "@/components/companions/Companion";
 import { spring } from "@/lib/motion";
 import { SectionTitle } from "@/components/ui/PageShell";
@@ -37,7 +38,7 @@ export function ActivityList({
               const who = people[a.actorId ?? ""];
               const xp = a.kind === "solve" ? Number(a.payload.xp) : 0;
               return (
-                <motion.li
+                <m.li
                   key={a.id}
                   layout
                   initial={{ opacity: 0, scale: 0.96 }}
@@ -73,7 +74,7 @@ export function ActivityList({
                   <span className="text-ink-3 shrink-0 text-xs">
                     {ago(new Date(a.createdAt), now)}
                   </span>
-                </motion.li>
+                </m.li>
               );
             })}
           </AnimatePresence>
