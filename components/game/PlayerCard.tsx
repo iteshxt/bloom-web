@@ -1,32 +1,58 @@
-import type { PlayerView } from "@/lib/dashboard/derive";
+import { Bloom } from "@/components/bloom/Bloom";
+import { Companion } from "@/components/companions/Companion";
+import { sparklePath } from "@/components/icons/geometry";
+import { PuffyIcon } from "@/components/icons/puffy";
+import { ProgressBar } from "@/components/ui/Progress";
+import { growthFor } from "@/lib/bloom";
+import type { CompanionMood, PlayerView } from "@/lib/dashboard/derive";
+import type { Companion as Kind } from "@/lib/validation/onboarding";
+import { TokenPouch } from "./TokenPouch";
 
-// design §10.5–10.6 and §10.12: streak, heart-coin tokens, next gift, XP bar.
-// The companion and flower art arrive with the design pass.
+// design §10.5–10.6 and §10.12: companion and flower stage, streak, heart-coin
+// tokens, the next gift and the XP bar. On ice the card frosts over, with
+// crystals in two corners and a slow frost glow.
 
 export function PlayerCard({
   player,
+  kind,
+  mood,
   label,
 }: {
   player: PlayerView;
+  kind: Kind;
+  mood: CompanionMood;
   label: string;
 }) {
-  const xpPct =
-    player.xpLevelSpan > 0
-      ? Math.min(100, (player.xpIntoLevel / player.xpLevelSpan) * 100)
-      : 0;
+  const stage = growthFor(player.streak).label;
   return (
     <section
       data-player-color={player.color}
-      aria-label={`${label}: ${player.name}`}
-      className={`shadow-player flex flex-col gap-3 rounded-lg p-4 ${
-        player.onIce ? "bg-frost-soft ring-frost ring-2" : "bg-p-soft"
+      aria-label={`${label}: ${player.name}, ${player.streak}-day streak${player.onIce ? ", on ice" : ""}`}
+      className={`shadow-player relative flex h-full flex-col gap-2.5 overflow-hidden rounded-lg p-4 ${
+        player.onIce
+          ? "bg-frost-soft shadow-glow-frost animate-pulse-soft [animation-duration:4s]"
+          : "bg-p-soft"
       }`}
     >
-      <p className="text-p-deep truncate text-sm font-semibold">
+      {player.onIce && <FrostCorners />}
+      <div className="flex items-start justify-between gap-1">
+        <Companion
+          kind={kind}
+          mood={mood}
+          size={64}
+          streak={player.streak}
+          className="-mt-2 -ml-2"
+        />
+        <div className="flex flex-col items-end">
+          <Bloom streak={player.streak} size={40} frozen={player.onIce} />
+          <span className="text-p-deep text-xs font-semibold">{stage}</span>
+        </div>
+      </div>
+      <p className="text-p-deep -mt-1 truncate text-sm font-semibold">
         {player.name}
       </p>
       <div>
-        <p className="font-display text-[48px] leading-none font-extrabold tabular-nums">
+        <p className="font-display tabular text-[48px] leading-none font-extrabold">
           {player.streak}
         </p>
         <p
@@ -36,49 +62,53 @@ export function PlayerCard({
         </p>
       </div>
 
-      <div
-        className="flex items-center gap-1.5"
-        aria-label={`${player.tokens} of ${player.tokensMax} tokens left`}
-      >
-        {Array.from({ length: player.tokensMax }, (_, i) => (
-          <span
-            key={i}
-            className={`rounded-pill h-4 w-4 ${
-              i < player.tokens
-                ? "bg-butter"
-                : "border-ink-3 border-[1.5px] border-dashed"
-            }`}
-          />
-        ))}
-        <span className="text-ink-2 ml-1 text-[13px]">tokens</span>
-      </div>
+      <TokenPouch
+        tokens={player.tokens}
+        max={player.tokensMax}
+        label="tokens"
+      />
 
       {player.nextMilestone && (
-        <p className="rounded-pill bg-surface text-p-deep self-start px-3 py-1 text-[13px] font-semibold">
+        <p className="rounded-pill bg-surface text-p-deep inline-flex items-center gap-1 self-start py-0.5 pr-3 pl-1 text-[13px] font-semibold">
+          <PuffyIcon name="gift" size={22} />
           {player.nextMilestone.daysToGo === 1
-            ? "Next gift tomorrow"
-            : `Next gift in ${player.nextMilestone.daysToGo} days`}
+            ? "Gift tomorrow"
+            : `in ${player.nextMilestone.daysToGo} days`}
         </p>
       )}
 
-      <div className="flex items-center gap-2">
-        <div
-          className="rounded-pill bg-butter-soft h-2.5 flex-1 overflow-hidden"
-          role="progressbar"
-          aria-valuemin={0}
-          aria-valuemax={player.xpLevelSpan}
-          aria-valuenow={player.xpIntoLevel}
-          aria-label="XP to next level"
-        >
-          <div
-            className="rounded-pill bg-butter h-full"
-            style={{ width: `${xpPct}%` }}
-          />
-        </div>
-        <span className="text-butter-deep text-[13px] font-semibold">
+      <div className="mt-auto flex items-center gap-2">
+        <ProgressBar
+          value={player.xpIntoLevel}
+          max={player.xpLevelSpan}
+          tone="butter"
+          label="XP to next level"
+          className="flex-1"
+        />
+        <span className="text-butter-deep tabular text-[13px] font-semibold">
           Lv {player.level}
         </span>
       </div>
     </section>
+  );
+}
+
+function FrostCorners() {
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      className="pointer-events-none absolute inset-0 h-full w-full"
+      aria-hidden
+    >
+      <path d="M0 0H26L0 22Z" fill="var(--white)" opacity={0.7} />
+      <path d="M100 100H72L100 76Z" fill="var(--white)" opacity={0.7} />
+      <path d={sparklePath(8, 7, 4)} fill="var(--frost-deep)" opacity={0.35} />
+      <path
+        d={sparklePath(92, 92, 4)}
+        fill="var(--frost-deep)"
+        opacity={0.35}
+      />
+    </svg>
   );
 }

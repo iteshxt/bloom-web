@@ -1,10 +1,13 @@
+import { PuffyIcon } from "@/components/icons/puffy";
+import { Chip } from "@/components/ui/Chip";
 import type { PlayerView } from "@/lib/dashboard/derive";
 import type { Solve } from "@/lib/dashboard/useDuel";
 import { istClock, shortDate, weekday } from "@/lib/format/ist";
 import { addDays } from "@/lib/time";
+import { Seeds } from "./Seeds";
 
-// design §10.4 and §11.3 states. Seeds: one per required problem; make-up
-// seeds are frost. More than 6 switches to a segmented bar.
+// design §10.4 and §11.3 states: a glass card overlapping the sky edge.
+// Progress seeds, the make-up chip, the latest solves and Sync now.
 
 export function TodayQuestCard({
   me,
@@ -42,26 +45,19 @@ export function TodayQuestCard({
   const bothDone = f.done && partner?.focus?.done;
 
   return (
-    <Card>
-      <div className="flex items-baseline justify-between gap-3">
+    <Card done={f.done}>
+      <div className="flex items-center justify-between gap-3">
         <h2 className="font-display text-lg font-semibold">{title}</h2>
-        {f.done && (
-          <span className="rounded-pill bg-mint-soft text-mint-deep px-3 py-1 text-[13px] font-semibold">
-            Done
-          </span>
-        )}
-      </div>
-
-      <div className="flex items-center gap-4">
-        <Seeds solved={f.solved} target={f.target} makeup={f.makeup} />
-        <span className="font-display text-lg font-semibold tabular-nums">
+        <span className="font-display tabular text-lg font-semibold">
           {Math.min(f.solved, f.required)} of {f.required}
         </span>
       </div>
+
+      <Seeds solved={f.solved} target={f.target} makeup={f.makeup} />
       {f.makeup > 0 && (
-        <span className="rounded-pill bg-frost-soft text-frost-deep self-start px-3 py-1 text-[13px] font-semibold">
+        <Chip tone="frost" icon="ice" className="self-start">
           +{f.makeup} make-up for {weekday(addDays(f.day, -1))}
-        </span>
+        </Chip>
       )}
 
       <p className="text-ink-2">
@@ -77,20 +73,22 @@ export function TodayQuestCard({
       </p>
 
       {solves.length > 0 && (
-        <ul className="border-line flex flex-col gap-1 border-t pt-3">
+        <ul className="border-line flex flex-col gap-1.5 border-t pt-3">
           {solves.slice(0, 2).map((s) => (
             <li
               key={s.submittedAt + s.title}
-              className="flex justify-between gap-3 text-sm"
+              className="flex items-center justify-between gap-3 text-sm"
             >
               <span className="truncate">
-                {s.title}
-                {s.difficulty ? ` · ${s.difficulty}` : ""} ·{" "}
-                {istClock(s.submittedAt)}
+                <span className="font-semibold">{s.title}</span>
+                <span className="text-ink-2">
+                  {s.difficulty ? ` · ${s.difficulty}` : ""} ·{" "}
+                  {istClock(s.submittedAt)}
+                </span>
               </span>
               {s.xp > 0 && (
                 <span className="text-butter-deep shrink-0 font-semibold">
-                  +{s.xp}xp
+                  +{s.xp} XP
                 </span>
               )}
             </li>
@@ -102,56 +100,20 @@ export function TodayQuestCard({
   );
 }
 
-function Seeds({
-  solved,
-  target,
-  makeup,
+function Card({
+  done = false,
+  children,
 }: {
-  solved: number;
-  target: number;
-  makeup: number;
+  done?: boolean;
+  children: React.ReactNode;
 }) {
-  const total = target + makeup;
-  const filled = Math.min(solved, total);
-  if (total > 6) {
-    return (
-      <div className="flex h-3 w-40 gap-0.5" aria-hidden>
-        {Array.from({ length: total }, (_, i) => (
-          <span
-            key={i}
-            className={`rounded-pill flex-1 ${i < filled ? "bg-p" : "bg-p-soft"}`}
-          />
-        ))}
-      </div>
-    );
-  }
   return (
-    <div className="flex gap-2" aria-hidden>
-      {Array.from({ length: total }, (_, i) => {
-        const isMakeup = i >= target;
-        const on = i < filled;
-        return (
-          <span
-            key={i}
-            className={`rounded-pill h-6 w-6 border-2 ${
-              isMakeup
-                ? on
-                  ? "border-frost-deep bg-frost"
-                  : "border-frost-deep bg-frost-soft"
-                : on
-                  ? "border-p bg-p"
-                  : "border-p bg-surface"
-            }`}
-          />
-        );
-      })}
-    </div>
-  );
-}
-
-function Card({ children }: { children: React.ReactNode }) {
-  return (
-    <section className="bg-surface shadow-player flex flex-col gap-3 rounded-lg p-5">
+    <section className="glass relative flex flex-col gap-3 rounded-lg p-5">
+      {done && (
+        <span className="absolute -top-3 -right-2" aria-label="Done">
+          <PuffyIcon name="check" size={44} />
+        </span>
+      )}
       {children}
     </section>
   );

@@ -81,7 +81,11 @@ function IslandBase({ frozen }: { frozen: boolean }) {
       <circle cx={138} cy={12} r={2.2} fill="var(--white)" />
       {frozen && (
         <g>
-          <path d="M6 22C6 8 164 8 164 22C164 31 6 31 6 22Z" fill="var(--frost)" opacity={0.55} />
+          <path
+            d="M6 22C6 8 164 8 164 22C164 31 6 31 6 22Z"
+            fill="var(--frost)"
+            opacity={0.55}
+          />
           <path d={sparklePath(28, 18, 5)} fill="var(--white)" />
           <path d={sparklePath(132, 16, 4)} fill="var(--white)" />
           <path d={sparklePath(86, 24, 3)} fill="var(--white)" opacity={0.8} />

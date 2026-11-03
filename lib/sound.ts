@@ -7,14 +7,7 @@ import { getPrefs } from "@/lib/prefs";
 // Sound is never the only feedback, so every failure is silent.
 
 export type SoundName =
-  | "pop"
-  | "chime"
-  | "clink"
-  | "crack"
-  | "melt"
-  | "whoosh"
-  | "tap"
-  | "rustle";
+  "pop" | "chime" | "clink" | "crack" | "melt" | "whoosh" | "tap" | "rustle";
 
 let ctx: AudioContext | null = null;
 const buffers = new Map<SoundName, Promise<AudioBuffer | null>>();

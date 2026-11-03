@@ -2,10 +2,13 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { LineIcon } from "@/components/icons/line";
 import { Button } from "@/components/ui/Button";
+import { PetalSpinner } from "@/components/ui/Progress";
 import { api } from "@/lib/api/client";
 import { DUEL_KEY } from "@/lib/dashboard/useDuel";
 import { ago } from "@/lib/format/ist";
+import { toast } from "@/lib/toast";
 
 // design §14.4: "Sync now" → "Syncing…" → "Synced · 2 new".
 
@@ -36,13 +39,12 @@ export function SyncButton({
         text: "Can’t reach LeetCode right now. Try again soon.",
       });
     }
-    setState({
-      kind: "done",
-      text:
-        res.data.newSolves > 0
-          ? `Synced · ${res.data.newSolves} new`
-          : "Synced · nothing new",
-    });
+    const text =
+      res.data.newSolves > 0
+        ? `Synced · ${res.data.newSolves} new`
+        : "Synced · nothing new";
+    setState({ kind: "done", text });
+    toast(text, "code");
     await queryClient.invalidateQueries({ queryKey: DUEL_KEY });
   }
 
@@ -57,11 +59,19 @@ export function SyncButton({
       </p>
       <Button
         variant="secondary"
-        className="h-11!"
+        className="h-11! px-4 text-sm"
         onClick={sync}
         disabled={state.kind === "syncing"}
       >
-        {state.kind === "syncing" ? "Syncing…" : "Sync now"}
+        {state.kind === "syncing" ? (
+          <>
+            <PetalSpinner size={18} /> Syncing…
+          </>
+        ) : (
+          <>
+            Sync now <LineIcon name="sync" size={18} />
+          </>
+        )}
       </Button>
     </div>
   );

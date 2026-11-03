@@ -38,7 +38,11 @@ export interface KindArt {
   floats?: boolean;
 }
 
-const body = (k: Pick<KindArt, "fill" | "deep">, id: string, shape: (p: object) => ReactNode) => (
+const body = (
+  k: Pick<KindArt, "fill" | "deep">,
+  id: string,
+  shape: (p: object) => ReactNode,
+) => (
   <Puff id={id} fill={k.fill} deep={k.deep} shade={[-3, -4]} shape={shape} />
 );
 
@@ -51,9 +55,24 @@ const MOCHI: KindArt = {
       {/* the straight ear, slightly behind the head */}
       <g transform={droop ? "rotate(14 72 50)" : undefined}>
         {body(MOCHI, `${u}e1`, (p) => (
-          <ellipse cx={74} cy={28} rx={9} ry={24} transform="rotate(8 74 28)" {...p} />
+          <ellipse
+            cx={74}
+            cy={28}
+            rx={9}
+            ry={24}
+            transform="rotate(8 74 28)"
+            {...p}
+          />
         ))}
-        <ellipse cx={74} cy={30} rx={4} ry={16} transform="rotate(8 74 30)" fill="var(--blush)" opacity={0.55} />
+        <ellipse
+          cx={74}
+          cy={30}
+          rx={4}
+          ry={16}
+          transform="rotate(8 74 30)"
+          fill="var(--blush)"
+          opacity={0.55}
+        />
       </g>
       <circle cx={95} cy={98} r={8} fill={MOCHI.fill} />
     </g>
@@ -73,9 +92,16 @@ const MOCHI: KindArt = {
     // the floppy ear, folded over to the side
     <g transform={droop ? "rotate(-10 44 50)" : undefined}>
       {body(MOCHI, `${u}e2`, (p) => (
-        <path d="M44 52C34 40 22 32 14 38C8 43 14 54 26 58C34 61 42 58 44 52Z" {...p} />
+        <path
+          d="M44 52C34 40 22 32 14 38C8 43 14 54 26 58C34 61 42 58 44 52Z"
+          {...p}
+        />
       ))}
-      <path d="M40 52C32 44 24 40 19 43C16 46 20 52 28 55Z" fill="var(--blush)" opacity={0.5} />
+      <path
+        d="M40 52C32 44 24 40 19 43C16 46 20 52 28 55Z"
+        fill="var(--blush)"
+        opacity={0.5}
+      />
     </g>
   ),
   eyes: [
@@ -100,12 +126,54 @@ const TOFU: KindArt = {
       {body(TOFU, `${u}b`, (p) => (
         <>
           <rect x={22} y={56} width={76} height={56} rx={28} {...p} />
-          <path d={roundPoly([[25, 70], [28, 40], [48, 58]], 0.22)} {...p} />
-          <path d={roundPoly([[95, 70], [92, 40], [72, 58]], 0.22)} {...p} />
+          <path
+            d={roundPoly(
+              [
+                [25, 70],
+                [28, 40],
+                [48, 58],
+              ],
+              0.22,
+            )}
+            {...p}
+          />
+          <path
+            d={roundPoly(
+              [
+                [95, 70],
+                [92, 40],
+                [72, 58],
+              ],
+              0.22,
+            )}
+            {...p}
+          />
         </>
       ))}
-      <path d={roundPoly([[30, 62], [31, 49], [42, 59]], 0.25)} fill="var(--blush)" opacity={0.45} />
-      <path d={roundPoly([[90, 62], [89, 49], [78, 59]], 0.25)} fill="var(--blush)" opacity={0.45} />
+      <path
+        d={roundPoly(
+          [
+            [30, 62],
+            [31, 49],
+            [42, 59],
+          ],
+          0.25,
+        )}
+        fill="var(--blush)"
+        opacity={0.45}
+      />
+      <path
+        d={roundPoly(
+          [
+            [90, 62],
+            [89, 49],
+            [78, 59],
+          ],
+          0.25,
+        )}
+        fill="var(--blush)"
+        opacity={0.45}
+      />
     </g>
   ),
   front: ({ u, droop }) => (
@@ -121,9 +189,19 @@ const TOFU: KindArt = {
       />
       {/* the tail curled around the front of the loaf */}
       {body(TOFU, `${u}t`, (p) => (
-        <path d="M98 96C108 92 110 106 98 110C84 115 50 115 38 110C46 108 80 108 92 104C98 102 100 98 98 96Z" {...p} />
+        <path
+          d="M98 96C108 92 110 106 98 110C84 115 50 115 38 110C46 108 80 108 92 104C98 102 100 98 98 96Z"
+          {...p}
+        />
       ))}
-      <path d="M44 109C60 111 80 110 92 106" stroke="var(--wood-deep)" strokeOpacity={0.25} strokeWidth={2} strokeLinecap="round" fill="none" />
+      <path
+        d="M44 109C60 111 80 110 92 106"
+        stroke="var(--wood-deep)"
+        strokeOpacity={0.25}
+        strokeWidth={2}
+        strokeLinecap="round"
+        fill="none"
+      />
     </g>
   ),
   eyes: [
@@ -154,7 +232,14 @@ const PIP: KindArt = {
           <ellipse cx={84} cy={109} rx={12} ry={5} {...p} />
         </>
       ))}
-      <ellipse cx={60} cy={96} rx={22} ry={13} fill="var(--white)" opacity={0.35} />
+      <ellipse
+        cx={60}
+        cy={96}
+        rx={22}
+        ry={13}
+        fill="var(--white)"
+        opacity={0.35}
+      />
     </g>
   ),
   front: ({ u, droop }) => (
@@ -167,8 +252,21 @@ const PIP: KindArt = {
           <path d="M40 52C46 36 72 34 84 46C72 54 50 56 40 52Z" {...p} />
         )}
       />
-      <path d="M44 51C56 48 70 46 80 46" stroke="var(--leaf-deep)" strokeOpacity={0.4} strokeWidth={1.6} strokeLinecap="round" fill="none" />
-      <path d="M62 44q2-6 6-7" stroke="var(--leaf-deep)" strokeWidth={2} strokeLinecap="round" fill="none" />
+      <path
+        d="M44 51C56 48 70 46 80 46"
+        stroke="var(--leaf-deep)"
+        strokeOpacity={0.4}
+        strokeWidth={1.6}
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M62 44q2-6 6-7"
+        stroke="var(--leaf-deep)"
+        strokeWidth={2}
+        strokeLinecap="round"
+        fill="none"
+      />
     </g>
   ),
   eyes: [
@@ -208,9 +306,19 @@ const BUN: KindArt = {
           <circle cx={60} cy={72} r={32} {...p} />
         </>
       ))}
-      <ellipse cx={60} cy={84} rx={13} ry={9.5} fill="var(--white)" opacity={0.55} />
+      <ellipse
+        cx={60}
+        cy={84}
+        rx={13}
+        ry={9.5}
+        fill="var(--white)"
+        opacity={0.55}
+      />
       {/* the heart-shaped nose */}
-      <path d="M60 83C56 80 55.5 76.5 58 76.5C59 76.5 59.6 77.2 60 78C60.4 77.2 61 76.5 62 76.5C64.5 76.5 64 80 60 83Z" fill="var(--plum)" />
+      <path
+        d="M60 83C56 80 55.5 76.5 58 76.5C59 76.5 59.6 77.2 60 78C60.4 77.2 61 76.5 62 76.5C64.5 76.5 64 80 60 83Z"
+        fill="var(--plum)"
+      />
     </g>
   ),
   eyes: [
@@ -246,9 +354,24 @@ const PUFF: KindArt = {
       ))}
       {/* the fluffy edge wobbles */}
       <g fill={PUFF.fill}>
-        <circle cx={26} cy={74} r={7} className="animate-[fluff_3s_ease-in-out_infinite] svg-origin-center" />
-        <circle cx={94} cy={74} r={7} className="animate-[fluff_3.4s_ease-in-out_infinite] svg-origin-center" />
-        <circle cx={60} cy={106} r={8} className="animate-[fluff_2.8s_ease-in-out_infinite] svg-origin-center" />
+        <circle
+          cx={26}
+          cy={74}
+          r={7}
+          className="svg-origin-center animate-[fluff_3s_ease-in-out_infinite]"
+        />
+        <circle
+          cx={94}
+          cy={74}
+          r={7}
+          className="svg-origin-center animate-[fluff_3.4s_ease-in-out_infinite]"
+        />
+        <circle
+          cx={60}
+          cy={106}
+          r={8}
+          className="svg-origin-center animate-[fluff_2.8s_ease-in-out_infinite]"
+        />
       </g>
     </g>
   ),
@@ -314,7 +437,10 @@ const SPRIG: KindArt = {
   ),
   front: ({ streak }) => {
     // tiny flowers among the spines bloom with the streak
-    const count = Math.min(SPRIG_FLOWER_SPOTS.length, 1 + Math.floor(streak / 7));
+    const count = Math.min(
+      SPRIG_FLOWER_SPOTS.length,
+      1 + Math.floor(streak / 7),
+    );
     return (
       <g>
         {SPRIG_FLOWER_SPOTS.slice(0, count).map(([x, y], i) => (

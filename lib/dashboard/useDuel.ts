@@ -74,39 +74,62 @@ async function fetchDuel(): Promise<DuelData | null> {
   const today = todayIST(new Date());
   const days = [addDays(today, -1), today];
 
-  const [pair, runs, dayRows, targets, solves, requests, activity, sync] =
-    await Promise.all([
-      supabase.from("pairs").select("*").eq("id", pairId).single(),
-      supabase
-        .from("runs")
-        .select("player_id, length, tokens_remaining, at_risk_day")
-        .is("ended_on", null),
-      supabase.from("days").select("*").in("day", days),
-      supabase
-        .from("daily_targets")
-        .select("player_id, effective_from, target"),
-      supabase
-        .from("submissions")
-        .select(
-          "player_id, assigned_day, submitted_at, xp, problems(title, difficulty)",
-        )
-        .eq("counted", true)
-        .in("assigned_day", days)
-        .order("submitted_at", { ascending: false }),
-      supabase
-        .from("restore_requests")
-        .select("id, player_id, approver_id")
-        .eq("status", "pending"),
-      supabase
-        .from("activity")
-        .select("id, actor_id, kind, payload, created_at")
-        .order("created_at", { ascending: false })
-        .limit(8),
-      api<{ players: { playerId: string; lastSuccessAt: string | null }[] }>(
-        "/api/sync",
-      ),
-    ]);
-  for (const r of [pair, runs, dayRows, targets, solves, requests, activity]) {
+  const [
+    pair,
+    runs,
+    ended,
+    dayRows,
+    targets,
+    solves,
+    requests,
+    activity,
+    sync,
+  ] = await Promise.all([
+    supabase.from("pairs").select("*").eq("id", pairId).single(),
+    supabase
+      .from("runs")
+      .select("player_id, length, tokens_remaining, at_risk_day")
+      .is("ended_on", null),
+    // The latest ended run per player, for the "sad" mood (design §9.3).
+    supabase
+      .from("runs")
+      .select("player_id, length, ended_on")
+      .not("ended_on", "is", null)
+      .order("ended_on", { ascending: false })
+      .limit(10),
+    supabase.from("days").select("*").in("day", days),
+    supabase.from("daily_targets").select("player_id, effective_from, target"),
+    supabase
+      .from("submissions")
+      .select(
+        "player_id, assigned_day, submitted_at, xp, problems(title, difficulty)",
+      )
+      .eq("counted", true)
+      .in("assigned_day", days)
+      .order("submitted_at", { ascending: false }),
+    supabase
+      .from("restore_requests")
+      .select("id, player_id, approver_id")
+      .eq("status", "pending"),
+    supabase
+      .from("activity")
+      .select("id, actor_id, kind, payload, created_at")
+      .order("created_at", { ascending: false })
+      .limit(8),
+    api<{ players: { playerId: string; lastSuccessAt: string | null }[] }>(
+      "/api/sync",
+    ),
+  ]);
+  for (const r of [
+    pair,
+    runs,
+    ended,
+    dayRows,
+    targets,
+    solves,
+    requests,
+    activity,
+  ]) {
     if (r.error) throw r.error;
   }
   if (!pair.data?.start_date) return null;
@@ -158,6 +181,8 @@ async function fetchDuel(): Promise<DuelData | null> {
         .map((t) => ({ effectiveFrom: t.effective_from, target: t.target })),
       // ISO text, not a Date, so the cache survives being saved offline.
       lastSyncAt: lastSync ?? null,
+      lastEndedRunLength:
+        ended.data?.find((r) => r.player_id === row.id)?.length ?? null,
       recentSolves,
     };
   };

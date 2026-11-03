@@ -50,7 +50,9 @@ export function Companion({
   const k = KINDS[kind] ?? KINDS.mochi;
   const reduced = useReducedMotionPref();
   const blink = useBlink(!reduced && eyesOpen(mood));
-  const glance = useGlance(!reduced && (mood === "waiting" || mood === "frozen"));
+  const glance = useGlance(
+    !reduced && (mood === "waiting" || mood === "frozen"),
+  );
   const hop = useAnimationControls();
 
   // Happy hops once when it arrives; celebrate keeps jumping.
@@ -234,11 +236,19 @@ function Face({
   if (mood === "happy" || mood === "celebrate") {
     // content "^ ^"
     eyes = k.eyes.map(([x, y], i) => (
-      <path key={i} d={`M${x - 4} ${y + 1.5}Q${x} ${y - 4} ${x + 4} ${y + 1.5}`} {...line} />
+      <path
+        key={i}
+        d={`M${x - 4} ${y + 1.5}Q${x} ${y - 4} ${x + 4} ${y + 1.5}`}
+        {...line}
+      />
     ));
   } else if (mood === "sleeping") {
     eyes = k.eyes.map(([x, y], i) => (
-      <path key={i} d={`M${x - 4} ${y}Q${x} ${y + 3.5} ${x + 4} ${y}`} {...line} />
+      <path
+        key={i}
+        d={`M${x - 4} ${y}Q${x} ${y + 3.5} ${x + 4} ${y}`}
+        {...line}
+      />
     ));
   } else {
     eyes = k.eyes.map(([x, y], i) => (
@@ -279,14 +289,26 @@ function Face({
       );
       break;
     case "sad":
-      mouth = <path d={`M${mx - 3.5} ${my + 3}Q${mx} ${my - 0.5} ${mx + 3.5} ${my + 3}`} {...line} strokeWidth={2} />;
+      mouth = (
+        <path
+          d={`M${mx - 3.5} ${my + 3}Q${mx} ${my - 0.5} ${mx + 3.5} ${my + 3}`}
+          {...line}
+          strokeWidth={2}
+        />
+      );
       break;
     case "urgent":
     case "sleeping":
       mouth = <ellipse cx={mx} cy={my + 1.5} rx={2} ry={2.4} fill={ink} />;
       break;
     case "frozen":
-      mouth = <path d={`M${mx - 3.5} ${my + 1}q1.75 -1.5 3.5 0t3.5 0`} {...line} strokeWidth={1.8} />;
+      mouth = (
+        <path
+          d={`M${mx - 3.5} ${my + 1}q1.75 -1.5 3.5 0t3.5 0`}
+          {...line}
+          strokeWidth={1.8}
+        />
+      );
       break;
     default:
       // a small "w"
@@ -302,7 +324,15 @@ function Face({
   return (
     <g>
       {k.cheeks.map(([x, y], i) => (
-        <ellipse key={i} cx={x} cy={y} rx={5} ry={3} fill="var(--blush)" opacity={0.6} />
+        <ellipse
+          key={i}
+          cx={x}
+          cy={y}
+          rx={5}
+          ry={3}
+          fill="var(--blush)"
+          opacity={0.6}
+        />
       ))}
       {eyes}
       {mouth}
@@ -324,11 +354,12 @@ function Paw({ k, mood }: { k: KindArt; mood: Mood }) {
   return (
     <g
       className={
-        mood === "wave"
-          ? "animate-[wave-paw_0.5s_ease-in-out_3]"
-          : undefined
+        mood === "wave" ? "animate-[wave-paw_0.5s_ease-in-out_3]" : undefined
       }
-      style={{ transformBox: "view-box", transformOrigin: `${x - 8}px ${y + 6}px` }}
+      style={{
+        transformBox: "view-box",
+        transformOrigin: `${x - 8}px ${y + 6}px`,
+      }}
     >
       <ellipse
         cx={x}
@@ -343,7 +374,12 @@ function Paw({ k, mood }: { k: KindArt; mood: Mood }) {
       />
       {mood === "celebrate" && (
         <g transform={`translate(${x + 2} ${y - 22})`}>
-          <path d="M0 4V18" stroke="var(--leaf-deep)" strokeWidth={2.4} strokeLinecap="round" />
+          <path
+            d="M0 4V18"
+            stroke="var(--leaf-deep)"
+            strokeWidth={2.4}
+            strokeLinecap="round"
+          />
           {[0, 1, 2, 3, 4].map((i) => {
             const a = ((-90 + i * 72) * Math.PI) / 180;
             return (
@@ -377,7 +413,12 @@ function Extras({ k, mood }: { k: KindArt; mood: Mood }) {
   }
   if (mood === "sleeping") {
     return (
-      <g className="particle" fill="var(--ink-2)" fontFamily="var(--font-baloo)" fontWeight={700}>
+      <g
+        className="particle"
+        fill="var(--ink-2)"
+        fontFamily="var(--font-baloo)"
+        fontWeight={700}
+      >
         {[0, 1, 2].map((i) => (
           <text
             key={i}
@@ -406,7 +447,10 @@ function Extras({ k, mood }: { k: KindArt; mood: Mood }) {
             key={i}
             d={sparklePath(x, y, s)}
             className="animate-twinkle"
-            style={{ animationDuration: "1.2s", animationDelay: `-${i * 0.3}s` }}
+            style={{
+              animationDuration: "1.2s",
+              animationDelay: `-${i * 0.3}s`,
+            }}
           />
         ))}
       </g>
@@ -431,7 +475,13 @@ function IceCube() {
         strokeOpacity={0.75}
         strokeWidth={2}
       />
-      <path d="M22 36L32 28M22 46L27 42" stroke="var(--white)" strokeWidth={3} strokeLinecap="round" opacity={0.85} />
+      <path
+        d="M22 36L32 28M22 46L27 42"
+        stroke="var(--white)"
+        strokeWidth={3}
+        strokeLinecap="round"
+        opacity={0.85}
+      />
       <path d={sparklePath(98, 32, 5)} fill="var(--white)" />
       <path d={sparklePath(22, 100, 3.5)} fill="var(--white)" opacity={0.8} />
     </g>

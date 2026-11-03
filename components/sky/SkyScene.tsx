@@ -137,8 +137,8 @@ function BandLayer({ band }: { band: SkyBand }) {
       )}
       {band === "day" && (
         <g>
-          <circle cx={318} cy={96} r={42} fill={`url(#${id}-halo)`} />
-          <circle cx={318} cy={96} r={19} fill="var(--butter)" />
+          <circle cx={196} cy={74} r={42} fill={`url(#${id}-halo)`} />
+          <circle cx={196} cy={74} r={19} fill="var(--butter)" />
           <g className="animate-bob" style={{ animationDuration: "7s" }}>
             <path
               d="M86 74q5-5 9 0q4-5 9 0M110 62q4-4 7 0q3-4 7 0"
@@ -166,10 +166,16 @@ function BandLayer({ band }: { band: SkyBand }) {
       )}
       {isDark(band) && (
         <g>
-          <circle cx={312} cy={82} r={44} fill={`url(#${id}-halo)`} opacity={0.4} />
-          <circle cx={312} cy={82} r={18} fill="var(--butter-soft)" />
-          <circle cx={306} cy={78} r={3.2} fill="var(--butter)" opacity={0.5} />
-          <circle cx={318} cy={89} r={2.2} fill="var(--butter)" opacity={0.5} />
+          <circle
+            cx={196}
+            cy={72}
+            r={44}
+            fill={`url(#${id}-halo)`}
+            opacity={0.4}
+          />
+          <circle cx={196} cy={72} r={18} fill="var(--butter-soft)" />
+          <circle cx={190} cy={68} r={3.2} fill="var(--butter)" opacity={0.5} />
+          <circle cx={202} cy={79} r={2.2} fill="var(--butter)" opacity={0.5} />
         </g>
       )}
       {band === "night" &&
@@ -187,7 +193,10 @@ function BandLayer({ band }: { band: SkyBand }) {
             r={2}
             fill="var(--butter)"
             className="animate-twinkle"
-            style={{ animationDelay: `-${i * 0.9}s`, animationDuration: "3.4s" }}
+            style={{
+              animationDelay: `-${i * 0.9}s`,
+              animationDuration: "3.4s",
+            }}
           />
         ))}
     </>

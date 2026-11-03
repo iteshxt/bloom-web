@@ -93,7 +93,7 @@ export function FloatingNav() {
                 <span className="relative flex items-center gap-1.5">
                   {active ? (
                     <>
-                      <span className="bg-white/80 rounded-pill flex h-8 w-8 items-center justify-center">
+                      <span className="rounded-pill flex h-8 w-8 items-center justify-center bg-white/80">
                         <PuffyIcon name={item.puffy} size={28} />
                       </span>
                       <span className="text-sm font-semibold">

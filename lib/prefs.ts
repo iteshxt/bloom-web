@@ -64,8 +64,7 @@ export function usePrefs(): Prefs {
   return useSyncExternalStore(subscribe, getPrefs, () => DEFAULT_PREFS);
 }
 
-const reduceQuery = () =>
-  window.matchMedia("(prefers-reduced-motion: reduce)");
+const reduceQuery = () => window.matchMedia("(prefers-reduced-motion: reduce)");
 
 function subscribeReduce(l: () => void) {
   const q = reduceQuery();

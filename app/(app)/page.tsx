@@ -1,23 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import { ActivityList } from "@/components/game/ActivityList";
-import { RemindersPrompt } from "@/components/push/RemindersPrompt";
-import { InstallCard } from "@/components/pwa/InstallCard";
+import { ActivityList, type Person } from "@/components/game/ActivityList";
 import { Banner } from "@/components/game/Banner";
 import { CountdownPill } from "@/components/game/CountdownPill";
 import { PlayerCard } from "@/components/game/PlayerCard";
+import { PlayerIsland } from "@/components/game/PlayerIsland";
 import { SyncButton } from "@/components/game/SyncButton";
 import { TodayQuestCard } from "@/components/game/TodayQuestCard";
+import { Companion } from "@/components/companions/Companion";
+import { LineIcon } from "@/components/icons/line";
+import { PuffyTile, type PuffyName } from "@/components/icons/puffy";
+import { RemindersPrompt } from "@/components/push/RemindersPrompt";
+import { InstallCard } from "@/components/pwa/InstallCard";
+import { Rainbow } from "@/components/sky/Rainbow";
+import { ScreenSky } from "@/components/sky/ScreenSky";
 import { Button } from "@/components/ui/Button";
-import { derivePlayer, pickBanner } from "@/lib/dashboard/derive";
+import { Skeleton } from "@/components/ui/Progress";
+import { asKind } from "@/lib/companions";
+import { derivePlayer, moodFor, pickBanner } from "@/lib/dashboard/derive";
 import { useDuel } from "@/lib/dashboard/useDuel";
 import { useNow } from "@/lib/dashboard/useNow";
 import { useGifts } from "@/lib/game/queries";
 
-// The duel dashboard (PRD 5.2, design §11.3), functional pass: both players
-// side by side, kept live by Realtime. The sky, islands, creatures and
-// flowers arrive with the design pass (build step 9).
+// The duel dashboard (PRD 5.2, design §11.3): your island and your
+// partner's in the sky, today's quest on glass over the sky edge, then the
+// calm panel with a banner, quick actions, both player cards and recent
+// activity. Realtime keeps it live.
 
 export default function HomePage() {
   const now = useNow();
@@ -28,25 +37,32 @@ export default function HomePage() {
   // when there's nothing to show.
   if (isError && !data) {
     return (
-      <Shell>
-        <p className="text-ink-2">
-          Something went sideways. Pull to try again.
-        </p>
-        <Button
-          variant="secondary"
-          className="self-start"
-          onClick={() => refetch()}
-        >
-          Try again
-        </Button>
-      </Shell>
+      <main className="flex flex-1 flex-col">
+        <ScreenSky className="h-[260px]" />
+        <section className="flex flex-col items-center gap-3 px-4 pt-4 text-center">
+          <Companion kind="mochi" mood="sad" size={120} />
+          <p className="text-ink-2">
+            Something went sideways. Pull to try again.
+          </p>
+          <Button variant="secondary" onClick={() => refetch()}>
+            Try again
+          </Button>
+        </section>
+      </main>
     );
   }
   if ((isPending && !data) || !now || !data) {
     return (
-      <Shell>
-        <p className="text-ink-2">Loading…</p>
-      </Shell>
+      <main className="flex flex-1 flex-col" aria-busy>
+        <ScreenSky className="h-[360px]" />
+        <div className="flex flex-col gap-4 px-4">
+          <Skeleton className="h-16" />
+          <div className="grid grid-cols-2 gap-3">
+            <Skeleton className="h-56 rounded-lg" />
+            <Skeleton className="h-56 rounded-lg" />
+          </div>
+        </div>
+      </main>
     );
   }
 
@@ -54,107 +70,201 @@ export default function HomePage() {
   const partner = data.partner
     ? derivePlayer(data.partner, data.pair, now)
     : null;
+  const myKind = asKind(data.me.avatarKey);
+  const partnerKind = asKind(data.partner?.avatarKey);
+  const myMood = moodFor(me, now);
+  const partnerMood = partner ? moodFor(partner, now) : "idle";
   const banner = pickBanner({
     me,
     pendingRequestFromPartner: data.pendingRequestFromPartner,
     giftOwed: gifts.data?.giving.find((g) => g.owed) ?? null,
   });
   const focusDay = me.focus?.day;
-  const names = Object.fromEntries(
-    [data.me, data.partner]
-      .filter((p) => p !== null)
-      .map((p) => [p.id, p.name]),
+  const bothDone =
+    me.focus?.which === "today" &&
+    me.focus.done &&
+    partner?.focus?.which === "today" &&
+    partner.focus.done;
+  const milestoneToday = [me, partner].some(
+    (p) =>
+      p?.focus?.which === "today" &&
+      p.focus.done &&
+      data.pair.milestones.includes(p.streak),
   );
+  const people: Record<string, Person> = {
+    [data.me.id]: { name: data.me.name, kind: myKind, color: data.me.color },
+  };
+  if (data.partner) {
+    people[data.partner.id] = {
+      name: data.partner.name,
+      kind: partnerKind,
+      color: data.partner.color,
+    };
+  }
 
   return (
-    <Shell color={me.color}>
-      <header className="flex items-center justify-between gap-3">
-        <h1 className="font-display text-[28px] leading-[1.15] font-extrabold">
-          Hi {me.name}
-        </h1>
-        <CountdownPill me={me} />
-      </header>
-
-      {banner && (
-        <Banner banner={banner} partnerName={partner?.name ?? "your partner"} />
-      )}
-
-      <RemindersPrompt />
-      <InstallCard dismissible />
-
-      <nav aria-label="Quick actions" className="grid grid-cols-3 gap-2">
-        {QUICK_ACTIONS.map((a) => (
+    <main data-player-color={me.color} className="flex flex-1 flex-col">
+      <ScreenSky petals={milestoneToday} className="pb-12">
+        <header className="flex items-center justify-between gap-2 px-4 pt-4">
           <Link
-            key={a.href}
-            href={a.href}
-            className="bg-surface shadow-soft flex h-14 items-center justify-center rounded-md text-sm font-semibold"
+            href="/player/me"
+            className="sky-ink flex min-w-0 items-center gap-1.5"
           >
-            {a.label}
+            <Companion kind={myKind} mood="idle" size={40} color={me.color} />
+            <span className="font-display truncate text-[22px] leading-none font-bold">
+              Hi {me.name}
+            </span>
           </Link>
-        ))}
-      </nav>
+          <div className="flex items-center gap-2">
+            <CountdownPill me={me} />
+            <Link
+              href="/settings"
+              aria-label="Notification settings"
+              className="bg-surface text-ink shadow-soft rounded-pill inline-flex h-11 w-11 items-center justify-center"
+            >
+              <LineIcon name="bell" />
+            </Link>
+          </div>
+        </header>
 
-      <TodayQuestCard
-        me={me}
-        partner={partner}
-        startDate={data.pair.startDate}
-        solves={focusDay ? (data.me.recentSolves[focusDay] ?? []) : []}
-        sync={<SyncButton lastSyncAt={data.me.lastSyncAt} now={now} />}
-      />
-
-      {partner ? (
-        <div className="grid grid-cols-2 gap-3">
-          <Link href={`/player/${me.id}`}>
-            <PlayerCard player={me} label="You" />
-          </Link>
-          <Link href={`/player/${partner.id}`}>
-            <PlayerCard player={partner} label="Partner" />
-          </Link>
+        <div className="relative mt-3 flex items-end justify-between px-1">
+          {bothDone && (
+            <Rainbow className="absolute -top-2 left-1/2 w-[58%] -translate-x-1/2" />
+          )}
+          <PlayerIsland
+            name={me.name}
+            kind={myKind}
+            color={me.color}
+            streak={me.streak}
+            mood={myMood}
+            side="left"
+            done={me.focus?.done}
+          />
+          {partner && data.partner ? (
+            <PlayerIsland
+              name={partner.name}
+              kind={partnerKind}
+              color={partner.color}
+              streak={partner.streak}
+              mood={partnerMood}
+              side="right"
+              done={partner.focus?.done}
+            />
+          ) : (
+            <EmptyIsland code={data.pair.inviteCode} />
+          )}
         </div>
-      ) : (
-        <>
-          <section className="bg-surface shadow-soft flex flex-col gap-2 rounded-lg p-5">
-            <p>Waiting for your partner to join. Share this code:</p>
-            <p className="font-display text-[32px] font-extrabold tracking-[0.12em]">
-              {data.pair.inviteCode}
-            </p>
-          </section>
-          <PlayerCard player={me} label="You" />
-        </>
-      )}
 
-      <ActivityList items={data.activity.slice(0, 3)} names={names} now={now} />
+        <div className="relative z-10 mt-4 px-4">
+          <TodayQuestCard
+            me={me}
+            partner={partner}
+            startDate={data.pair.startDate}
+            solves={focusDay ? (data.me.recentSolves[focusDay] ?? []) : []}
+            sync={<SyncButton lastSyncAt={data.me.lastSyncAt} now={now} />}
+          />
+        </div>
+      </ScreenSky>
 
-      <Link
-        href="/settings"
-        className="text-ink-2 inline-flex h-11 items-center self-start text-sm font-semibold"
-      >
-        Settings
-      </Link>
-    </Shell>
+      <div className="flex flex-col gap-6 px-4 pt-3 pb-32">
+        {banner && (
+          <Banner
+            banner={banner}
+            partnerName={partner?.name ?? "your partner"}
+          />
+        )}
+
+        <RemindersPrompt />
+        <InstallCard dismissible />
+
+        <nav aria-label="Quick actions" className="flex justify-between gap-2">
+          {QUICK_ACTIONS.map((a) => (
+            <Link
+              key={a.href}
+              href={a.href}
+              className="flex flex-1 flex-col items-center gap-1.5 text-[13px] font-semibold"
+            >
+              <PuffyTile name={a.icon} tone={a.tone} />
+              {a.label}
+            </Link>
+          ))}
+        </nav>
+
+        {partner ? (
+          <div className="grid grid-cols-2 gap-3">
+            <Card href={`/player/${me.id}`}>
+              <PlayerCard player={me} kind={myKind} mood={myMood} label="You" />
+            </Card>
+            <Card href={`/player/${partner.id}`}>
+              <PlayerCard
+                player={partner}
+                kind={partnerKind}
+                mood={partnerMood}
+                label="Partner"
+              />
+            </Card>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            <Card href={`/player/${me.id}`}>
+              <PlayerCard player={me} kind={myKind} mood={myMood} label="You" />
+            </Card>
+            <InviteCard code={data.pair.inviteCode} />
+          </div>
+        )}
+
+        <ActivityList
+          items={data.activity.slice(0, 3)}
+          people={people}
+          now={now}
+        />
+      </div>
+    </main>
   );
 }
 
-// design §11.3 quick actions; badges, days and nudge join as they're built.
-const QUICK_ACTIONS = [
-  { href: "/gifts", label: "Gifts" },
-  { href: "/restores", label: "Restores" },
-  { href: "/milestones", label: "Journey" },
-] as const;
+// design §11.3 quick actions; badges and nudges join with the P1 features.
+const QUICK_ACTIONS: {
+  href: string;
+  label: string;
+  icon: PuffyName;
+  tone: "blush" | "frost" | "sky" | "lilac";
+}[] = [
+  { href: "/gifts", label: "Gifts", icon: "gift", tone: "blush" },
+  { href: "/restores", label: "Restores", icon: "ice", tone: "frost" },
+  { href: "/player/me", label: "Days", icon: "calendar", tone: "sky" },
+  { href: "/settings", label: "Settings", icon: "gear", tone: "lilac" },
+];
 
-function Shell({
-  color,
-  children,
-}: {
-  color?: string;
-  children: React.ReactNode;
-}) {
+function Card({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <main
-      data-player-color={color}
-      className="mx-auto flex w-full max-w-[430px] flex-1 flex-col gap-5 px-4 pt-[max(2rem,env(safe-area-inset-top))] pb-10"
-    >
+    <Link href={href} className="block rounded-lg">
       {children}
-    </main>
+    </Link>
+  );
+}
+
+/** The partner's spot before they join: an empty island with a hint. */
+function EmptyIsland({ code }: { code: string }) {
+  return (
+    <div className="sky-ink flex w-[168px] flex-col items-center gap-1 pb-6 text-center text-sm font-semibold">
+      <span className="bg-surface text-ink shadow-soft rounded-pill px-3 py-1">
+        Waiting for your partner
+      </span>
+      <span className="font-display text-lg tracking-[0.12em]">{code}</span>
+    </div>
+  );
+}
+
+function InviteCard({ code }: { code: string }) {
+  return (
+    <section className="bg-surface shadow-soft flex flex-col justify-center gap-2 rounded-lg p-4">
+      <p className="text-ink-2 text-sm">
+        Share this code so your partner can join:
+      </p>
+      <p className="font-display text-[28px] font-extrabold tracking-[0.12em]">
+        {code}
+      </p>
+    </section>
   );
 }

@@ -116,4 +116,5 @@ export function SoftBlur({ id, std = 1.5 }: { id: string; std?: number }) {
 }
 
 /** A unique, CSS-safe id prefix from React's useId(). */
-export const svgId = (reactId: string) => reactId.replace(/[^a-zA-Z0-9_-]/g, "");
+export const svgId = (reactId: string) =>
+  reactId.replace(/[^a-zA-Z0-9_-]/g, "");

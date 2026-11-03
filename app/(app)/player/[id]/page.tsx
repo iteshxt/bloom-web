@@ -1,21 +1,35 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Suspense, useState } from "react";
+import { Bloom } from "@/components/bloom/Bloom";
+import { Companion } from "@/components/companions/Companion";
+import { TokenPouch } from "@/components/game/TokenPouch";
+import { LineIcon } from "@/components/icons/line";
+import { PuffyIcon } from "@/components/icons/puffy";
+import { Island } from "@/components/sky/Island";
 import { Button } from "@/components/ui/Button";
-import { PageShell } from "@/components/ui/PageShell";
+import { StatChip } from "@/components/ui/Chip";
+import { PageShell, SectionTitle } from "@/components/ui/PageShell";
+import { ProgressBar, Skeleton } from "@/components/ui/Progress";
 import { api } from "@/lib/api/client";
+import { bloomLabel, growthFor } from "@/lib/bloom";
+import { asKind } from "@/lib/companions";
+import { derivePlayer, moodFor } from "@/lib/dashboard/derive";
 import { targetFor } from "@/lib/engine";
+import { levelTitle } from "@/lib/push/copy";
 import { useDuel } from "@/lib/dashboard/useDuel";
 import { useNow } from "@/lib/dashboard/useNow";
 import { shortDate } from "@/lib/format/ist";
 import { useTargetHistory } from "@/lib/game/queries";
 import { addDays, todayIST } from "@/lib/time";
 
-// Player profile (design §11.4), functional pass: the daily target and its
-// history. Only the partner can change it (PRD 4.3). The heatmap, stats and
-// badges arrive later in the build.
+// Player profile (design §11.4): the sky zooms in on that player's island,
+// then their stats and the daily target, which only the partner can change
+// (PRD 4.3). The heatmap, difficulty split and badges join with the P1
+// features. "/player/me" is the Me tab (§11.11).
 
 export default function PlayerPage() {
   // useParams() reads the URL, so it must sit behind a Suspense boundary.
@@ -36,12 +50,15 @@ function PlayerProfile() {
 
   if (!now || !duel.data || !history.data) {
     return (
-      <PageShell title="Profile">
-        <p className="text-ink-2">
-          {duel.isError || history.isError
-            ? "Something went sideways. Try again."
-            : "Loading…"}
-        </p>
+      <PageShell title="Profile" skyClassName="h-[300px]">
+        {duel.isError || history.isError ? (
+          <p className="text-ink-2">Something went sideways. Try again.</p>
+        ) : (
+          <>
+            <Skeleton className="h-14" />
+            <Skeleton className="h-40 rounded-lg" />
+          </>
+        )}
       </PageShell>
     );
   }
@@ -49,7 +66,7 @@ function PlayerProfile() {
   const player = id === me.id ? me : id === partner?.id ? partner : null;
   if (!player) {
     return (
-      <PageShell title="Profile">
+      <PageShell title="Profile" back="/">
         <p className="text-ink-2">That player isn’t in your pair.</p>
       </PageShell>
     );
@@ -61,17 +78,104 @@ function PlayerProfile() {
   const todayTarget = targetFor(player.targets, today);
   const tomorrowTarget = targetFor(player.targets, tomorrow);
 
+  const view = derivePlayer(player, duel.data.pair, now);
+  const kind = asKind(player.avatarKey);
+  const mood = moodFor(view, now);
+  const growth = growthFor(view.streak);
+
   return (
-    <PageShell title={isPartner ? player.name : "You"} color={player.color}>
-      <section className="bg-p-soft flex flex-col gap-1 rounded-lg p-5">
-        <p className="font-display text-[48px] leading-none font-extrabold tabular-nums">
-          {player.run?.length ?? 0}
-        </p>
-        <p className="text-ink-2 text-sm">
-          day streak · Lv {player.level} · {player.xpTotal} XP
-        </p>
+    <PageShell
+      title={isPartner ? player.name : "You"}
+      color={player.color}
+      back={isPartner ? "/" : undefined}
+      skyClassName="pb-14"
+      sky={
+        <>
+          <div className="sky-ink -mt-1 flex items-center gap-1.5 text-sm font-semibold">
+            <PuffyIcon name="crown" size={28} />
+            Level {player.level} · {levelTitle(player.level)}
+            {!isPartner && (
+              <Link
+                href="/settings"
+                aria-label="Settings"
+                className="bg-surface text-ink shadow-soft rounded-pill absolute top-5 right-4 inline-flex h-11 w-11 items-center justify-center"
+              >
+                <LineIcon name="gear" />
+              </Link>
+            )}
+          </div>
+          <div className="flex justify-center pt-2">
+            <Island width={260} frozen={view.onIce}>
+              <Companion
+                kind={kind}
+                mood={mood}
+                size={140}
+                streak={view.streak}
+                label={`${player.name}’s companion`}
+                className="-mr-6"
+              />
+              <Bloom
+                streak={view.streak}
+                size={120}
+                frozen={view.onIce}
+                label={bloomLabel({
+                  name: player.name,
+                  streak: view.streak,
+                  state: view.onIce
+                    ? "frozen"
+                    : view.focus?.done
+                      ? "done"
+                      : "pending",
+                })}
+              />
+            </Island>
+          </div>
+        </>
+      }
+    >
+      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+        <StatChip
+          icon="bloom"
+          value={view.streak}
+          label={view.onIce ? "on ice" : "day streak"}
+        />
+        <StatChip icon="sprout" value={growth.label} label="flower stage" />
+        <StatChip icon="star" value={player.xpTotal} label="total XP" />
+      </div>
+
+      <section className="bg-surface shadow-soft flex flex-col gap-3 rounded-lg p-5">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-lg font-semibold">
+            Level {player.level}
+          </h2>
+          <span className="text-butter-deep tabular text-sm font-semibold">
+            {view.xpIntoLevel} / {view.xpLevelSpan} XP
+          </span>
+        </div>
+        <ProgressBar
+          value={view.xpIntoLevel}
+          max={view.xpLevelSpan}
+          tone="butter"
+          label="XP to next level"
+        />
+        <div className="flex items-center justify-between gap-3">
+          <TokenPouch
+            tokens={view.tokens}
+            max={view.tokensMax}
+            label="restore tokens"
+          />
+          {view.nextMilestone && (
+            <span className="text-p-deep text-sm font-semibold">
+              {view.nextMilestone.daysToGo === 1
+                ? "Next gift tomorrow"
+                : `Next gift in ${view.nextMilestone.daysToGo} days`}
+            </span>
+          )}
+        </div>
         {player.leetcode && (
-          <p className="text-ink-2 text-sm">LeetCode: {player.leetcode}</p>
+          <p className="text-ink-2 inline-flex items-center gap-1.5 text-sm">
+            <PuffyIcon name="code" size={24} /> LeetCode: {player.leetcode}
+          </p>
         )}
       </section>
 
@@ -101,11 +205,9 @@ function PlayerProfile() {
       )}
 
       {history.data.length > 0 && (
-        <section className="flex flex-col gap-2">
-          <h2 className="font-display text-[22px] leading-[1.2] font-bold">
-            Target history
-          </h2>
-          <ul className="flex flex-col gap-1">
+        <section className="flex flex-col gap-3">
+          <SectionTitle>Target history</SectionTitle>
+          <ul className="bg-surface shadow-soft flex flex-col gap-2 rounded-md p-4">
             {history.data.map((t) => (
               <li
                 key={t.effective_from}
@@ -165,24 +267,24 @@ function TargetStepper({
       <div className="flex items-center gap-4">
         <Button
           variant="secondary"
-          className="w-11! px-0!"
+          className="w-12! px-0!"
           aria-label="One fewer"
           disabled={value <= 1}
           onClick={() => setValue(value - 1)}
         >
-          −
+          <LineIcon name="minus" />
         </Button>
-        <span className="font-display w-8 text-center text-3xl font-extrabold tabular-nums">
+        <span className="font-display w-10 text-center text-[40px] leading-none font-extrabold tabular-nums">
           {value}
         </span>
         <Button
           variant="secondary"
-          className="w-11! px-0!"
+          className="w-12! px-0!"
           aria-label="One more"
           disabled={value >= 10}
           onClick={() => setValue(value + 1)}
         >
-          +
+          <LineIcon name="plus" />
         </Button>
       </div>
       <p className="text-ink-2 text-sm">

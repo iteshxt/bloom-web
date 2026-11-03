@@ -18,3 +18,8 @@ export const COLOR_NAMES: Record<PlayerColor, string> = {
   sky: "Sky",
   lilac: "Lilac",
 };
+
+/** A stored avatar key as a companion kind (Mochi if it's ever unknown). */
+export function asKind(key: string | null | undefined): Companion {
+  return key && key in COMPANION_INFO ? (key as Companion) : "mochi";
+}

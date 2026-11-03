@@ -2,13 +2,7 @@
 // the day within the stage picks a visible micro-step.
 
 export type BloomStage =
-  | "seed"
-  | "sprout"
-  | "bud"
-  | "bloom"
-  | "bouquet"
-  | "bush"
-  | "garden";
+  "seed" | "sprout" | "bud" | "bloom" | "bouquet" | "bush" | "garden";
 
 const STAGES: { stage: BloomStage; from: number; label: string }[] = [
   { stage: "seed", from: 0, label: "Seed" },

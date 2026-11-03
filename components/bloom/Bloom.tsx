@@ -293,9 +293,7 @@ function draw(a: Art, stage: BloomStage, step: number): ReactNode[] {
       // A round bush that collects one more small flower every few days;
       // the garden adds tall flowers and two butterflies.
       const id = a.id();
-      const bush = (
-        p: React.SVGProps<SVGPathElement>,
-      ): ReactNode =>
+      const bush = (p: React.SVGProps<SVGPathElement>): ReactNode =>
         [
           [CX - 26, BASE - 22, 22],
           [CX + 26, BASE - 22, 22],
@@ -351,9 +349,30 @@ function draw(a: Art, stage: BloomStage, step: number): ReactNode[] {
 function Butterflies() {
   const wing = (fill: string) => (
     <g>
-      <ellipse cx={-3.5} cy={-2} rx={4} ry={5} fill={fill} transform="rotate(-25 -3.5 -2)" />
-      <ellipse cx={3.5} cy={-2} rx={4} ry={5} fill={fill} transform="rotate(25 3.5 -2)" />
-      <rect x={-0.8} y={-5} width={1.6} height={8} rx={0.8} fill="var(--plum)" />
+      <ellipse
+        cx={-3.5}
+        cy={-2}
+        rx={4}
+        ry={5}
+        fill={fill}
+        transform="rotate(-25 -3.5 -2)"
+      />
+      <ellipse
+        cx={3.5}
+        cy={-2}
+        rx={4}
+        ry={5}
+        fill={fill}
+        transform="rotate(25 3.5 -2)"
+      />
+      <rect
+        x={-0.8}
+        y={-5}
+        width={1.6}
+        height={8}
+        rx={0.8}
+        fill="var(--plum)"
+      />
     </g>
   );
   return (
@@ -385,9 +404,19 @@ function FrostShell({ stage }: { stage: BloomStage }) {
         strokeOpacity={0.7}
         strokeWidth={1.5}
       />
-      <path d={`M24 ${top + 14}L32 ${top + 8}`} stroke="var(--white)" strokeWidth={3} strokeLinecap="round" opacity={0.8} />
+      <path
+        d={`M24 ${top + 14}L32 ${top + 8}`}
+        stroke="var(--white)"
+        strokeWidth={3}
+        strokeLinecap="round"
+        opacity={0.8}
+      />
       <path d={sparklePath(94, top + 12, 5)} fill="var(--white)" />
-      <path d={sparklePath(26, BASE - 14, 3.5)} fill="var(--white)" opacity={0.85} />
+      <path
+        d={sparklePath(26, BASE - 14, 3.5)}
+        fill="var(--white)"
+        opacity={0.85}
+      />
     </g>
   );
 }

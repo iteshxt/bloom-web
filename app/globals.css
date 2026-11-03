@@ -158,6 +158,7 @@
   --color-leaf: var(--leaf);
   --color-leaf-deep: var(--leaf-deep);
   --color-white: var(--white);
+  --color-plum: var(--plum);
   --color-transparent: transparent;
   --color-current: currentColor;
   --color-wood: var(--wood);
@@ -220,6 +221,16 @@ body {
 :focus-visible {
   outline: 3px solid rgb(var(--p-rgb) / 0.6);
   outline-offset: 2px;
+}
+
+/* Text drawn straight on the sky: plum by day, white under dark skies. */
+.sky-ink {
+  color: var(--plum);
+}
+:root[data-band="night"] .sky-ink,
+:root[data-band="grace"] .sky-ink,
+:root[data-band="deep"] .sky-ink {
+  color: var(--white);
 }
 
 /* SVG parts that scale or turn around their own box (creatures, flowers). */

@@ -1,56 +1,77 @@
+"use client";
+
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { LineIcon } from "@/components/icons/line";
+import { ScreenSky } from "@/components/sky/ScreenSky";
 
-// A secondary screen: back to home, a title, then the content. The floating
-// nav (design §10.7) replaces the back link in the design pass.
+export { Chip } from "./Chip";
+
+// A screen with a short sky on top and the calm panel below (design §5.3).
+// Tabs reached from the floating nav have no back button; screens opened
+// from elsewhere pass `back`.
 
 export function PageShell({
   title,
   color,
+  back,
+  sky,
+  skyClassName = "h-[176px]",
+  petals,
   children,
 }: {
   title: string;
   color?: string;
+  /** Where the back button goes; omitted on nav tabs. */
+  back?: string;
+  /** Extra content on the sky, under the title. */
+  sky?: ReactNode;
+  skyClassName?: string;
+  petals?: boolean;
   children: ReactNode;
 }) {
   return (
-    <main
-      data-player-color={color}
-      className="mx-auto flex w-full max-w-[430px] flex-1 flex-col gap-5 px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-10"
-    >
-      <Link
-        href="/"
-        className="text-ink-2 -ml-2 inline-flex h-11 items-center self-start px-2 text-sm font-semibold"
-      >
-        ← Home
-      </Link>
-      <h1 className="font-display text-[28px] leading-[1.15] font-extrabold">
-        {title}
-      </h1>
-      {children}
+    <main data-player-color={color} className="flex flex-1 flex-col">
+      <ScreenSky className={skyClassName} petals={petals}>
+        <div className="flex flex-col gap-3 px-4 pt-5">
+          <div className="flex items-center gap-2">
+            {back && (
+              <Link
+                href={back}
+                aria-label="Back"
+                className="bg-surface text-ink shadow-soft rounded-pill -ml-1 inline-flex h-11 w-11 shrink-0 items-center justify-center"
+              >
+                <LineIcon name="back" />
+              </Link>
+            )}
+            <h1 className="sky-ink font-display text-[28px] leading-[1.15] font-extrabold">
+              {title}
+            </h1>
+          </div>
+          {sky}
+        </div>
+      </ScreenSky>
+      <div className="flex flex-1 flex-col gap-5 px-4 pt-2 pb-32">
+        {children}
+      </div>
     </main>
   );
 }
 
-export function Chip({
-  tone,
+/** A section heading in the calm panel (H2, design §4). */
+export function SectionTitle({
   children,
+  action,
 }: {
-  tone: "mint" | "peach" | "frost" | "butter" | "muted";
   children: ReactNode;
+  action?: ReactNode;
 }) {
-  const styles = {
-    mint: "bg-mint-soft text-mint-deep",
-    peach: "bg-peach-soft text-peach-deep",
-    frost: "bg-frost-soft text-frost-deep",
-    butter: "bg-butter-soft text-butter-deep",
-    muted: "bg-surface text-ink-3 border border-line",
-  } as const;
   return (
-    <span
-      className={`rounded-pill inline-flex h-7 shrink-0 items-center px-3 text-[13px] font-semibold ${styles[tone]}`}
-    >
-      {children}
-    </span>
+    <div className="flex items-center justify-between gap-3">
+      <h2 className="font-display text-[22px] leading-[1.2] font-bold">
+        {children}
+      </h2>
+      {action}
+    </div>
   );
 }

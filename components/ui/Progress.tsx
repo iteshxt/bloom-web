@@ -41,10 +41,13 @@ export function ProgressBar({
         className={`rounded-pill absolute inset-y-0 left-0 w-full origin-left ${t.fill}`}
         initial={{ scaleX: 0 }}
         animate={{ scaleX: pct, scaleY: [1, 1.15, 1] }}
-        transition={{ scaleX: spring.soft, scaleY: { duration: 0.3, delay: 0.35 } }}
+        transition={{
+          scaleX: spring.soft,
+          scaleY: { duration: 0.3, delay: 0.35 },
+        }}
       >
         {tone === "butter" && (
-          <span className="bg-white/70 rounded-pill absolute inset-x-1 top-[1.5px] h-[2px]" />
+          <span className="rounded-pill absolute inset-x-1 top-[1.5px] h-[2px] bg-white/70" />
         )}
       </motion.div>
     </div>

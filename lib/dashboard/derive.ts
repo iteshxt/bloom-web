@@ -38,6 +38,8 @@ export interface PlayerInput {
   targets: TargetChange[];
   /** A Date, or its ISO string after the cache round-trips through storage. */
   lastSyncAt: Date | string | null;
+  /** Length of the most recent run that ended, if any. */
+  lastEndedRunLength?: number | null;
 }
 
 export interface PairInput {
@@ -79,6 +81,8 @@ export interface PlayerView {
   /** Days until the challenge starts, when it hasn't yet. */
   startsInDays: number | null;
   syncFailing: boolean;
+  /** A run ended and no day has been completed since (design §9.3 "sad"). */
+  runJustEnded: boolean;
 }
 
 export function derivePlayer(
@@ -120,7 +124,25 @@ export function derivePlayer(
     syncFailing:
       p.lastSyncAt !== null &&
       now.getTime() - new Date(p.lastSyncAt).getTime() > SYNC_FAILING_AFTER_MS,
+    runJustEnded: started && streak === 0 && (p.lastEndedRunLength ?? 0) > 0,
   };
+}
+
+export type CompanionMood =
+  "idle" | "waiting" | "urgent" | "happy" | "sleeping" | "frozen" | "sad";
+
+/** A player's creature mood from their day (design §9.3). Celebrate and
+ *  wave are one-off moments, so they're not derived here. */
+export function moodFor(v: PlayerView, now: Date): CompanionMood {
+  if (v.onIce) return "frozen";
+  if (v.startsInDays !== null || !v.focus) return "idle";
+  const { minuteOfDay } = istParts(now);
+  if (v.focus.done) {
+    return minuteOfDay >= 60 && minuteOfDay < 300 ? "sleeping" : "happy";
+  }
+  if (v.focus.which === "yesterday" || minuteOfDay >= 21 * 60) return "urgent";
+  if (v.runJustEnded) return "sad";
+  return "waiting";
 }
 
 function focusDay(
