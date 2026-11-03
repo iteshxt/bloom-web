@@ -52,7 +52,11 @@ function PlayerProfile() {
 
   if (!now || !duel.data || !history.data) {
     return (
-      <PageShell title="Profile" skyClassName="h-[300px]">
+      <PageShell
+        title="Profile"
+        skyClassName="h-[300px]"
+        transitionName={id ? `player-${id}` : undefined}
+      >
         {duel.isError || history.isError ? (
           <p className="text-ink-2">Something went sideways. Try again.</p>
         ) : (
@@ -90,6 +94,7 @@ function PlayerProfile() {
       title={isPartner ? player.name : "You"}
       color={player.color}
       back={isPartner ? "/" : undefined}
+      transitionName={`player-${player.id}`}
       skyClassName="pb-14"
       sky={
         <>

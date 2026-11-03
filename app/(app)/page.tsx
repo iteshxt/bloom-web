@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { navigateWithTransition } from "@/lib/viewTransition";
 import { useState } from "react";
 import { NudgeSheet } from "@/components/game/NudgeSheet";
 import { ActivityList, type Person } from "@/components/game/ActivityList";
@@ -33,6 +35,10 @@ import type { Snapshot } from "@/lib/moments";
 import { todayIST } from "@/lib/time";
 import { useFeedSeen } from "@/lib/feedSeen";
 import { useMoments } from "@/lib/useMoments";
+import { PetalSpinner } from "@/components/ui/Progress";
+import { usePartnerWave } from "@/lib/presence";
+import { usePullToRefresh } from "@/lib/usePullToRefresh";
+import { useSyncNow } from "@/lib/useSyncNow";
 
 // The duel dashboard (PRD 5.2, design §11.3): your island and your
 // partner's in the sky, today's quest on glass over the sky edge, then the
@@ -54,6 +60,9 @@ export default function HomePage() {
   const moments = useMoments(data?.me.id ?? null, snapshot);
   const [nudging, setNudging] = useState(false);
   const feedSeen = useFeedSeen(data?.me.id ?? null);
+  const syncNow = useSyncNow();
+  const pull = usePullToRefresh(syncNow.sync);
+  const partnerWaving = usePartnerWave();
 
   // Cached data (e.g. offline) beats an error screen; only show the error
   // when there's nothing to show.
@@ -97,7 +106,7 @@ export default function HomePage() {
   const myMood = moodFor(me, now);
   const greeting = moments.queue[0]?.kind === "nudge";
   const partnerMood = partner
-    ? greeting
+    ? greeting || partnerWaving
       ? "wave"
       : moodFor(partner, now)
     : "idle";
@@ -149,6 +158,11 @@ export default function HomePage() {
           partnerName: partner?.name ?? "your partner",
         }}
       />
+      <PullIndicator
+        pull={pull.pull}
+        ready={pull.ready}
+        refreshing={pull.refreshing}
+      />
       <ScreenSky petals={milestoneToday} className="pb-12">
         <header className="flex items-center justify-between gap-2 px-4 pt-4">
           <Link
@@ -187,6 +201,7 @@ export default function HomePage() {
             mood={myMood}
             side="left"
             done={me.focus?.done}
+            stretch={pull.pull / 110}
           />
           {partner && data.partner ? (
             <PlayerIsland
@@ -210,7 +225,13 @@ export default function HomePage() {
             partner={partner}
             startDate={data.pair.startDate}
             solves={focusDay ? (data.me.recentSolves[focusDay] ?? []) : []}
-            sync={<SyncButton lastSyncAt={data.me.lastSyncAt} now={now} />}
+            sync={
+              <SyncButton
+                lastSyncAt={data.me.lastSyncAt}
+                now={now}
+                sync={syncNow}
+              />
+            }
           />
         </div>
       </ScreenSky>
@@ -260,10 +281,10 @@ export default function HomePage() {
 
         {partner ? (
           <div className="grid grid-cols-2 gap-3">
-            <Card href={`/player/${me.id}`}>
+            <Card href={`/player/${me.id}`} name={`player-${me.id}`}>
               <PlayerCard player={me} kind={myKind} mood={myMood} label="You" />
             </Card>
-            <Card href={`/player/${partner.id}`}>
+            <Card href={`/player/${partner.id}`} name={`player-${partner.id}`}>
               <PlayerCard
                 player={partner}
                 kind={partnerKind}
@@ -274,7 +295,7 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3">
-            <Card href={`/player/${me.id}`}>
+            <Card href={`/player/${me.id}`} name={`player-${me.id}`}>
               <PlayerCard player={me} kind={myKind} mood={myMood} label="You" />
             </Card>
             <InviteCard code={data.pair.inviteCode} />
@@ -352,10 +373,27 @@ const QUICK_ACTIONS: {
   { href: "/player/me", label: "Days", icon: "calendar", tone: "sky" },
 ];
 
-function Card({ href, children }: { href: string; children: React.ReactNode }) {
+/** A player card that expands into their profile (design §12.3). */
+function Card({
+  href,
+  name,
+  children,
+}: {
+  href: string;
+  /** The shared view-transition-name with the profile screen. */
+  name: string;
+  children: React.ReactNode;
+}) {
+  const router = useRouter();
   return (
     <Link
       href={href}
+      onClick={(e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+        e.preventDefault();
+        navigateWithTransition(() => router.push(href));
+      }}
+      style={{ viewTransitionName: name }}
       className="block rounded-lg transition-transform duration-150 active:scale-[0.97]"
     >
       {children}
@@ -385,5 +423,37 @@ function InviteCard({ code }: { code: string }) {
         {code}
       </p>
     </section>
+  );
+}
+
+/** design §10.14: the pull-to-refresh hint; petals spin while syncing. */
+function PullIndicator({
+  pull,
+  ready,
+  refreshing,
+}: {
+  pull: number;
+  ready: boolean;
+  refreshing: boolean;
+}) {
+  if (!pull && !refreshing) return null;
+  return (
+    <div
+      role="status"
+      className="pointer-events-none fixed inset-x-0 top-[max(0.75rem,env(safe-area-inset-top))] z-50 flex justify-center"
+      style={{ transform: `translateY(${refreshing ? 8 : pull * 0.4}px)` }}
+    >
+      <span className="glass text-p-ink rounded-pill flex items-center gap-2 px-3 py-1.5 text-sm font-semibold">
+        <span
+          style={
+            refreshing ? undefined : { transform: `rotate(${pull * 3}deg)` }
+          }
+          className={refreshing ? "animate-spin-slow" : ""}
+        >
+          <PetalSpinner size={20} />
+        </span>
+        {refreshing ? "Syncing…" : ready ? "Release to sync" : "Pull to sync"}
+      </span>
+    </div>
   );
 }

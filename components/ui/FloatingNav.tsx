@@ -77,8 +77,11 @@ export function FloatingNav() {
     >
       <ul className="glass rounded-pill flex h-16 items-center justify-between px-2">
         {ITEMS.map((item) => {
+          // Decided after hydration, so the first client render matches the
+          // server's however the route was prerendered.
           const active =
-            item.match(path) || (item.href === "/player/me" && onMyProfile);
+            hydrated &&
+            (item.match(path) || (item.href === "/player/me" && onMyProfile));
           return (
             <li key={item.href} className="relative flex flex-1 justify-center">
               <Link

@@ -18,8 +18,11 @@ export function PageShell({
   sky,
   skyClassName = "h-[176px]",
   petals,
+  transitionName,
   children,
 }: {
+  /** view-transition-name for a card → screen expand (design §12.3). */
+  transitionName?: string;
   title: string;
   color?: string;
   /** Where the back button goes; omitted on nav tabs. */
@@ -31,7 +34,13 @@ export function PageShell({
   children: ReactNode;
 }) {
   return (
-    <main data-player-color={color} className="flex flex-1 flex-col">
+    <main
+      data-player-color={color}
+      className="flex flex-1 flex-col"
+      style={
+        transitionName ? { viewTransitionName: transitionName } : undefined
+      }
+    >
       <ScreenSky className={skyClassName} petals={petals}>
         <div className="flex flex-col gap-3 px-4 pt-5">
           <div className="flex items-center gap-2">

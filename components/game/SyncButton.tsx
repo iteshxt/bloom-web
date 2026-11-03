@@ -1,52 +1,25 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
 import { LineIcon } from "@/components/icons/line";
 import { Button } from "@/components/ui/Button";
 import { PetalSpinner } from "@/components/ui/Progress";
-import { api } from "@/lib/api/client";
-import { DUEL_KEY } from "@/lib/dashboard/useDuel";
 import { ago } from "@/lib/format/ist";
-import { toast } from "@/lib/toast";
+import { useSyncNow } from "@/lib/useSyncNow";
 
 // design §14.4: "Sync now" → "Syncing…" → "Synced · 2 new".
 
 export function SyncButton({
   lastSyncAt,
   now,
+  sync: shared,
 }: {
   lastSyncAt: Date | string | null;
   now: Date;
+  /** The page's sync, when pull-to-refresh shares it. */
+  sync?: ReturnType<typeof useSyncNow>;
 }) {
-  const queryClient = useQueryClient();
-  const [state, setState] = useState<
-    | { kind: "idle" }
-    | { kind: "syncing" }
-    | { kind: "done"; text: string }
-    | { kind: "error"; text: string }
-  >({ kind: "idle" });
-
-  async function sync() {
-    setState({ kind: "syncing" });
-    const res = await api<{ sync: string; newSolves: number }>("/api/sync", {
-      body: {},
-    });
-    if (!res.ok) return setState({ kind: "error", text: res.message });
-    if (res.data.sync === "failed") {
-      return setState({
-        kind: "error",
-        text: "Can’t reach LeetCode right now. Try again soon.",
-      });
-    }
-    const text =
-      res.data.newSolves > 0
-        ? `Synced · ${res.data.newSolves} new`
-        : "Synced · nothing new";
-    setState({ kind: "done", text });
-    toast(text, "code");
-    await queryClient.invalidateQueries({ queryKey: DUEL_KEY });
-  }
+  const own = useSyncNow();
+  const { state, sync } = shared ?? own;
 
   return (
     <div className="border-line flex items-center justify-between gap-3 border-t pt-3">

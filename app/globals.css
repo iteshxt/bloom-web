@@ -265,6 +265,16 @@ body {
   );
 }
 
+/* Card → profile expand (design §12.3), via the View Transitions API. */
+::view-transition-group(*) {
+  animation-duration: 0.42s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.25s;
+}
+
 /* Sideways scrollers (chip rows, carousels, the heatmap) scroll by touch
    without a bar. */
 .no-scrollbar {

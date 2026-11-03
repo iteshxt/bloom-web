@@ -19,7 +19,10 @@ export function PlayerIsland({
   restored = false,
   done = false,
   width = 168,
+  stretch = 0,
 }: {
+  /** Pull-to-refresh stretches the flower (0–1). */
+  stretch?: number;
   name: string;
   kind: Kind;
   color: string;
@@ -32,18 +35,25 @@ export function PlayerIsland({
 }) {
   const frozen = mood === "frozen";
   const flower = (
-    <Bloom
-      streak={streak}
-      size={Math.round(width * 0.46)}
-      frozen={frozen}
-      restored={restored}
-      label={bloomLabel({
-        name,
-        streak,
-        state: frozen ? "frozen" : done ? "done" : "pending",
-      })}
-      className="-mx-2"
-    />
+    <span
+      className="inline-block origin-bottom transition-transform duration-150"
+      style={
+        stretch ? { transform: `scaleY(${1 + stretch * 0.3})` } : undefined
+      }
+    >
+      <Bloom
+        streak={streak}
+        size={Math.round(width * 0.46)}
+        frozen={frozen}
+        restored={restored}
+        label={bloomLabel({
+          name,
+          streak,
+          state: frozen ? "frozen" : done ? "done" : "pending",
+        })}
+        className="-mx-2"
+      />
+    </span>
   );
   const creature = (
     <Companion
