@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLayoutEffect, useRef, useState } from "react";
 import { LineIcon, type LineName } from "@/components/icons/line";
 import { PuffyIcon, type PuffyName } from "@/components/icons/puffy";
 import { useDuel } from "@/lib/dashboard/useDuel";
@@ -57,8 +58,14 @@ const ITEMS: {
   },
 ];
 
-export function FloatingNav() {
-  const path = usePathname();
+export function FloatingNav({
+  previewPath,
+}: {
+  /** The dev gallery drives the nav with a pretend path. */
+  previewPath?: string;
+} = {}) {
+  const realPath = usePathname();
+  const path = previewPath ?? realPath;
   const hydrated = useHydrated();
   const duel = useDuel();
   const gifts = useGifts();
@@ -71,26 +78,78 @@ export function FloatingNav() {
     "/gifts": hydrated && Boolean(gifts.data?.receiving.some((g) => g.canOpen)),
   };
 
+  // Decided after hydration, so the first client render matches the
+  // server's however the route was prerendered.
+  const activeIndex = hydrated
+    ? ITEMS.findIndex(
+        (item) =>
+          item.match(path) || (item.href === "/player/me" && onMyProfile),
+      )
+    : -1;
+
+  // The pill is one element that slides to the active tab's measured box
+  // inside the nav. (A shared-layout animation measured against the page,
+  // so leaving a long, scrolled page made it fly in from below.)
+  // Links are looked up in the list itself rather than kept in per-item
+  // refs, which React may detach and reattach around the effect.
+  const list = useRef<HTMLUListElement>(null);
+  const [box, setBox] = useState<{
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    /** false for the first placement, which shouldn't animate */
+    glide: boolean;
+  } | null>(null);
+  useLayoutEffect(() => {
+    const links = list.current?.querySelectorAll("a") ?? [];
+    const measure = () => {
+      const el = links[activeIndex];
+      setBox((prev) =>
+        el
+          ? {
+              x: el.offsetLeft,
+              y: el.offsetTop,
+              w: el.offsetWidth,
+              h: el.offsetHeight,
+              glide: prev !== null,
+            }
+          : null,
+      );
+    };
+    measure();
+    // Fonts arriving or the window resizing change the label widths.
+    const ro = new ResizeObserver(measure);
+    links.forEach((el) => ro.observe(el));
+    return () => ro.disconnect();
+  }, [activeIndex]);
   return (
-    // layoutRoot: the nav is fixed, so the pill's glide is measured within
-    // the nav, not the page; otherwise a page change that scrolls to the
-    // top makes it fly in from below instead of sliding across.
-    <motion.nav
-      layoutRoot
+    <nav
       aria-label="Main"
       data-player-color={me?.color}
       className="pointer-events-none fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[430px] md:bottom-6"
     >
       <DockWave />
-      <ul className="bg-dock pointer-events-auto box-content flex h-16 items-center justify-between px-3 pb-[env(safe-area-inset-bottom)] md:rounded-b-xl">
-        {ITEMS.map((item) => {
-          // Decided after hydration, so the first client render matches the
-          // server's however the route was prerendered.
-          const active =
-            hydrated &&
-            (item.match(path) || (item.href === "/player/me" && onMyProfile));
+      <ul
+        ref={list}
+        className="bg-dock pointer-events-auto relative box-content flex h-16 items-center justify-between px-3 pb-[env(safe-area-inset-bottom)] md:rounded-b-xl"
+      >
+        <motion.span
+          aria-hidden
+          className="bg-p rounded-pill pointer-events-none absolute top-0 left-0 shadow-[0_8px_24px_-10px_rgb(var(--p-rgb)/0.9)]"
+          initial={false}
+          animate={
+            box
+              ? { x: box.x, y: box.y, width: box.w, height: box.h, opacity: 1 }
+              : { opacity: 0 }
+          }
+          // The first placement is instant; after that it glides.
+          transition={box?.glide ? spring.soft : { duration: 0 }}
+        />
+        {ITEMS.map((item, i) => {
+          const active = i === activeIndex;
           return (
-            <li key={item.href} className="relative flex flex-1 justify-center">
+            <li key={item.href} className="flex flex-1 justify-center">
               <Link
                 href={item.href}
                 aria-current={active ? "page" : undefined}
@@ -101,13 +160,6 @@ export function FloatingNav() {
                     : "text-dock-ink hover:text-dock-ink-strong w-12"
                 }`}
               >
-                {active && (
-                  <motion.span
-                    layoutId="nav-pill"
-                    className="bg-p rounded-pill absolute inset-0 shadow-[0_8px_24px_-10px_rgb(var(--p-rgb)/0.9)]"
-                    transition={spring.soft}
-                  />
-                )}
                 <span className="relative flex items-center gap-1.5">
                   {active ? (
                     <>
@@ -133,6 +185,6 @@ export function FloatingNav() {
           );
         })}
       </ul>
-    </motion.nav>
+    </nav>
   );
 }

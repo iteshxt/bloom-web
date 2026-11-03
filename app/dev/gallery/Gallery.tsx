@@ -69,6 +69,7 @@ export function Gallery() {
   const [sheet, setSheet] = useState(false);
   const [unbox, setUnbox] = useState(false);
   const [checkIn, setCheckIn] = useState(false);
+  const [navPath, setNavPath] = useState("/milestones");
   const moments = useMoments(null, null);
   return (
     <main
@@ -76,8 +77,20 @@ export function Gallery() {
       className="mx-auto flex w-full max-w-[430px] flex-col gap-8 px-4 pt-8 pb-32"
     >
       <Suspense>
-        <FloatingNav />
+        <FloatingNav previewPath={navPath} />
       </Suspense>
+      <div className="flex flex-wrap gap-2" aria-label="Nav preview">
+        {["/", "/milestones", "/gifts", "/player/me"].map((p) => (
+          <Button
+            key={p}
+            variant="secondary"
+            className="h-11! text-sm"
+            onClick={() => setNavPath(p)}
+          >
+            Nav: {p}
+          </Button>
+        ))}
+      </div>
       <Wordmark />
 
       <MomentHost
