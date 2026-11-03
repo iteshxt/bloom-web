@@ -1,4 +1,6 @@
+import { AnimatePresence, motion } from "motion/react";
 import { Companion } from "@/components/companions/Companion";
+import { spring } from "@/lib/motion";
 import { SectionTitle } from "@/components/ui/PageShell";
 import type { ActivityItem } from "@/lib/dashboard/useDuel";
 import { ago, humanizeSlug } from "@/lib/format/ist";
@@ -29,36 +31,47 @@ export function ActivityList({
         <p className="text-ink-2">Your story starts with the first solve.</p>
       ) : (
         <ul className="bg-surface shadow-soft flex flex-col gap-1 rounded-md p-2">
-          {items.map((a) => {
-            const who = people[a.actorId ?? ""];
-            const xp = a.kind === "solve" ? Number(a.payload.xp) : 0;
-            return (
-              <li key={a.id} className="flex items-center gap-2.5 py-1 pr-2">
-                {who ? (
-                  <Companion
-                    kind={who.kind}
-                    color={who.color}
-                    size={36}
-                    mood="idle"
-                    className="shrink-0"
-                  />
-                ) : (
-                  <span className="w-9" />
-                )}
-                <span className="flex-1 text-sm">
-                  {describe(a, who?.name ?? "Someone")}
-                </span>
-                {xp > 0 && (
-                  <span className="rounded-pill bg-butter-soft text-butter-deep shrink-0 px-2 py-0.5 text-xs font-semibold">
-                    +{xp}
+          {/* Only new items animate in, never the whole list (§12.3). */}
+          <AnimatePresence initial={false}>
+            {items.map((a) => {
+              const who = people[a.actorId ?? ""];
+              const xp = a.kind === "solve" ? Number(a.payload.xp) : 0;
+              return (
+                <motion.li
+                  key={a.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={spring.soft}
+                  className="flex items-center gap-2.5 py-1 pr-2"
+                >
+                  {who ? (
+                    <Companion
+                      kind={who.kind}
+                      color={who.color}
+                      size={36}
+                      mood="idle"
+                      className="shrink-0"
+                    />
+                  ) : (
+                    <span className="w-9" />
+                  )}
+                  <span className="flex-1 text-sm">
+                    {describe(a, who?.name ?? "Someone")}
                   </span>
-                )}
-                <span className="text-ink-3 shrink-0 text-xs">
-                  {ago(new Date(a.createdAt), now)}
-                </span>
-              </li>
-            );
-          })}
+                  {xp > 0 && (
+                    <span className="rounded-pill bg-butter-soft text-butter-deep shrink-0 px-2 py-0.5 text-xs font-semibold">
+                      +{xp}
+                    </span>
+                  )}
+                  <span className="text-ink-3 shrink-0 text-xs">
+                    {ago(new Date(a.createdAt), now)}
+                  </span>
+                </motion.li>
+              );
+            })}
+          </AnimatePresence>
         </ul>
       )}
     </section>

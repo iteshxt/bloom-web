@@ -214,7 +214,7 @@ export default function HomePage() {
             <Link
               key={a.href}
               href={a.href}
-              className="flex flex-1 flex-col items-center gap-1.5 text-[13px] font-semibold"
+              className="flex flex-1 flex-col items-center gap-1.5 text-[13px] font-semibold transition-transform duration-150 active:scale-[0.94]"
             >
               <PuffyTile name={a.icon} tone={a.tone} />
               {a.label}
@@ -312,7 +312,10 @@ const QUICK_ACTIONS: {
 
 function Card({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Link href={href} className="block rounded-lg">
+    <Link
+      href={href}
+      className="block rounded-lg transition-transform duration-150 active:scale-[0.97]"
+    >
       {children}
     </Link>
   );

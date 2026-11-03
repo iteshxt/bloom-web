@@ -1,3 +1,7 @@
+"use client";
+
+import { motion, useAnimationControls } from "motion/react";
+import { useEffect, useRef } from "react";
 import { Bloom } from "@/components/bloom/Bloom";
 import { Companion } from "@/components/companions/Companion";
 import { sparklePath } from "@/components/icons/geometry";
@@ -25,8 +29,12 @@ export function PlayerCard({
   label: string;
 }) {
   const stage = growthFor(player.streak).label;
+  const nudge = useNudge(
+    `${player.streak}:${player.focus?.solved ?? 0}:${player.onIce}`,
+  );
   return (
-    <section
+    <motion.section
+      animate={nudge}
       data-player-color={player.color}
       aria-label={`${label}: ${player.name}, ${player.streak}-day streak${player.onIce ? ", on ice" : ""}`}
       className={`shadow-player relative flex h-full flex-col gap-2.5 overflow-hidden rounded-lg p-4 ${
@@ -90,8 +98,24 @@ export function PlayerCard({
           Lv {player.level}
         </span>
       </div>
-    </section>
+    </motion.section>
   );
+}
+
+/** design §12.3: a realtime update makes the card nudge (x ±3, bouncy).
+ *  Not on first render. */
+function useNudge(signature: string) {
+  const controls = useAnimationControls();
+  const first = useRef(signature);
+  useEffect(() => {
+    if (first.current === signature) return;
+    first.current = signature;
+    controls.start({
+      x: [0, 3, -3, 2, 0],
+      transition: { duration: 0.4, ease: "easeOut" },
+    });
+  }, [signature, controls]);
+  return controls;
 }
 
 function FrostCorners() {
