@@ -40,7 +40,7 @@ export function PlayerCard({
       className={`shadow-player relative flex h-full flex-col gap-2.5 overflow-hidden rounded-lg p-4 ${
         player.onIce
           ? "bg-frost-soft shadow-glow-frost animate-pulse-soft [animation-duration:4s]"
-          : "bg-p-soft"
+          : "bg-p-wash"
       }`}
     >
       {player.onIce && <FrostCorners />}
@@ -54,10 +54,10 @@ export function PlayerCard({
         />
         <div className="flex flex-col items-end">
           <Bloom streak={player.streak} size={40} frozen={player.onIce} />
-          <span className="text-p-deep text-xs font-semibold">{stage}</span>
+          <span className="text-p-ink text-xs font-semibold">{stage}</span>
         </div>
       </div>
-      <p className="text-p-deep -mt-1 truncate text-sm font-semibold">
+      <p className="text-p-ink -mt-1 truncate text-sm font-semibold">
         {player.name}
       </p>
       <div>
@@ -65,7 +65,7 @@ export function PlayerCard({
           <RollingNumber value={player.streak} />
         </p>
         <p
-          className={`text-sm ${player.onIce ? "text-frost-deep font-semibold" : "text-ink-2"}`}
+          className={`text-sm ${player.onIce ? "text-frost-ink font-semibold" : "text-ink-2"}`}
         >
           {player.onIce ? "On ice" : "day streak"}
         </p>
@@ -78,7 +78,7 @@ export function PlayerCard({
       />
 
       {player.nextMilestone && (
-        <p className="rounded-pill bg-surface text-p-deep inline-flex items-center gap-1 self-start py-0.5 pr-3 pl-1 text-[13px] font-semibold">
+        <p className="rounded-pill bg-surface text-p-ink inline-flex items-center gap-1 self-start py-0.5 pr-3 pl-1 text-[13px] font-semibold">
           <PuffyIcon name="gift" size={22} />
           {player.nextMilestone.daysToGo === 1
             ? "Gift tomorrow"
@@ -94,7 +94,7 @@ export function PlayerCard({
           label="XP to next level"
           className="flex-1"
         />
-        <span className="text-butter-deep tabular text-[13px] font-semibold">
+        <span className="text-butter-ink tabular text-[13px] font-semibold">
           Lv {player.level}
         </span>
       </div>

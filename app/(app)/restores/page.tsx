@@ -234,7 +234,7 @@ function AskCard({
         Closes in {Math.floor(mins / 60)}h {mins % 60}m
       </p>
       {error && (
-        <p role="alert" className="text-peach-deep text-sm font-semibold">
+        <p role="alert" className="text-peach-ink text-sm font-semibold">
           {error}
         </p>
       )}
@@ -335,7 +335,7 @@ function DecideCard({
         onCancel={() => setConfirmReject(false)}
       />
       {error && (
-        <p role="alert" className="text-peach-deep text-sm font-semibold">
+        <p role="alert" className="text-peach-ink text-sm font-semibold">
           {error}
         </p>
       )}

@@ -69,7 +69,7 @@ export function CodeSeeds({
                 key={i}
                 className={`bg-surface rounded-pill font-display shadow-soft relative flex h-12 w-12 items-center justify-center text-xl font-bold ${
                   active ? "ring-p ring-4" : ""
-                } ${ch ? "text-p-deep" : ""}`}
+                } ${ch ? "text-p-ink" : ""}`}
               >
                 <AnimatePresence>
                   {ch && (

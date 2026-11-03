@@ -148,7 +148,7 @@ function PlayerProfile() {
           <h2 className="font-display text-lg font-semibold">
             Level {player.level}
           </h2>
-          <span className="text-butter-deep tabular text-sm font-semibold">
+          <span className="text-butter-ink tabular text-sm font-semibold">
             {view.xpIntoLevel} / {view.xpLevelSpan} XP
           </span>
         </div>
@@ -165,7 +165,7 @@ function PlayerProfile() {
             label="restore tokens"
           />
           {view.nextMilestone && (
-            <span className="text-p-deep text-sm font-semibold">
+            <span className="text-p-ink text-sm font-semibold">
               {view.nextMilestone.daysToGo === 1
                 ? "Next gift tomorrow"
                 : `Next gift in ${view.nextMilestone.daysToGo} days`}

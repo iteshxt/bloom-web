@@ -607,7 +607,7 @@ function LevelUp({
           transition={{ delay: 0.8, duration: dur.slow }}
         >
           New title:{" "}
-          <span className="text-butter-deep font-semibold">
+          <span className="text-butter-ink font-semibold">
             {levelTitle(level)}
           </span>
         </motion.p>

@@ -219,9 +219,9 @@ function Receiving({
         </div>
       )}
       {(gift.status === "revealed" || gift.status === "delivered") && (
-        <div className="bg-p-soft shadow-player flex flex-col gap-2 rounded-xl p-5">
+        <div className="bg-p-wash shadow-player flex flex-col gap-2 rounded-xl p-5">
           <PuffyIcon name="giftOpen" size={48} />
-          <p className="font-display text-p-deep text-[32px] leading-[1.1] font-extrabold">
+          <p className="font-display text-p-ink text-[32px] leading-[1.1] font-extrabold">
             {gift.title}
           </p>
           {gift.details && (
@@ -237,7 +237,7 @@ function Receiving({
               <LineIcon name="link" size={18} /> Open link
             </a>
           )}
-          <p className="text-p-deep font-display mt-1 text-sm font-semibold">
+          <p className="text-p-ink font-display mt-1 text-sm font-semibold">
             From {partnerName}, for {gift.milestone} days
           </p>
         </div>
@@ -248,7 +248,7 @@ function Receiving({
         </Button>
       )}
       {error && (
-        <p role="alert" className="text-peach-deep text-sm font-semibold">
+        <p role="alert" className="text-peach-ink text-sm font-semibold">
           {error}
         </p>
       )}
@@ -388,14 +388,14 @@ function Giving({
             {busy ? "Wrapping…" : "Wrap it"}
           </Button>
           {error && (
-            <p role="alert" className="text-peach-deep text-sm font-semibold">
+            <p role="alert" className="text-peach-ink text-sm font-semibold">
               {error}
             </p>
           )}
         </form>
       </Sheet>
       {error && (
-        <p role="alert" className="text-peach-deep text-sm font-semibold">
+        <p role="alert" className="text-peach-ink text-sm font-semibold">
           {error}
         </p>
       )}

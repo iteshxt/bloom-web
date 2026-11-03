@@ -28,7 +28,7 @@ export function TextField({
       {(error || hint) && (
         <p
           id={`${id}-note`}
-          className={`text-sm ${error ? "text-peach-deep" : "text-ink-2"}`}
+          className={`text-sm ${error ? "text-peach-ink" : "text-ink-2"}`}
         >
           {error ?? hint}
         </p>

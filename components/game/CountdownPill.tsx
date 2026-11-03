@@ -11,7 +11,7 @@ import {
 
 const STYLES = {
   calm: "glass text-ink",
-  soon: "glass text-peach-deep",
+  soon: "glass text-peach-ink",
   urgent: "bg-peach-soft text-peach-deep shadow-float animate-pulse-soft",
   grace: "bg-frost-soft text-frost-deep shadow-float",
   done: "bg-mint-soft text-mint-deep shadow-float",

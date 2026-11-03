@@ -94,11 +94,11 @@ export function Sheet({
             </div>
             <h2
               id={titleId}
-              className="font-display px-5 pb-3 text-[22px] leading-[1.2] font-bold"
+              className="font-display px-4 pb-3 text-[22px] leading-[1.2] font-bold"
             >
               {title}
             </h2>
-            <div className="flex flex-col gap-4 overflow-y-auto px-5">
+            <div className="flex flex-col gap-4 overflow-x-hidden overflow-y-auto px-4 pb-2">
               {children}
             </div>
           </motion.section>

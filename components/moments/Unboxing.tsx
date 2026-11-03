@@ -182,7 +182,7 @@ export function Unboxing({
                 : { ...spring.floaty, rotateY: { duration: 0.5, delay: 0.3 } }
             }
           >
-            <span className="text-p-deep text-sm font-semibold">
+            <span className="text-p-ink text-sm font-semibold">
               Your {milestone}-day gift
             </span>
             <h2 className="font-display text-[32px] leading-[1.1] font-extrabold">
@@ -201,7 +201,7 @@ export function Unboxing({
                 <LineIcon name="link" size={18} /> Open link
               </a>
             )}
-            <p className="font-display text-p-deep mt-1 text-sm font-semibold">
+            <p className="font-display text-p-ink mt-1 text-sm font-semibold">
               From {partnerName}, for {milestone} days
             </p>
             <div className="mt-2 flex flex-col gap-2">

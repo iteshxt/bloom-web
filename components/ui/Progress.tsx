@@ -88,9 +88,9 @@ export function Skeleton({ className = "" }: { className?: string }) {
   return (
     <div
       aria-hidden
-      className={`bg-p-soft relative overflow-hidden rounded-md ${className}`}
+      className={`bg-surface relative overflow-hidden rounded-md ${className}`}
     >
-      <div className="animate-shimmer absolute inset-0 bg-linear-to-r from-transparent via-white/50 to-transparent" />
+      <div className="animate-shimmer via-p/15 absolute inset-0 bg-linear-to-r from-transparent to-transparent" />
     </div>
   );
 }

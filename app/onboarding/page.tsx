@@ -250,7 +250,7 @@ export default function OnboardingPage() {
             onChange={(e) => onLcChange(e.target.value)}
             hint={
               lc.state === "checking" ? (
-                <span className="text-p-deep inline-flex items-center gap-1.5">
+                <span className="text-p-ink inline-flex items-center gap-1.5">
                   <PetalSpinner size={16} /> Checking…
                 </span>
               ) : (
@@ -517,7 +517,7 @@ function Shell({
 
 function ErrorText({ children }: { children: React.ReactNode }) {
   return (
-    <p role="alert" className="text-peach-deep text-sm font-semibold">
+    <p role="alert" className="text-peach-ink text-sm font-semibold">
       {children}
     </p>
   );

@@ -219,7 +219,7 @@ function ProfileRow({
           onColor={(c) => setForm({ ...form, color: c })}
         />
         {error && (
-          <p role="alert" className="text-peach-deep text-sm font-semibold">
+          <p role="alert" className="text-peach-ink text-sm font-semibold">
             {error}
           </p>
         )}
@@ -427,7 +427,7 @@ function DevicePush() {
         onChange={(next) => (next ? enable() : disable())}
       />
       {message && (
-        <p className="text-peach-deep text-sm font-semibold">{message}</p>
+        <p className="text-peach-ink text-sm font-semibold">{message}</p>
       )}
       {state === "on" && (
         <div className="flex items-center gap-3">

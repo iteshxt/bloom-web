@@ -24,9 +24,16 @@ export function CompanionPicker({
   onKind: (k: Kind) => void;
   onColor: (c: PlayerColor) => void;
 }) {
+  const row = useRef<HTMLDivElement>(null);
   const refs = useRef<Partial<Record<Kind, HTMLLabelElement | null>>>({});
   useEffect(() => {
-    refs.current[kind]?.scrollIntoView({ inline: "center", block: "nearest" });
+    // Centre the current pick by scrolling only the carousel. (scrollIntoView
+    // would also scroll every scrollable parent sideways, like a sheet.)
+    const el = refs.current[kind];
+    const r = row.current;
+    if (el && r) {
+      r.scrollLeft = el.offsetLeft - (r.clientWidth - el.clientWidth) / 2;
+    }
     // Only on mount: later picks are already in view.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -35,7 +42,10 @@ export function CompanionPicker({
     <div className="flex flex-col gap-5" data-player-color={color}>
       <fieldset>
         <legend className="mb-2 text-sm font-semibold">Companion</legend>
-        <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2">
+        <div
+          ref={row}
+          className="relative -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain px-4 pt-1 pb-3"
+        >
           {COMPANIONS.map((c) => (
             <label
               key={c}

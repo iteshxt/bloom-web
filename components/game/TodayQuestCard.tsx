@@ -90,7 +90,7 @@ export function TodayQuestCard({
                 </span>
               </span>
               {s.xp > 0 && (
-                <span className="text-butter-deep shrink-0 font-semibold">
+                <span className="text-butter-ink shrink-0 font-semibold">
                   +{s.xp} XP
                 </span>
               )}

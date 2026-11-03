@@ -56,6 +56,10 @@
   --hill-near-night: #34506a;
   --soil: #c9a27e;
   --soil-deep: #8a6447;
+  --soil-dark: #a98263;
+  --stone: #cfc6e6;
+  --stone-deep: #8d82ad;
+  --grass-light: #c4ecc9;
   --wood: #f2c4a2;
   --wood-deep: #b97b52;
   --white: #ffffff;
@@ -78,10 +82,22 @@
   --shadow-float: 0 20px 40px -18px rgba(46, 37, 71, 0.25);
   --player-glow: 0.55;
 
+  /* Coloured text on surfaces (not on pastel fills): the deep shade by
+     day, the pastel itself at night, so it keeps its contrast. */
+  --ink-blush: var(--blush-deep);
+  --ink-sky: var(--sky-deep);
+  --ink-lilac: var(--lilac-deep);
+  --ink-butter: var(--butter-deep);
+  --ink-peach: var(--peach-deep);
+  --ink-mint: var(--mint-deep);
+  --ink-frost: var(--frost-deep);
+  --wash: 0.12;
+
   /* Default player scope until an element sets data-player-color */
   --p: var(--blush);
   --p-deep: var(--blush-deep);
   --p-soft: var(--blush-soft);
+  --p-ink: var(--ink-blush);
   --p-rgb: 247 168 200;
 }
 
@@ -96,6 +112,14 @@
   --shadow-soft: 0 12px 32px -16px rgba(0, 0, 0, 0.35);
   --shadow-float: 0 20px 40px -18px rgba(0, 0, 0, 0.45);
   --player-glow: 1;
+  --ink-blush: var(--blush);
+  --ink-sky: var(--sky);
+  --ink-lilac: var(--lilac);
+  --ink-butter: var(--butter);
+  --ink-peach: var(--peach);
+  --ink-mint: var(--mint);
+  --ink-frost: var(--frost);
+  --wash: 0.16;
 }
 
 /* Player scope: set on any element that belongs to a player */
@@ -103,18 +127,21 @@
   --p: var(--blush);
   --p-deep: var(--blush-deep);
   --p-soft: var(--blush-soft);
+  --p-ink: var(--ink-blush);
   --p-rgb: 247 168 200;
 }
 [data-player-color="sky"] {
   --p: var(--sky);
   --p-deep: var(--sky-deep);
   --p-soft: var(--sky-soft);
+  --p-ink: var(--ink-sky);
   --p-rgb: 142 211 234;
 }
 [data-player-color="lilac"] {
   --p: var(--lilac);
   --p-deep: var(--lilac-deep);
   --p-soft: var(--lilac-soft);
+  --p-ink: var(--ink-lilac);
   --p-rgb: 205 184 245;
 }
 
@@ -133,6 +160,11 @@
   --color-p: var(--p);
   --color-p-deep: var(--p-deep);
   --color-p-soft: var(--p-soft);
+  --color-p-ink: var(--p-ink);
+  --color-butter-ink: var(--ink-butter);
+  --color-peach-ink: var(--ink-peach);
+  --color-mint-ink: var(--ink-mint);
+  --color-frost-ink: var(--ink-frost);
 
   --color-blush: var(--blush);
   --color-blush-deep: var(--blush-deep);
@@ -221,6 +253,16 @@ body {
 :focus-visible {
   outline: 3px solid rgb(var(--p-rgb) / 0.6);
   outline-offset: 2px;
+}
+
+/* A player-owned card: the surface with a wash of their colour (design
+   §10.5), readable in both themes. */
+.bg-p-wash {
+  background-color: var(--surface);
+  background-image: linear-gradient(
+    rgb(var(--p-rgb) / var(--wash)),
+    rgb(var(--p-rgb) / var(--wash))
+  );
 }
 
 /* Text drawn straight on the sky: plum by day, white under dark skies. */
