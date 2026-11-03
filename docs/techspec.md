@@ -821,7 +821,8 @@ Errors use the shape `{ error: { code, message } }` with an HTTP status of 400, 
 | `POST /api/pair/create` | `{ startDate }` | `startDate` from today (IST) to +90 days. Creates a pair with a 6-character code (no ambiguous characters, retried on a clash) and joins the creator; 409 `already_paired`. Runs one tick after the response |
 | `POST /api/pair/join` | `{ code }` | Joins; 404 `pair_not_found`, 409 `pair_full` if the pair is full, 409 `color_taken` if the partner already has my colour (UI asks me to pick another). Runs one tick after the response |
 | `PATCH /api/pair` | `{ startDate? , addMilestone?, makeupEnabled? }` | startDate only before the start; milestones can only be added |
-| `POST /api/sync` | — | On-demand sync of my account (60 s rate limit) plus finalizing overdue days |
+| `POST /api/sync` | — | On-demand tick for me: sync, finalize overdue days, today's row, reminders. At most once per 60 s per player (429 `too_soon` with `Retry-After`); 409 `busy` if a tick holds the lock |
+| `GET /api/sync` | — | Last successful sync time for both pair members (`sync_state` is server-only) |
 | `POST /api/restore/request` | `{ message? }` | Section 7.6 |
 | `POST /api/restore/cancel` | `{ requestId }` | Section 7.6 |
 | `POST /api/restore/respond` | `{ requestId, approve, reply? }` | Section 7.6 (approver only) |

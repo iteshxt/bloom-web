@@ -389,7 +389,7 @@ A glass or soft-fill rounded card (`r-md`) with a 40 px puffy icon, one line of 
 - "Your flower is frosted. Ask {Partner} for a restore." (frost)
 - "{Partner} is asking you for a restore." (frost, with a primary action)
 - "You owe {Partner} a gift for 30 days." (blush)
-- "Can't reach LeetCode. Manual check-in is on." (peach)
+- "Can't reach LeetCode. Manual check-in is on." (peach). Until manual check-in ships (P1), it reads "Can't reach LeetCode right now. We'll keep trying."
 
 Only **one** banner shows at a time, in priority order: request to you > your frost > gift owed > sync.
 
