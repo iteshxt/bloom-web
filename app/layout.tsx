@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Baloo_2, Figtree } from "next/font/google";
 import "./globals.css";
+import { Providers } from "./providers";
 
 // design.md §4: only the weights listed there are loaded.
 const baloo = Baloo_2({
@@ -33,7 +34,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${baloo.variable} ${figtree.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col font-sans">{children}</body>
+      <body className="flex min-h-full flex-col font-sans">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
