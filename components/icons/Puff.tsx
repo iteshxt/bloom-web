@@ -75,7 +75,10 @@ export function Puff({
   );
 }
 
-/** The blurred white highlight. Needs a <SoftBlur id> in the same SVG. */
+/** The soft white highlight. Needs a <SoftBlur id> in the same SVG.
+ *  It's a radial gradient rather than a blur filter: it looks the same and
+ *  costs nothing to repaint, where a filter is recomputed every frame
+ *  anything around it moves. */
 export function Shine({
   filter,
   cx,
@@ -93,25 +96,31 @@ export function Shine({
   rotate?: number;
   opacity?: number;
 }) {
+  // A blur spreads the ellipse past its edge, so the gradient is drawn a
+  // little larger and fades out across that rim.
+  const grow = 1.45;
   return (
     <ellipse
       cx={cx}
       cy={cy}
-      rx={rx}
-      ry={ry}
-      fill="var(--white)"
+      rx={rx * grow}
+      ry={ry * grow}
+      fill={`url(#${filter})`}
       opacity={opacity}
-      filter={`url(#${filter})`}
       transform={`rotate(${rotate} ${cx} ${cy})`}
     />
   );
 }
 
-export function SoftBlur({ id, std = 1.5 }: { id: string; std?: number }) {
+/** The gradient a <Shine> fills with: solid white in the middle, fading
+ *  to nothing at the rim. */
+export function SoftBlur({ id }: { id: string }) {
   return (
-    <filter id={id} x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation={std} />
-    </filter>
+    <radialGradient id={id}>
+      <stop offset="0.3" stopColor="var(--white)" />
+      <stop offset="0.62" stopColor="var(--white)" stopOpacity="0.6" />
+      <stop offset="1" stopColor="var(--white)" stopOpacity="0" />
+    </radialGradient>
   );
 }
 

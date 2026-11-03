@@ -248,7 +248,7 @@ function GiftBox({
       aria-hidden
     >
       <defs>
-        <SoftBlur id="ub-s" std={2} />
+        <SoftBlur id="ub-s" />
       </defs>
       {glow &&
         [0, 1, 2, 3, 4].map((i) => (

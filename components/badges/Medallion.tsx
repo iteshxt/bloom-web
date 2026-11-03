@@ -58,7 +58,7 @@ export function Medallion({
     >
       <svg viewBox="0 0 100 100" width={size} height={size} aria-hidden>
         <defs>
-          <SoftBlur id={`${u}s`} std={2} />
+          <SoftBlur id={`${u}s`} />
         </defs>
         <g
           style={
