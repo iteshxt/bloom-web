@@ -9,14 +9,17 @@ import { SKY_GRADIENTS, type SkyBand } from "@/lib/sky";
 import { Aurora } from "./Aurora";
 import { Clouds } from "./Clouds";
 import { PetalDrift } from "./PetalDrift";
+import { at, H, W, wide } from "./stage";
 
 // The living sky at the top of every main screen (design §6). Inline SVG on
 // a 390 × 360 canvas, anchored to the bottom so taller screens show more
 // sky. Layers, back to front: gradient, celestial, far hills, clouds, then
 // whatever the screen places on top (islands, chips).
-
-const W = 390;
-const H = 360;
+//
+// The still parts are one SVG, painted once. Everything that moves (stars,
+// clouds, birds, aurora, petals) is a small HTML layer on a "stage" laid
+// over the same canvas, so the browser animates it on the compositor
+// instead of repainting the whole sky every frame.
 
 /** Deterministic scatter, so stars don't jump between renders. */
 function scatter(n: number, seed: number) {
@@ -86,10 +89,22 @@ export function SkyScene({
           )}
         </AnimatePresence>
         <Hills night={band !== null && isDark(band)} />
-        {band && <Clouds night={isDark(band)} />}
-        {band === "grace" && <Aurora u={u} />}
-        {petals && <PetalDrift />}
       </svg>
+      {/* The stage covers the canvas exactly as the SVG's "xMidYMax slice"
+          does: as wide as the box or as tall as it, whichever is bigger,
+          centred and sitting on the bottom edge. Children place themselves
+          in canvas percentages. */}
+      <div
+        aria-hidden
+        className="[container-type:size] pointer-events-none absolute inset-0"
+      >
+        <div className="absolute bottom-0 left-1/2 aspect-[390/360] w-[max(100cqw,calc(100cqh*390/360))] -translate-x-1/2">
+          {band && <Twinkles band={band} />}
+          {band && <Clouds night={isDark(band)} />}
+          {band === "grace" && <Aurora u={u} />}
+          {petals && <PetalDrift />}
+        </div>
+      </div>
       {dim && (
         <div className="bg-ink/15 pointer-events-none absolute inset-0" />
       )}
@@ -103,7 +118,6 @@ const isDark = (b: SkyBand) => b === "night" || b === "grace" || b === "deep";
 function BandLayer({ band, u }: { band: SkyBand; u: string }) {
   const [top, bottom] = SKY_GRADIENTS[band];
   const id = `${u}-${band}`;
-  const stars = STARS[band];
   return (
     <>
       <defs>
@@ -118,21 +132,6 @@ function BandLayer({ band, u }: { band: SkyBand; u: string }) {
       </defs>
       <rect width={W} height={H} fill={`url(#${id})`} />
 
-      {stars?.map((s, i) => (
-        <circle
-          key={i}
-          cx={s.x}
-          cy={s.y}
-          r={s.r}
-          fill="var(--white)"
-          className="animate-twinkle"
-          style={{
-            animationDuration: `${s.d}s`,
-            animationDelay: `-${s.delay}s`,
-          }}
-        />
-      ))}
-
       {band === "dawn" && (
         <g>
           <circle cx={92} cy={236} r={64} fill="var(--peach)" opacity={0.35} />
@@ -143,29 +142,12 @@ function BandLayer({ band, u }: { band: SkyBand; u: string }) {
         <g>
           <circle cx={196} cy={74} r={42} fill={`url(#${id}-halo)`} />
           <circle cx={196} cy={74} r={19} fill="var(--butter)" />
-          <g className="animate-bob" style={{ animationDuration: "7s" }}>
-            <path
-              d="M86 74q5-5 9 0q4-5 9 0M110 62q4-4 7 0q3-4 7 0"
-              stroke="var(--ink-2)"
-              strokeOpacity={0.45}
-              strokeWidth={1.6}
-              strokeLinecap="round"
-              fill="none"
-            />
-          </g>
         </g>
       )}
       {band === "dusk" && (
         <g>
           <circle cx={300} cy={262} r={58} fill="var(--peach)" opacity={0.3} />
           <circle cx={300} cy={262} r={24} fill="var(--peach)" />
-          <circle
-            cx={74}
-            cy={62}
-            r={1.8}
-            fill="var(--white)"
-            className="animate-twinkle"
-          />
         </g>
       )}
       {isDark(band) && (
@@ -182,27 +164,6 @@ function BandLayer({ band, u }: { band: SkyBand; u: string }) {
           <circle cx={202} cy={79} r={2.2} fill="var(--butter)" opacity={0.5} />
         </g>
       )}
-      {band === "night" &&
-        [
-          [60, 250],
-          [140, 228],
-          [228, 258],
-          [334, 236],
-          [190, 214],
-        ].map(([x, y], i) => (
-          <circle
-            key={i}
-            cx={x}
-            cy={y}
-            r={2}
-            fill="var(--butter)"
-            className="animate-twinkle"
-            style={{
-              animationDelay: `-${i * 0.9}s`,
-              animationDuration: "3.4s",
-            }}
-          />
-        ))}
     </>
   );
 }
@@ -221,5 +182,72 @@ function Hills({ night }: { night: boolean }) {
         opacity={0.75}
       />
     </g>
+  );
+}
+
+/** Everything that twinkles or bobs in the band: stars, the dusk star,
+ *  night fireflies and the daytime birds. */
+function Twinkles({ band }: { band: SkyBand }) {
+  const dots: {
+    x: number;
+    y: number;
+    r: number;
+    c: string;
+    d: number;
+    delay: number;
+  }[] = [
+    ...(STARS[band] ?? []).map((s) => ({ ...s, c: "var(--white)" })),
+    ...(band === "dusk"
+      ? [{ x: 74, y: 62, r: 1.8, c: "var(--white)", d: 3, delay: 0 }]
+      : []),
+    ...(band === "night"
+      ? [
+          [60, 250],
+          [140, 228],
+          [228, 258],
+          [334, 236],
+          [190, 214],
+        ].map(([x, y], i) => ({
+          x,
+          y,
+          r: 2,
+          c: "var(--butter)",
+          d: 3.4,
+          delay: i * 0.9,
+        }))
+      : []),
+  ];
+  return (
+    <>
+      {dots.map((s, i) => (
+        <span
+          key={i}
+          className="animate-twinkle absolute block aspect-square -translate-1/2 rounded-full"
+          style={{
+            ...at(s.x, s.y),
+            width: wide(s.r * 2),
+            background: s.c,
+            animationDuration: `${s.d}s`,
+            animationDelay: `-${s.delay}s`,
+          }}
+        />
+      ))}
+      {band === "day" && (
+        <svg
+          viewBox="84 56 42 20"
+          className="animate-bob absolute overflow-visible"
+          style={{ ...at(84, 56), width: wide(42), animationDuration: "7s" }}
+        >
+          <path
+            d="M86 74q5-5 9 0q4-5 9 0M110 62q4-4 7 0q3-4 7 0"
+            stroke="var(--ink-2)"
+            strokeOpacity={0.45}
+            strokeWidth={1.6}
+            strokeLinecap="round"
+            fill="none"
+          />
+        </svg>
+      )}
+    </>
   );
 }

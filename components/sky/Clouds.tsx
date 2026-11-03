@@ -1,6 +1,9 @@
+import { at, wide } from "./stage";
+
 // Three clouds drifting at 80 s, 110 s and 140 s per loop with a slight
-// bob (design §6.2). CSS transforms only; paused in the background and
-// static with reduced motion (they rest where they start).
+// bob (design §6.2). Each is an HTML layer on the sky's stage, moved with
+// CSS transforms on the compositor; paused in the background and static
+// with reduced motion (they rest where they start).
 
 const CLOUDS = [
   { y: 40, scale: 1, duration: 80, delay: 22, x: 40 },
@@ -10,31 +13,38 @@ const CLOUDS = [
 
 export function Clouds({ night }: { night: boolean }) {
   return (
-    <g opacity={night ? 0.22 : 0.92}>
+    <div
+      className="absolute inset-0 transition-opacity duration-[2s]"
+      style={{ opacity: night ? 0.22 : 0.92 }}
+    >
       {CLOUDS.map((c, i) => (
-        <g key={i} transform={`translate(0 ${c.y})`}>
-          <g
-            className="animate-drift"
+        // A full-width track, so the drift is a percentage of the stage
+        // whatever its size.
+        <div
+          key={i}
+          className="animate-drift absolute inset-x-0"
+          style={{
+            top: at(0, c.y).top,
+            animationDuration: `${c.duration}s`,
+            animationDelay: `-${c.delay}s`,
+            // The resting spot when animations are off (reduced motion);
+            // a running animation overrides it.
+            transform: `translateX(${Math.round((c.x / 390) * 1000) / 10}%)`,
+          }}
+        >
+          <svg
+            viewBox="0 0 100 50"
+            className="animate-bob block overflow-visible"
             style={{
-              animationDuration: `${c.duration}s`,
-              animationDelay: `-${c.delay}s`,
-              // The resting spot when animations are off (reduced motion);
-              // a running animation overrides it.
-              transform: `translateX(${c.x}px)`,
+              width: wide(100 * c.scale),
+              animationDuration: `${7 + i * 2}s`,
             }}
           >
-            <g
-              className="animate-bob"
-              style={{ animationDuration: `${7 + i * 2}s` }}
-            >
-              <g transform={`scale(${c.scale})`}>
-                <Cloud />
-              </g>
-            </g>
-          </g>
-        </g>
+            <Cloud />
+          </svg>
+        </div>
       ))}
-    </g>
+    </div>
   );
 }
 

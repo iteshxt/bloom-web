@@ -43,19 +43,21 @@ function IslandBase({ frozen }: { frozen: boolean }) {
   return (
     <svg viewBox="0 0 170 96" className="w-full overflow-visible" aria-hidden>
       <defs>
-        <SoftBlur id={`${u}s`} std={2} />
-        <SoftBlur id={`${u}g`} std={5} />
+        <SoftBlur id={`${u}s`} />
+        <radialGradient id={`${u}g`}>
+          <stop offset="0.2" stopColor="var(--plum)" />
+          <stop offset="1" stopColor="var(--plum)" stopOpacity="0" />
+        </radialGradient>
       </defs>
 
       {/* a soft glow below, so it reads as floating */}
       <ellipse
         cx={85}
         cy={92}
-        rx={44}
-        ry={4}
-        fill="var(--plum)"
-        opacity={0.12}
-        filter={`url(#${u}g)`}
+        rx={56}
+        ry={9}
+        fill={`url(#${u}g)`}
+        opacity={0.14}
       />
 
       {/* the rocky underside, tapering to a point, with a darker stratum */}

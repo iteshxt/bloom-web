@@ -1,4 +1,7 @@
-// Milestone day: petals drift across the whole sky (design §6.3).
+import { at, wide } from "./stage";
+
+// Milestone day: petals drift across the whole sky (design §6.3). Each
+// petal is its own small layer, moved with CSS transforms.
 
 const PETALS = [
   { x: 20, d: 11, delay: 0, c: "var(--blush)" },
@@ -12,23 +15,21 @@ const PETALS = [
 
 export function PetalDrift() {
   return (
-    <g className="particle">
+    <div className="particle absolute inset-0">
       {PETALS.map((p, i) => (
-        <g key={i} transform={`translate(${p.x} 0)`}>
-          <ellipse
-            rx={4.5}
-            ry={2.6}
-            fill={p.c}
-            opacity={0.85}
-            className="animate-[petal-fall_12s_linear_infinite]"
-            style={{
-              animationDuration: `${p.d}s`,
-              animationDelay: `-${p.delay}s`,
-              transform: `translate(0, ${40 + i * 30}px)`,
-            }}
-          />
-        </g>
+        <span
+          key={i}
+          className="absolute block aspect-[9/5.2] -translate-1/2 animate-[petal-fall_12s_linear_infinite] rounded-[50%] opacity-85"
+          style={{
+            ...at(p.x, 0),
+            width: wide(9),
+            background: p.c,
+            animationDuration: `${p.d}s`,
+            animationDelay: `-${p.delay}s`,
+            transform: `translate(0, ${40 + i * 30}px)`,
+          }}
+        />
       ))}
-    </g>
+    </div>
   );
 }

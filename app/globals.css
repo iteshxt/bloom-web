@@ -379,12 +379,14 @@ body {
   }
 }
 /* Sky art lives in a 390-unit-wide SVG, so these move in user units. */
+/* Across the sky's stage: from just off its left edge (−130 of 390) to past
+   its right (520 of 390). The track is as wide as the stage. */
 @keyframes drift {
   from {
-    transform: translateX(-130px);
+    transform: translateX(-33.3%);
   }
   to {
-    transform: translateX(520px);
+    transform: translateX(133.3%);
   }
 }
 @keyframes sway {
