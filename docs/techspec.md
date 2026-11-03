@@ -995,9 +995,9 @@ All tests use a fixed `now` and fixture states. Minimum scenarios:
 | 21 | Solves before the start date | Stored, `counted=false`, no streak effect |
 | 22 | Level formula | 0→1, 100→2, 299→2, 300→3, 4500→10 |
 | 23 | Each badge condition | Earned exactly once |
+| 24 | Make-up off: approve, then D+1 ends below its target | Same as #11 (D reverted, run ends `makeup_failed`, token stays spent, new run at D+2); D+1 never goes on ice |
 | 25 | Manual check-in while sync is failing | Counts like a synced solve (day, XP, streak); stored with `source = manual`, no LeetCode id; its `solve` activity carries `manual: true` |
 | 26 | The same problem later arrives from LeetCode the same day | Stored, `counted = false`, no extra XP: never double-counted |
-| 24 | Make-up off: approve, then D+1 ends below its target | Same as #11 (D reverted, run ends `makeup_failed`, token stays spent, new run at D+2); D+1 never goes on ice |
 
 ### 14.2 Integration
 - There is no local database. The engine is covered by pure unit tests (14.1); the LeetCode client is tested with recorded fixtures (msw), never the real API.
