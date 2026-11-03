@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ActivityList } from "@/components/game/ActivityList";
+import { RemindersPrompt } from "@/components/push/RemindersPrompt";
 import { Banner } from "@/components/game/Banner";
 import { CountdownPill } from "@/components/game/CountdownPill";
 import { PlayerCard } from "@/components/game/PlayerCard";
@@ -13,23 +13,15 @@ import { derivePlayer, pickBanner } from "@/lib/dashboard/derive";
 import { useDuel } from "@/lib/dashboard/useDuel";
 import { useNow } from "@/lib/dashboard/useNow";
 import { useGifts } from "@/lib/game/queries";
-import { createClient } from "@/lib/supabase/browser";
 
 // The duel dashboard (PRD 5.2, design §11.3), functional pass: both players
 // side by side, kept live by Realtime. The sky, islands, creatures and
 // flowers arrive with the design pass (build step 9).
 
 export default function HomePage() {
-  const router = useRouter();
   const now = useNow();
   const { data, isPending, isError, refetch } = useDuel();
   const gifts = useGifts();
-
-  async function signOut() {
-    await createClient().auth.signOut();
-    router.replace("/login");
-    router.refresh();
-  }
 
   if (isError) {
     return (
@@ -84,6 +76,8 @@ export default function HomePage() {
         <Banner banner={banner} partnerName={partner?.name ?? "your partner"} />
       )}
 
+      <RemindersPrompt />
+
       <nav aria-label="Quick actions" className="grid grid-cols-3 gap-2">
         {QUICK_ACTIONS.map((a) => (
           <Link
@@ -127,9 +121,12 @@ export default function HomePage() {
 
       <ActivityList items={data.activity.slice(0, 3)} names={names} now={now} />
 
-      <Button variant="ghost" onClick={signOut} className="self-start">
-        Sign out
-      </Button>
+      <Link
+        href="/settings"
+        className="text-ink-2 inline-flex h-11 items-center self-start text-sm font-semibold"
+      >
+        Settings
+      </Link>
     </Shell>
   );
 }
