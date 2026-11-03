@@ -222,6 +222,16 @@ body {
   outline-offset: 2px;
 }
 
+/* SVG parts that scale or turn around their own box (creatures, flowers). */
+.svg-origin-bottom {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+.svg-origin-center {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
 /* Sentence-case numbers that change (§4). */
 .tabular {
   font-variant-numeric: tabular-nums;
@@ -299,6 +309,49 @@ body {
   to {
     transform: translateY(34px);
     opacity: 0;
+  }
+}
+@keyframes tap {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2.5px);
+  }
+}
+@keyframes shiver {
+  0%,
+  88%,
+  100% {
+    transform: translateX(0);
+  }
+  90%,
+  94%,
+  98% {
+    transform: translateX(-1.5px);
+  }
+  92%,
+  96% {
+    transform: translateX(1.5px);
+  }
+}
+@keyframes wave-paw {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-28deg);
+  }
+}
+@keyframes fluff {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
   }
 }
 @keyframes float-up {

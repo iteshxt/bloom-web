@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Bloom } from "@/components/bloom/Bloom";
+import { Companion, type Mood } from "@/components/companions/Companion";
 import { LineIcon } from "@/components/icons/line";
 import { PuffyIcon, type PuffyName } from "@/components/icons/puffy";
 import { Island } from "@/components/sky/Island";
@@ -16,6 +17,17 @@ import { Wordmark } from "@/components/ui/Wordmark";
 import { toast } from "@/lib/toast";
 import type { SkyBand } from "@/lib/sky";
 
+const MOODS: Mood[] = [
+  "idle",
+  "waiting",
+  "urgent",
+  "happy",
+  "sleeping",
+  "frozen",
+  "celebrate",
+  "sad",
+  "wave",
+];
 const BANDS: SkyBand[] = ["dawn", "day", "dusk", "night", "grace", "deep"];
 const PUFFY: PuffyName[] = [
   "bloom",
@@ -53,6 +65,35 @@ export function Gallery() {
       className="mx-auto flex w-full max-w-[430px] flex-col gap-8 px-4 py-8"
     >
       <Wordmark />
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-display text-[22px] font-bold">Companions</h2>
+        {(["mochi", "tofu", "pip", "bun", "puff", "sprig"] as const).map(
+          (kind, ki) => (
+            <div key={kind} className="flex flex-col gap-1">
+              <h3 className="font-display font-semibold">{kind}</h3>
+              <div
+                className="grid grid-cols-5 gap-1"
+                data-player-color={["blush", "sky", "lilac"][ki % 3]}
+              >
+                {MOODS.map((m) => (
+                  <div
+                    key={m}
+                    className="bg-surface flex flex-col items-center rounded-md"
+                  >
+                    <Companion kind={kind} mood={m} size={64} streak={30} />
+                    <span className="text-ink-3 text-[10px]">{m}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ),
+        )}
+        <div className="bg-surface flex justify-center rounded-md">
+          <Companion kind="mochi" mood="sad" size={140} color="sky" />
+          <Companion kind="bun" mood="celebrate" size={140} color="lilac" />
+        </div>
+      </section>
 
       <section className="flex flex-col gap-4">
         <h2 className="font-display text-[22px] font-bold">Flowers</h2>
