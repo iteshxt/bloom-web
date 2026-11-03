@@ -34,6 +34,36 @@
   --frost-soft: #eef2ff;
   --leaf: #9ed9a9;
   --leaf-deep: #3e8a55;
+  --overlap: #c9b4e8; /* where the wordmark's two o's meet (§2.1) */
+
+  /* Illustration colours: skies (§6.1), hills, islands, wood (§11.7) and
+     the companions' body pastels (§9.2). Only SVG art uses these. */
+  --sky-dawn-top: #ffd9c2;
+  --sky-dawn-bottom: #fff1d6;
+  --sky-day-top: #a9e0f2;
+  --sky-day-bottom: #eaf7fb;
+  --sky-dusk-top: #cdb8f5;
+  --sky-dusk-bottom: #ffc9dd;
+  --sky-night-top: #2b2257;
+  --sky-night-bottom: #4a3b7d;
+  --sky-grace-top: #1d1836;
+  --sky-grace-bottom: #3a2e6e;
+  --sky-deep-top: #1d1836;
+  --sky-deep-bottom: #2b2257;
+  --hill-far: #d9cff0;
+  --hill-near: #c6e8cf;
+  --soil: #c9a27e;
+  --soil-deep: #8a6447;
+  --wood: #f2c4a2;
+  --wood-deep: #b97b52;
+  --white: #ffffff;
+  --body-mochi: #fff6f0;
+  --body-tofu: #f4e3d3;
+  --body-pip: #bfe7b5;
+  --body-bun: #e9cdb4;
+  --body-puff: #ffffff;
+  --body-sprig: #d9c3a8;
+  --spine-sprig: #a9876a;
 
   --r-tile: 8px;
   --r-sm: 14px;
@@ -63,6 +93,8 @@
   --shadow-soft: 0 12px 32px -16px rgba(0, 0, 0, 0.35);
   --shadow-float: 0 20px 40px -18px rgba(0, 0, 0, 0.45);
   --player-glow: 1;
+  --hill-far: #3b3170;
+  --hill-near: #34506a;
 }
 
 /* Player scope: set on any element that belongs to a player */
@@ -124,6 +156,11 @@
   --color-frost-soft: var(--frost-soft);
   --color-leaf: var(--leaf);
   --color-leaf-deep: var(--leaf-deep);
+  --color-white: var(--white);
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-wood: var(--wood);
+  --color-wood-deep: var(--wood-deep);
 
   --radius-*: initial;
   --radius-tile: var(--r-tile);
@@ -143,9 +180,136 @@
 
   --font-display: var(--font-baloo);
   --font-sans: var(--font-figtree);
+
+  --animate-breathe: breathe 3.2s ease-in-out infinite;
+  --animate-bob: bob 4s ease-in-out infinite;
+  --animate-twinkle: twinkle 3.6s ease-in-out infinite;
+  --animate-drift: drift 110s linear infinite;
+  --animate-wiggle: wiggle 3s ease-in-out infinite;
+  --animate-pulse-soft: pulse-soft 2s ease-in-out infinite;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-spin-slow: spin 1.4s linear infinite;
 }
 
 body {
   background: var(--cloud);
   color: var(--ink);
+  transition: background-color 0.6s;
+}
+
+/* Glass (design §5.4): at most 3 per screen, solid where blur is missing. */
+@utility glass {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: var(--shadow-float);
+  @supports not (backdrop-filter: blur(1px)) {
+    background: rgba(255, 255, 255, 0.94);
+  }
+}
+:root[data-theme="night"] .glass {
+  border-color: rgba(255, 255, 255, 0.08);
+  @supports not (backdrop-filter: blur(1px)) {
+    background: rgba(42, 35, 80, 0.96);
+  }
+}
+
+/* Focus (design §15): 3 px ring in the player colour at 60%, offset 2 px. */
+:focus-visible {
+  outline: 3px solid rgb(var(--p-rgb) / 0.6);
+  outline-offset: 2px;
+}
+
+/* Sentence-case numbers that change (§4). */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+@keyframes drift {
+  from {
+    transform: translateX(-30%);
+  }
+  to {
+    transform: translateX(130%);
+  }
+}
+@keyframes wiggle {
+  0%,
+  80%,
+  100% {
+    transform: rotate(0);
+  }
+  85% {
+    transform: rotate(-6deg);
+  }
+  90% {
+    transform: rotate(6deg);
+  }
+  95% {
+    transform: rotate(-3deg);
+  }
+}
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Ambient loops pause in the background (§12.6) and stop entirely with
+   reduced motion (§12.5): elements fall back to their resting pose. */
+:root[data-hidden] *,
+:root[data-hidden] *::before,
+:root[data-hidden] *::after {
+  animation-play-state: paused !important;
+}
+:root[data-motion="reduce"] *,
+:root[data-motion="reduce"] *::before,
+:root[data-motion="reduce"] *::after {
+  animation: none !important;
+  transition-duration: 0.16s !important;
 }

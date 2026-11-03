@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Baloo_2, Figtree } from "next/font/google";
 import "./globals.css";
+import { THEME_BOOT_SCRIPT } from "@/lib/sky";
 import { Providers } from "./providers";
 
 // design.md §4: only the weights listed there are loaded.
@@ -42,7 +43,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       className={`${baloo.variable} ${figtree.variable} h-full antialiased`}
+      // The boot script sets data-theme and data-motion before hydration.
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+      </head>
       <body className="flex min-h-full flex-col font-sans">
         <Providers>{children}</Providers>
       </body>
