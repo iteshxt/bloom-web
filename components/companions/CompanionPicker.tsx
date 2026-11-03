@@ -40,7 +40,9 @@ export function CompanionPicker({
 
   return (
     <div className="flex flex-col gap-5" data-player-color={color}>
-      <fieldset>
+      {/* min-w-0: a fieldset otherwise refuses to shrink below its
+          content, so the row never overflows and can't be swiped. */}
+      <fieldset className="min-w-0">
         <legend className="mb-2 text-sm font-semibold">Companion</legend>
         <div
           ref={row}
@@ -93,7 +95,7 @@ export function ColorDots({
   onChange: (c: PlayerColor) => void;
 }) {
   return (
-    <fieldset>
+    <fieldset className="min-w-0">
       <legend className="mb-2 text-sm font-semibold">Your colour</legend>
       <div className="flex gap-3">
         {PLAYER_COLORS.map((c) => (
