@@ -10,6 +10,8 @@ import {
   useOnline,
 } from "@/lib/offline/cache";
 import { syncPushOnStart } from "@/lib/push/client";
+// Loaded early so Chrome's one-time install event is never missed.
+import "@/lib/pwa/install";
 
 export function Providers({ children }: { children: ReactNode }) {
   const [client] = useState(

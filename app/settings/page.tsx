@@ -5,6 +5,7 @@ import { clearOfflineCache } from "@/lib/offline/cache";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { usePushState } from "@/components/push/usePushState";
+import { InstallCard } from "@/components/pwa/InstallCard";
 import { Button } from "@/components/ui/Button";
 import { PageShell } from "@/components/ui/PageShell";
 import { api } from "@/lib/api/client";
@@ -78,6 +79,8 @@ export default function SettingsPage() {
 
   return (
     <PageShell title="Settings">
+      <InstallCard />
+
       <Group title="Reminders">
         <DevicePush />
         {NOTIFICATION_CATEGORIES.map((c) => (

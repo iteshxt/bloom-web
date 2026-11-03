@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ActivityList } from "@/components/game/ActivityList";
 import { RemindersPrompt } from "@/components/push/RemindersPrompt";
+import { InstallCard } from "@/components/pwa/InstallCard";
 import { Banner } from "@/components/game/Banner";
 import { CountdownPill } from "@/components/game/CountdownPill";
 import { PlayerCard } from "@/components/game/PlayerCard";
@@ -79,6 +80,7 @@ export default function HomePage() {
       )}
 
       <RemindersPrompt />
+      <InstallCard dismissible />
 
       <nav aria-label="Quick actions" className="grid grid-cols-3 gap-2">
         {QUICK_ACTIONS.map((a) => (
