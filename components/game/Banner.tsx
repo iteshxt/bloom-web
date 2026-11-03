@@ -25,7 +25,7 @@ export function Banner({
       role="status"
       className={`shadow-soft flex items-center gap-3 rounded-md py-2.5 pr-2.5 pl-2 text-sm font-semibold ${TONES[tone]}`}
     >
-      <PuffyIcon name={icon} size={40} />
+      <PuffyIcon name={icon} size={40} className="shrink-0" />
       <p className="flex-1">{text}</p>
       {action && (
         <Link

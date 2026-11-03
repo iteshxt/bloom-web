@@ -14,7 +14,7 @@ export function RemindersPrompt() {
   return (
     <section className="bg-peach-soft text-peach-deep shadow-soft flex flex-col gap-2 rounded-md p-4">
       <p className="flex items-center gap-3 font-semibold">
-        <PuffyIcon name="bell" size={40} />
+        <PuffyIcon name="bell" size={40} className="shrink-0" />
         {state === "denied"
           ? "Notifications are blocked for Bloom. Allow them in your browser's site settings to get reminders."
           : "Turn on reminders so you never lose a streak to a busy day."}

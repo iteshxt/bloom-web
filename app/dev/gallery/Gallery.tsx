@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import LoginPage from "@/app/(auth)/login/page";
 import { Bloom } from "@/components/bloom/Bloom";
 import { MomentHost } from "@/components/moments/Moments";
 import { Unboxing } from "@/components/moments/Unboxing";
@@ -83,6 +84,13 @@ export function Gallery() {
           partnerName: "Riya",
         }}
       />
+      <section className="flex flex-col gap-3">
+        <h2 className="font-display text-[22px] font-bold">Sign in</h2>
+        <div className="-mx-4 h-[760px] overflow-hidden rounded-xl">
+          <LoginPage />
+        </div>
+      </section>
+
       <section className="flex flex-col gap-3">
         <h2 className="font-display text-[22px] font-bold">Moments</h2>
         <div className="flex flex-wrap gap-2">
