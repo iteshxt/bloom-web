@@ -858,7 +858,9 @@ export async function sendToPlayer(playerId: string, n: { title: string; body: s
   //   404/410 → delete subscription; other errors → failure_count++
 }
 ```
-`notify.ts` is the only caller. It first inserts into `notification_log` with the dedupe key (on conflict, skip), then sends. Every notification also writes an `activity` row, so the in-app feed shows it even when push is off.
+`notify.ts` is the only caller. Notifications are logged in `notification_log` with their dedupe key first (by `save_player_state`, or `services/events.ts` for non-engine actions), and only newly logged ones are delivered. Delivery skips kinds muted in `notif_prefs`, fills in the other player's display name, and builds the text with `lib/push/copy.ts` (design §14.2). Each row carries `actor_id` (the player whose event it is), so shared events such as `milestone_reached` and `streak_broken` read right for each recipient. Push errors never fail the caller; the activity feed still has the event.
+
+Settings groups the kinds into six toggles (`lib/push/categories.ts`: daily reminders, partner progress, streaks and restores, milestones and gifts, levels/badges/goals, sync problems), stored per kind in `notif_prefs`.
 
 ### 11.2 Client
 - After onboarding and from Settings, call `Notification.requestPermission()` **from a user tap** (iOS requires this, and only inside the installed PWA).
