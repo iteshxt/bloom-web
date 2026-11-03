@@ -53,6 +53,7 @@ export async function setTarget(
         notifications: [
           {
             player_id: input.playerId,
+            actor_id: input.setterId,
             kind: "target_changed",
             dedupe_key: `target_changed:${input.playerId}:${effectiveFrom}:${input.target}`,
             data: {

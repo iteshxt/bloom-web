@@ -69,7 +69,7 @@ async function act(
       submissions: [],
       now,
     });
-    await deliverNotifications(sent);
+    await deliverNotifications(admin, sent);
     return { ok: true, request: result.value } as const;
   });
   return locked.locked ? { ok: false, error: "locked" } : locked.value;

@@ -175,6 +175,7 @@ export async function advanceGift(
     notifications: [
       {
         player_id: gift.giver_id,
+        actor_id: input.receiverId,
         kind,
         dedupe_key: `${kind}:${gift.id}`,
         data: { milestone: gift.milestone },

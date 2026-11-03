@@ -69,7 +69,7 @@ export async function tickPlayer(
       sync,
       now,
     });
-    await deliverNotifications(sent);
+    await deliverNotifications(admin, sent);
 
     return {
       playerId,

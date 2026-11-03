@@ -28,6 +28,9 @@ export interface NotificationRow {
   kind: NotificationKind;
   dedupe_key: string;
   data: Record<string, unknown>;
+  /** The player whose event this is, so shared events read right for each
+   *  recipient. Absent on gift_owed, which only ever goes to the giver. */
+  actor_id?: string;
 }
 
 export interface SavePayload {
@@ -176,6 +179,7 @@ function recipients(
     kind: e.notif,
     dedupe_key: dedupeKey,
     data: e.data,
+    actor_id: refs.playerId,
   });
   switch (e.to) {
     case "self":

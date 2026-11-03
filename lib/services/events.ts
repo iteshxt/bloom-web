@@ -45,6 +45,7 @@ export async function recordEvents(
       throw new Error(`notification_log insert failed: ${error.message}`);
     const fresh = new Set((data ?? []).map((r) => r.dedupe_key));
     await deliverNotifications(
+      admin,
       input.notifications.filter((n) => fresh.has(n.dedupe_key)),
     );
   }
