@@ -5,7 +5,7 @@ import { Wordmark } from "@/components/ui/Wordmark";
 import { LogoMark } from "./LogoMark";
 
 // The launch screen inside the installed app (design §2.3). Android shows
-// its own splash from the manifest (the icon on Cloud); this one is in the
+// its own splash from the manifest (the icon on plum); this one is in the
 // first HTML so it continues that look without a flash while the app
 // starts, then fades once it has hydrated. Only in the installed app: a
 // normal browser tab opens straight to the page.
@@ -31,13 +31,13 @@ export function BootSplash() {
   return (
     <div
       aria-hidden
-      className={`boot-splash text-plum fixed inset-0 z-[100] flex-col items-center justify-center gap-5 transition-opacity duration-300 ${
+      className={`boot-splash text-dock-ink-strong fixed inset-0 z-[100] flex-col items-center justify-center gap-5 transition-opacity duration-300 ${
         state === "leaving" ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
     >
       <LogoMark size={148} shadow className="animate-breathe" />
       <Wordmark height={44} />
-      <p className="text-[15px] font-semibold opacity-70">
+      <p className="text-dock-ink text-[15px] font-semibold">
         Grow a little every day, together.
       </p>
     </div>

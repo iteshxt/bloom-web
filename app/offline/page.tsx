@@ -1,4 +1,5 @@
 import { Companion } from "@/components/companions/Companion";
+import { Ground } from "@/components/ui/Ground";
 
 // The service worker's fallback for a page that was never visited while
 // online (techspec §11.3). Static, so it's cached at install.
@@ -43,6 +44,7 @@ export default function OfflinePage() {
       >
         Try again
       </a>
+      <Ground />
     </main>
   );
 }

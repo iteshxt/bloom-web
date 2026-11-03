@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 // techspec §12, design §2.2–2.3: installs full screen with the Bloom flower.
-// Android draws the launch screen from this: the icon and name on Cloud.
+// Android draws the launch screen from this: the icon and name on plum.
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Bloom",
@@ -13,8 +13,11 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: "/",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#F6F4FC",
-    theme_color: "#F6F4FC",
+    // Night plum, the dock colour: Android paints the navigation bar (and
+    // its launch screen) once from these, so they match the bottom of
+    // every screen in both themes (design §2.3, §10.7).
+    background_color: "#1D1836",
+    theme_color: "#1D1836",
     categories: ["education", "productivity", "games"],
     icons: [
       {

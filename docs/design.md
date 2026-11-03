@@ -45,7 +45,8 @@ Every day you solve your problems, your flower grows. Two players, two little co
 - **Link preview (1200×630):** the flower, wordmark and tagline on the dusk sky with hills.
 
 ### 2.3 Splash and theme
-- Manifest `background_color` and `theme_color`: `#F6F4FC` (Cloud).
+- Manifest `background_color` and `theme_color`: `#1D1836` (night plum), which Android uses for its launch screen and the navigation bar. The in-app launch screen and the iPhone/iPad launch images use the same plum, with the wordmark in light ink.
+- The status bar follows the palette instead (Cloud by day, plum at night) through the `theme-color` tag.
 - iOS status bar: `black-translucent`, so the sky runs under the notch.
 
 ---
@@ -380,8 +381,9 @@ Each player picks a small original creature in onboarding. It lives on their isl
 ### 10.6 Heart-coin token pouch
 Three 20 px heart-coins in a row: filled ones are butter puffy coins, used ones are dashed outlines in `ink-3`. On the partner's card, an "Approve restore" banner can appear right above it.
 
-### 10.7 Floating nav
-- A glass pill, 64 px tall, inset 16 px from the sides and bottom (plus the safe area).
+### 10.7 Bottom dock (nav)
+- Android paints the installed app's system navigation bar once, from the manifest, so it can't follow day and night. It's night plum (`#1D1836`), and the app meets it with a **plum dock** in both themes: by day the light page settles onto it along a soft wave (like the garden's earth, with a couple of fireflies), and at night it's one continuous plum. The nav sits on the dock: 64 px of plum plus the bottom safe area, running straight into the system bar. Inactive icons are soft lavender (`#BDB4DA`).
+- Screens without the nav (sign-in, onboarding, offline) end in the same plum wave, so the bottom edge always matches the bar.
 - Four items: **Home**, **Journey**, **Gifts**, **Me**.
 - The active item expands into a **player-colour pill with a puffy icon and label**, like the reference's pink "Home" pill. Inactive items are line icons only.
 - A badge dot (peach) appears on Home when there's a pending restore request for you, and on Gifts when a gift is unlocked and unopened.
@@ -462,7 +464,7 @@ Each screen follows the sky-on-top, calm-panel-below structure unless noted. `{P
 ### 11.2 Onboarding (`/onboarding`)
 A step-by-step flow on a single calm panel. Progress is shown as **five little sprouts** at the top that grow as you advance.
 1. **Name:** "What should {Partner} call you?"
-2. **Companion and colour:** a horizontal carousel of the six creatures (big, 140 px, idle animations) plus three colour dots. The chosen colour instantly dresses the creature's scarf.
+2. **Companion and colour:** a horizontal carousel of the six creatures (big, 140 px, idle animations) plus three colour dots. The chosen colour instantly dresses the creature's scarf. Swipe or drag the row (it settles on the nearest creature; a flick moves one), tap a card, or use the arrows with position dots under it.
 3. **LeetCode:** the username field with live verification (section 10.10).
 4. **Pair up:**
    - *Create:* shows a big 6-character code in Baloo 2, with "Copy code" and "Share" (Web Share API) buttons, and a start-date picker (default today) with "Today" and "Tomorrow" shortcut chips.

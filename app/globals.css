@@ -63,7 +63,13 @@
   --wood: #f2c4a2;
   --wood-deep: #b97b52;
   --white: #ffffff;
-  --splash: #f6f4fc; /* Cloud in both themes: the manifest's splash colour */
+  /* The dock: night plum in both themes. Android paints the system
+     navigation bar once, from the manifest, in this same colour, so the
+     bottom of every screen runs straight into it (design §10.7). */
+  --dock: #1d1836;
+  --dock-raised: #2a2350;
+  --dock-ink: #bdb4da;
+  --dock-ink-strong: #f4f0ff;
   --plum: #2e2547; /* creature eyes and art lines: plum ink in both themes */
   --body-mochi: #fff6f0;
   --body-tofu: #f4e3d3;
@@ -192,6 +198,10 @@
   --color-leaf-deep: var(--leaf-deep);
   --color-white: var(--white);
   --color-plum: var(--plum);
+  --color-dock: var(--dock);
+  --color-dock-raised: var(--dock-raised);
+  --color-dock-ink: var(--dock-ink);
+  --color-dock-ink-strong: var(--dock-ink-strong);
   --color-transparent: transparent;
   --color-current: currentColor;
   --color-wood: var(--wood);
@@ -266,14 +276,14 @@ body {
 }
 
 /* The launch screen (components/brand/BootSplash.tsx): only in the
-   installed app, on the same light Cloud as Android's own splash in both
-   themes, so the hand-over is seamless. */
+   installed app, on the same plum as Android's own splash (the manifest's
+   background_color) in both themes, so the hand-over is seamless. */
 .boot-splash {
   display: none;
   background: radial-gradient(
     circle at 50% 42%,
-    var(--white),
-    var(--splash) 70%
+    var(--dock-raised),
+    var(--dock) 70%
   );
 }
 @media (display-mode: standalone) {

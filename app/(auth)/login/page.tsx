@@ -9,6 +9,7 @@ import { Companion } from "@/components/companions/Companion";
 import { Island } from "@/components/sky/Island";
 import { SkyScene } from "@/components/sky/SkyScene";
 import { Button } from "@/components/ui/Button";
+import { Ground } from "@/components/ui/Ground";
 import { Wordmark } from "@/components/ui/Wordmark";
 import { spring } from "@/lib/motion";
 
@@ -74,6 +75,7 @@ export default function LoginPage() {
           <SignIn />
         </Suspense>
       </motion.main>
+      <Ground />
     </SkyScene>
   );
 }

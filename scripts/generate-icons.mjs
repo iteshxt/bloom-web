@@ -127,6 +127,11 @@ sizes.forEach((s, i) => {
 await writeFile("app/favicon.ico", Buffer.concat([header, ...pngs]));
 
 // ── Launch screens (iPhone and iPad) ──────────────────────────────────
+// Night plum, like Android's (the manifest colours) and the dock.
+const DOCK = "#1D1836";
+const DOCK_RAISED = "#2A2350";
+const DOCK_INK = "#BDB4DA";
+const DOCK_INK_STRONG = "#F4F0FF";
 // Android builds its own from the manifest (icon + name on Cloud); iOS
 // needs an exact-size image per device.
 function launchScreen(w, h) {
@@ -136,19 +141,24 @@ function launchScreen(w, h) {
   const my = h * 0.42 - mark / 2;
   const size = unit * 0.15;
   const probe = wordmark(0, 0, size);
-  const word = wordmark((w - probe.width) / 2, my + mark + size * 1.15, size);
+  const word = wordmark(
+    (w - probe.width) / 2,
+    my + mark + size * 1.15,
+    size,
+    DOCK_INK_STRONG,
+  );
   const tagline = text(
     "Grow a little every day, together.",
     w / 2,
     my + mark + size * 1.15 + size * 0.62,
     size * 0.28,
-    "#6E6589",
+    DOCK_INK,
     figtree,
     "middle",
   );
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
-    <defs><radialGradient id="g" cx="${w / 2}" cy="${h * 0.4}" r="${Math.max(w, h) * 0.6}" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="${C.cloud}"/></radialGradient></defs>
+    <defs><radialGradient id="g" cx="${w / 2}" cy="${h * 0.42}" r="${Math.max(w, h) * 0.6}" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="${DOCK_RAISED}"/><stop offset="0.7" stop-color="${DOCK}"/></radialGradient></defs>
     <rect width="${w}" height="${h}" fill="url(#g)"/>
     <svg x="${mx}" y="${my}" width="${mark}" height="${mark}" viewBox="0 0 200 200">${logoFragment({ shadow: true, id: "s" })}</svg>
     ${word.svg}
@@ -157,7 +167,7 @@ function launchScreen(w, h) {
 }
 for (const s of SPLASH_SCREENS) {
   await png(launchScreen(s.width, s.height), s.width, s.height)
-    .flatten({ background: C.cloud })
+    .flatten({ background: DOCK })
     .toFile(`${splash}/${s.file}`);
 }
 

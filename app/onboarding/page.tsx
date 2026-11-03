@@ -14,6 +14,7 @@ import { RemindersPrompt } from "@/components/push/RemindersPrompt";
 import { InstallCard } from "@/components/pwa/InstallCard";
 import { ScreenSky } from "@/components/sky/ScreenSky";
 import { Button } from "@/components/ui/Button";
+import { Ground } from "@/components/ui/Ground";
 import { CodeSeeds } from "@/components/ui/CodeSeeds";
 import { PetalSpinner, Skeleton } from "@/components/ui/Progress";
 import { TextField } from "@/components/ui/TextField";
@@ -543,6 +544,7 @@ function Shell({
         )}
         {children}
       </div>
+      <Ground />
     </main>
   );
 }

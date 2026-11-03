@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import LoginPage from "@/app/(auth)/login/page";
 import { BadgeGrid } from "@/components/badges/BadgeGrid";
 import { Bloom } from "@/components/bloom/Bloom";
+import { FloatingNav } from "@/components/ui/FloatingNav";
 import { CheckInSheet } from "@/components/game/CheckInSheet";
 import { BADGES } from "@/lib/badges/catalog";
 import { MomentHost } from "@/components/moments/Moments";
@@ -72,8 +73,11 @@ export function Gallery() {
   return (
     <main
       data-player-color="blush"
-      className="mx-auto flex w-full max-w-[430px] flex-col gap-8 px-4 py-8"
+      className="mx-auto flex w-full max-w-[430px] flex-col gap-8 px-4 pt-8 pb-32"
     >
+      <Suspense>
+        <FloatingNav />
+      </Suspense>
       <Wordmark />
 
       <MomentHost
