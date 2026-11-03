@@ -78,6 +78,7 @@ export function useAchievements() {
 export function useTargetHistory(playerId: string) {
   return useQuery({
     queryKey: ["targets", playerId],
+    enabled: playerId !== "",
     queryFn: async () => {
       const { data, error } = await createClient()
         .from("daily_targets")

@@ -27,9 +27,11 @@ export default function PlayerPage() {
 }
 
 function PlayerProfile() {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams<{ id: string }>();
   const now = useNow();
   const duel = useDuel();
+  // "/player/me" is the Me tab (design §11.11).
+  const id = params.id === "me" ? (duel.data?.me.id ?? "") : params.id;
   const history = useTargetHistory(id);
 
   if (!now || !duel.data || !history.data) {

@@ -9,7 +9,11 @@ import {
   createOfflinePersister,
   useOnline,
 } from "@/lib/offline/cache";
+import { MotionConfig } from "motion/react";
+import { Toaster } from "@/components/ui/Toaster";
+import { useReducedMotionPref } from "@/lib/prefs";
 import { syncPushOnStart } from "@/lib/push/client";
+import { useDocumentTheme } from "@/lib/useSkyBand";
 // Loaded early so Chrome's one-time install event is never missed.
 import "@/lib/pwa/install";
 
@@ -29,6 +33,8 @@ export function Providers({ children }: { children: ReactNode }) {
       }),
   );
   const [persister] = useState(createOfflinePersister);
+  useDocumentTheme();
+  const reduced = useReducedMotionPref();
 
   // Register the service worker and keep this device's push subscription
   // known to the server (techspec §11.2).
@@ -45,8 +51,12 @@ export function Providers({ children }: { children: ReactNode }) {
         buster: OFFLINE_CACHE_VERSION,
       }}
     >
-      <OfflinePill />
-      {children}
+      {/* design §12.5: with reduced motion, Motion keeps only fades. */}
+      <MotionConfig reducedMotion={reduced ? "always" : "never"}>
+        <OfflinePill />
+        <Toaster />
+        {children}
+      </MotionConfig>
     </PersistQueryClientProvider>
   );
 }
@@ -58,7 +68,7 @@ function OfflinePill() {
   return (
     <p
       role="status"
-      className="bg-glass shadow-float text-ink rounded-pill fixed top-[max(0.75rem,env(safe-area-inset-top))] left-1/2 z-50 -translate-x-1/2 px-4 py-2 text-sm font-semibold"
+      className="glass text-ink rounded-pill fixed top-[max(0.75rem,env(safe-area-inset-top))] left-1/2 z-50 -translate-x-1/2 px-4 py-2 text-sm font-semibold"
     >
       You’re offline. Showing what we had.
     </p>
