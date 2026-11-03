@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "motion/react";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { GoogleSignIn } from "@/components/auth/GoogleSignIn";
@@ -11,7 +10,6 @@ import { SkyScene } from "@/components/sky/SkyScene";
 import { Button } from "@/components/ui/Button";
 import { Ground } from "@/components/ui/Ground";
 import { Wordmark } from "@/components/ui/Wordmark";
-import { spring } from "@/lib/motion";
 
 // Sign in (design §11.1): a full-screen dusk sky with two islands and two
 // waving creatures, the wordmark and one button. The one page-load moment:
@@ -21,12 +19,9 @@ import { spring } from "@/lib/motion";
 export default function LoginPage() {
   return (
     <SkyScene band="dusk" className="flex min-h-dvh flex-1 flex-col">
-      <motion.main
-        className="text-plum relative mx-auto flex w-full flex-1 flex-col px-4 pt-[max(3rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))] md:max-w-[430px]"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
-      >
+      {/* The entrance is CSS, so it starts with the first paint rather
+          than after the JavaScript arrives (which kept the page blank). */}
+      <main className="text-plum animate-fade-in relative mx-auto flex w-full flex-1 flex-col px-4 pt-[max(3rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))] md:max-w-[430px]">
         <div className="flex flex-1 items-center justify-between gap-2">
           {(
             [
@@ -34,12 +29,11 @@ export default function LoginPage() {
               ["tofu", "sky", 22],
             ] as const
           ).map(([kind, color, streak], i) => (
-            <motion.div
+            <div
               key={kind}
               data-player-color={color}
-              initial={{ y: 60, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ ...spring.floaty, delay: 0.3 + i * 0.12 }}
+              className="animate-rise"
+              style={{ animationDelay: `${0.3 + i * 0.12}s` }}
             >
               <Island width={160} bobDelay={i * 2.5}>
                 {i === 0 && (
@@ -60,7 +54,7 @@ export default function LoginPage() {
                   />
                 )}
               </Island>
-            </motion.div>
+            </div>
           ))}
         </div>
         <header className="flex flex-col gap-2 pt-8 pb-10">
@@ -74,7 +68,7 @@ export default function LoginPage() {
         <Suspense>
           <SignIn />
         </Suspense>
-      </motion.main>
+      </main>
       <Ground />
     </SkyScene>
   );
