@@ -2,30 +2,38 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { Bloom } from "@/components/bloom/Bloom";
+import { JourneyRoad } from "@/components/game/JourneyRoad";
+import { LineIcon } from "@/components/icons/line";
 import { Button } from "@/components/ui/Button";
-import { Chip, PageShell } from "@/components/ui/PageShell";
+import { StatChip } from "@/components/ui/Chip";
+import { PageShell } from "@/components/ui/PageShell";
+import { Skeleton } from "@/components/ui/Progress";
 import { api } from "@/lib/api/client";
+import { asKind } from "@/lib/companions";
 import { useDuel } from "@/lib/dashboard/useDuel";
-import { shortDate } from "@/lib/format/ist";
+import { useHydrated } from "@/lib/useHydrated";
 import { useAchievements } from "@/lib/game/queries";
 import { MAX_MILESTONE } from "@/lib/validation/game";
 
-// The journey (design §11.5, PRD 5.7), functional pass: the milestone path
-// with both players' progress and lifetime achievements. The illustrated
-// garden road arrives with the design pass.
+// The journey (design §11.5, PRD 5.7): stat chips on the sky, the winding
+// garden road with a gift at every milestone, and a bottom card with the
+// direction to your next gift and a slider whose thumb is your flower.
 
 export default function MilestonesPage() {
+  // Waits for hydration: the offline cache restores before it.
+  const hydrated = useHydrated();
   const duel = useDuel();
   const achievements = useAchievements();
 
-  if (!duel.data || !achievements.data) {
+  if (!hydrated || !duel.data || !achievements.data) {
     return (
       <PageShell title="Journey">
-        <p className="text-ink-2">
-          {duel.isError || achievements.isError
-            ? "Something went sideways. Try again."
-            : "Loading…"}
-        </p>
+        {duel.isError || achievements.isError ? (
+          <p className="text-ink-2">Something went sideways. Try again.</p>
+        ) : (
+          <Skeleton className="h-[480px] rounded-xl" />
+        )}
       </PageShell>
     );
   }
@@ -42,20 +50,67 @@ export default function MilestonesPage() {
   const prev = [...milestones].reverse().find((m) => m <= myStreak) ?? 0;
   const pct = next ? ((myStreak - prev) / (next - prev)) * 100 : 100;
 
+  const reachedAny = (playerId: string, m: number) =>
+    Boolean(reached(playerId, m));
+  const left = next ? next - myStreak : 0;
+
   return (
-    <PageShell title="Journey" color={me.color}>
-      <section className="bg-surface shadow-player flex flex-col gap-3 rounded-xl p-5">
-        <p className="font-display text-xl font-bold">
+    <PageShell
+      title="Journey"
+      color={me.color}
+      skyClassName="pb-12"
+      sky={
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+          <StatChip icon="bloom" value={myStreak} label="day streak" />
+          <StatChip
+            icon="gift"
+            value={next ? left : "All"}
+            label={next ? "to your next gift" : "gifts reached"}
+          />
+          <StatChip icon="crown" value={me.level} label="level" />
+        </div>
+      }
+    >
+      <JourneyRoad
+        milestones={milestones}
+        reached={reachedAny}
+        me={{
+          id: me.id,
+          name: me.name,
+          kind: asKind(me.avatarKey),
+          color: me.color,
+          streak: myStreak,
+          onIce: Boolean(me.run?.atRiskDay),
+        }}
+        partner={
+          partner
+            ? {
+                id: partner.id,
+                name: partner.name,
+                kind: asKind(partner.avatarKey),
+                color: partner.color,
+                streak: partnerStreak,
+                onIce: Boolean(partner.run?.atRiskDay),
+              }
+            : null
+        }
+      />
+
+      <section className="bg-surface shadow-float sticky bottom-24 z-10 flex flex-col gap-3 rounded-xl p-5">
+        <p className="rounded-pill bg-p-soft text-p-deep inline-flex items-center gap-2 self-start py-1.5 pr-4 pl-1.5 text-sm font-semibold">
+          <span className="bg-p rounded-pill inline-flex h-8 w-8 items-center justify-center">
+            <LineIcon name="next" size={18} />
+          </span>
           {next
-            ? `${next - myStreak} ${next - myStreak === 1 ? "day" : "days"} to your next gift`
-            : "You've passed every milestone"}
+            ? `${left} ${left === 1 ? "day" : "days"} to your next gift`
+            : "You’ve passed every milestone"}
         </p>
         <div className="flex items-center gap-3">
-          <span className="text-ink-2 text-sm tabular-nums">
+          <span className="text-ink-2 tabular text-sm">
             {myStreak} traveled
           </span>
           <div
-            className="bg-p-soft rounded-pill h-2.5 flex-1 overflow-hidden"
+            className="bg-p-soft rounded-pill relative h-2.5 flex-1"
             role="progressbar"
             aria-valuemin={prev}
             aria-valuemax={next ?? myStreak}
@@ -66,45 +121,18 @@ export default function MilestonesPage() {
               className="bg-p rounded-pill h-full"
               style={{ width: `${pct}%` }}
             />
+            <span
+              className="absolute top-1/2 -translate-x-1/2 -translate-y-[62%]"
+              style={{ left: `${pct}%` }}
+            >
+              <Bloom streak={myStreak} size={34} />
+            </span>
           </div>
           {next && (
-            <span className="text-ink-2 text-sm tabular-nums">
-              {next - myStreak} left
-            </span>
+            <span className="text-ink-2 tabular text-sm">{left} left</span>
           )}
         </div>
       </section>
-
-      <ol className="flex flex-col gap-3">
-        {milestones.map((m) => {
-          const mine = reached(me.id, m);
-          const theirs = partner ? reached(partner.id, m) : undefined;
-          return (
-            <li
-              key={m}
-              className="bg-surface shadow-soft flex flex-col gap-2 rounded-lg p-4"
-            >
-              <h2 className="font-display text-lg font-semibold">{m} days</h2>
-              <div className="flex flex-wrap gap-2">
-                <Chip tone={mine ? "mint" : "muted"}>
-                  You:{" "}
-                  {mine
-                    ? `reached ${shortDate(mine.achieved_on)}`
-                    : `${Math.max(0, m - myStreak)} to go`}
-                </Chip>
-                {partner && (
-                  <Chip tone={theirs ? "mint" : "muted"}>
-                    {partner.name}:{" "}
-                    {theirs
-                      ? `reached ${shortDate(theirs.achieved_on)}`
-                      : `${Math.max(0, m - partnerStreak)} to go`}
-                  </Chip>
-                )}
-              </div>
-            </li>
-          );
-        })}
-      </ol>
 
       <AddMilestone existing={milestones} />
     </PageShell>
@@ -155,7 +183,7 @@ function AddMilestone({ existing }: { existing: number[] }) {
           placeholder="e.g. 150"
           value={value}
           onChange={(e) => setValue(e.target.value.replace(/\D/g, ""))}
-          className="border-line bg-surface focus:border-p focus:ring-p-soft h-[52px] w-32 rounded-sm border-[1.5px] px-4 outline-none focus:ring-4"
+          className="border-line bg-surface text-ink focus:border-p focus:ring-p-soft h-[52px] w-32 rounded-sm border-[1.5px] px-4 outline-none focus:ring-4"
         />
         <Button type="submit" variant="secondary" disabled={busy || !value}>
           Add

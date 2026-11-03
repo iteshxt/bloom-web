@@ -2,83 +2,140 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { motion } from "motion/react";
+import { Companion } from "@/components/companions/Companion";
+import { GiftShelf } from "@/components/game/GiftShelf";
+import { LineIcon } from "@/components/icons/line";
+import { PuffyIcon } from "@/components/icons/puffy";
 import { Button } from "@/components/ui/Button";
 import { Chip, PageShell } from "@/components/ui/PageShell";
+import { Skeleton } from "@/components/ui/Progress";
+import { Sheet } from "@/components/ui/Sheet";
 import { TextField } from "@/components/ui/TextField";
+import { asKind } from "@/lib/companions";
+import { spring } from "@/lib/motion";
+import { toast } from "@/lib/toast";
 import { api } from "@/lib/api/client";
 import { useDuel } from "@/lib/dashboard/useDuel";
+import { useHydrated } from "@/lib/useHydrated";
 import type { GivingGift, ReceivingGift } from "@/lib/gifts/view";
 import { useGifts } from "@/lib/game/queries";
 
-// design §11.7 and PRD 5.8, functional pass. The shelf, wiggling boxes and
-// unboxing moment arrive with the design pass.
+// Gifts (design §11.7, PRD 5.8): a "For me / For {Partner}" toggle. For me
+// is the wooden shelf; tapping an unlocked box opens it, tapping an opened
+// one shows its keepsake card. For the partner, each milestone card opens
+// the editor sheet ("Wrap it").
 
 export default function GiftsPage() {
+  // Waits for hydration: the offline cache restores before it.
+  const hydrated = useHydrated();
   const duel = useDuel();
   const gifts = useGifts();
   const [tab, setTab] = useState<"mine" | "theirs">("mine");
+  const [open, setOpen] = useState<number | null>(null);
 
   const partnerName = duel.data?.partner?.name ?? "your partner";
-  if (!duel.data || !gifts.data) {
+  if (!hydrated || !duel.data || !gifts.data) {
     return (
       <PageShell title="Gifts">
-        <p className="text-ink-2">
-          {duel.isError || gifts.isError
-            ? "Something went sideways. Try again."
-            : "Loading…"}
-        </p>
+        {duel.isError || gifts.isError ? (
+          <p className="text-ink-2">Something went sideways. Try again.</p>
+        ) : (
+          <Skeleton className="h-72 rounded-xl" />
+        )}
       </PageShell>
     );
   }
   if (!duel.data.partner) {
     return (
       <PageShell title="Gifts" color={duel.data.me.color}>
-        <p className="text-ink-2">
-          Gifts open up once your partner joins with code{" "}
-          {duel.data.pair.inviteCode}.
-        </p>
+        <section className="bg-surface shadow-soft flex flex-col items-center gap-2 rounded-xl p-6 text-center">
+          <PuffyIcon name="gift" size={72} />
+          <p className="text-ink-2">
+            Gifts open up once your partner joins with code{" "}
+            <span className="font-display text-ink font-bold tracking-[0.1em]">
+              {duel.data.pair.inviteCode}
+            </span>
+            .
+          </p>
+        </section>
       </PageShell>
     );
   }
   const streak = duel.data.me.run?.length ?? 0;
+  const partnerKind = asKind(duel.data.partner.avatarKey);
+  const partnerColor = duel.data.partner.color;
+  const selected = gifts.data.receiving.find((g) => g.milestone === open);
 
   return (
-    <PageShell title="Gifts" color={duel.data.me.color}>
-      <div
-        role="tablist"
-        className="bg-surface shadow-soft rounded-pill grid grid-cols-2 gap-1 p-1"
-      >
-        {(["mine", "theirs"] as const).map((t) => (
-          <button
-            key={t}
-            role="tab"
-            aria-selected={tab === t}
-            onClick={() => setTab(t)}
-            className={`rounded-pill h-11 font-semibold ${tab === t ? "bg-p text-p-deep" : "text-ink-2"}`}
-          >
-            {t === "mine" ? "For me" : `For ${partnerName}`}
-          </button>
-        ))}
-      </div>
-
-      {tab === "mine" ? (
-        <ul className="flex flex-col gap-3">
-          {gifts.data.receiving.map((g) => (
-            <Receiving
-              key={g.milestone}
-              gift={g}
-              partnerName={partnerName}
-              streak={streak}
-            />
+    <PageShell
+      title="Gifts"
+      color={duel.data.me.color}
+      skyClassName="pb-12"
+      sky={
+        <div
+          role="tablist"
+          aria-label="Whose gifts"
+          className="bg-surface shadow-soft rounded-pill grid grid-cols-2 gap-1 p-1"
+        >
+          {(["mine", "theirs"] as const).map((t) => (
+            <button
+              key={t}
+              role="tab"
+              aria-selected={tab === t}
+              onClick={() => setTab(t)}
+              className={`rounded-pill relative h-11 font-semibold ${tab === t ? "text-p-deep" : "text-ink-2"}`}
+            >
+              {tab === t && (
+                <motion.span
+                  layoutId="gift-tab"
+                  className="bg-p rounded-pill absolute inset-0"
+                  transition={spring.soft}
+                />
+              )}
+              <span className="relative">
+                {t === "mine" ? "For me" : `For ${partnerName}`}
+              </span>
+            </button>
           ))}
-        </ul>
+        </div>
+      }
+    >
+      {tab === "mine" ? (
+        <GiftShelf
+          gifts={gifts.data.receiving}
+          streak={streak}
+          partnerName={partnerName}
+          onSelect={(g) => setOpen(g.milestone)}
+        />
       ) : (
         <ul className="flex flex-col gap-3">
           {gifts.data.giving.map((g) => (
-            <Giving key={g.milestone} gift={g} partnerName={partnerName} />
+            <Giving
+              key={g.milestone}
+              gift={g}
+              partnerName={partnerName}
+              partnerKind={partnerKind}
+              partnerColor={partnerColor}
+            />
           ))}
         </ul>
       )}
+
+      <Sheet
+        open={Boolean(selected)}
+        onClose={() => setOpen(null)}
+        title={selected ? `Your ${selected.milestone}-day gift` : ""}
+        color={duel.data.me.color}
+      >
+        {selected && (
+          <Receiving
+            gift={selected}
+            partnerName={partnerName}
+            streak={streak}
+          />
+        )}
+      </Sheet>
     </PageShell>
   );
 }
@@ -103,20 +160,16 @@ function Receiving({
     const res = await api(`/api/gifts/${gift.id}/${path}`, { body: {} });
     setBusy(false);
     if (!res.ok) return setError(res.message);
+    if (path === "received") toast("Marked as received", "check");
     await queryClient.invalidateQueries({ queryKey: ["gifts"] });
   }
 
   const daysToGo = Math.max(0, gift.milestone - streak);
   return (
-    <li className="bg-surface shadow-soft flex flex-col gap-2 rounded-lg p-5">
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="font-display text-lg font-semibold">
-          {gift.milestone} days
-        </h2>
-        <Chip tone={chipTone(gift.status)}>
-          {receivingLabel(gift, daysToGo)}
-        </Chip>
-      </div>
+    <div className="flex flex-col gap-3 pb-2">
+      <Chip tone={chipTone(gift.status)} className="self-start">
+        {receivingLabel(gift, daysToGo)}
+      </Chip>
 
       {gift.status === "locked" && (
         <p className="text-ink-2">
@@ -127,17 +180,19 @@ function Receiving({
         <p className="text-ink-2">{partnerName} is wrapping it…</p>
       )}
       {gift.canOpen && (
-        <Button
-          className="self-start"
-          disabled={busy}
-          onClick={() => step("reveal")}
-        >
-          {busy ? "Opening…" : "Open"}
-        </Button>
+        <div className="flex flex-col items-center gap-3 py-2">
+          <span className="animate-wiggle">
+            <PuffyIcon name="gift" size={120} />
+          </span>
+          <Button disabled={busy} onClick={() => step("reveal")}>
+            {busy ? "Opening…" : "Open gift"}
+          </Button>
+        </div>
       )}
       {(gift.status === "revealed" || gift.status === "delivered") && (
-        <div className="bg-p-soft flex flex-col gap-1 rounded-md p-4">
-          <p className="font-display text-p-deep text-2xl font-extrabold">
+        <div className="bg-p-soft shadow-player flex flex-col gap-2 rounded-xl p-5">
+          <PuffyIcon name="giftOpen" size={48} />
+          <p className="font-display text-p-deep text-[32px] leading-[1.1] font-extrabold">
             {gift.title}
           </p>
           {gift.details && (
@@ -148,23 +203,18 @@ function Receiving({
               href={gift.linkUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-p-deep font-semibold underline"
+              className="bg-surface text-ink rounded-pill inline-flex h-11 items-center gap-2 self-start px-4 font-semibold"
             >
-              Open link
+              <LineIcon name="link" size={18} /> Open link
             </a>
           )}
-          <p className="text-ink-2 text-sm">
+          <p className="text-p-deep font-display mt-1 text-sm font-semibold">
             From {partnerName}, for {gift.milestone} days
           </p>
         </div>
       )}
       {gift.status === "revealed" && (
-        <Button
-          variant="secondary"
-          className="self-start"
-          disabled={busy}
-          onClick={() => step("received")}
-        >
+        <Button disabled={busy} onClick={() => step("received")}>
           Mark as received
         </Button>
       )}
@@ -173,16 +223,20 @@ function Receiving({
           {error}
         </p>
       )}
-    </li>
+    </div>
   );
 }
 
 function Giving({
   gift,
   partnerName,
+  partnerKind,
+  partnerColor,
 }: {
   gift: GivingGift;
   partnerName: string;
+  partnerKind: ReturnType<typeof asKind>;
+  partnerColor: string;
 }) {
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState(false);
@@ -205,6 +259,7 @@ function Giving({
     setBusy(false);
     if (!res.ok) return setError(res.message);
     setEditing(false);
+    toast(`Wrapped for ${partnerName}`, "gift");
     await queryClient.invalidateQueries({ queryKey: ["gifts"] });
   }
 
@@ -212,19 +267,57 @@ function Giving({
     <li
       className={`bg-surface shadow-soft flex flex-col gap-3 rounded-lg p-5 ${gift.owed ? "ring-blush ring-2" : ""}`}
     >
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="font-display text-lg font-semibold">
+      <div className="flex items-center gap-3">
+        <PuffyIcon
+          name={
+            gift.status === "revealed" || gift.status === "delivered"
+              ? "giftOpen"
+              : "gift"
+          }
+          size={48}
+        />
+        <h2 className="font-display flex-1 text-lg font-semibold">
           {gift.milestone} days
         </h2>
         <Chip tone={chipTone(gift.status)}>{givingLabel(gift)}</Chip>
       </div>
       {gift.owed && (
-        <p className="text-blush-deep font-semibold">
-          {partnerName} reached {gift.milestone} days. You owe a gift.
-        </p>
+        <div
+          className="flex items-center gap-2"
+          data-player-color={partnerColor}
+        >
+          <Companion kind={partnerKind} mood="wave" size={48} />
+          <p className="text-blush-deep text-sm font-semibold">
+            {partnerName} reached {gift.milestone} days. You owe a gift.
+          </p>
+        </div>
       )}
 
-      {editing ? (
+      {gift.title ? (
+        <>
+          <p className="font-semibold">{gift.title}</p>
+          {gift.hint && <p className="text-ink-2 text-sm">Hint: {gift.hint}</p>}
+          {gift.editable && (
+            <Button
+              variant="secondary"
+              className="self-start"
+              onClick={() => setEditing(true)}
+            >
+              Edit
+            </Button>
+          )}
+        </>
+      ) : (
+        <Button className="self-start" onClick={() => setEditing(true)}>
+          Choose a gift
+        </Button>
+      )}
+
+      <Sheet
+        open={editing}
+        onClose={() => setEditing(false)}
+        title={`A gift for ${partnerName}’s ${gift.milestone} days`}
+      >
         <form
           className="flex flex-col gap-4"
           onSubmit={(e) => {
@@ -262,38 +355,16 @@ function Giving({
             value={form.linkUrl}
             onChange={(e) => setForm({ ...form, linkUrl: e.target.value })}
           />
-          <div className="flex gap-2">
-            <Button type="submit" disabled={busy || !form.title.trim()}>
-              {busy ? "Wrapping…" : "Wrap it"}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setEditing(false)}
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
-      ) : gift.title ? (
-        <>
-          <p className="font-semibold">{gift.title}</p>
-          {gift.hint && <p className="text-ink-2 text-sm">Hint: {gift.hint}</p>}
-          {gift.editable && (
-            <Button
-              variant="secondary"
-              className="self-start"
-              onClick={() => setEditing(true)}
-            >
-              Edit
-            </Button>
+          <Button type="submit" disabled={busy || !form.title.trim()}>
+            {busy ? "Wrapping…" : "Wrap it"}
+          </Button>
+          {error && (
+            <p role="alert" className="text-peach-deep text-sm font-semibold">
+              {error}
+            </p>
           )}
-        </>
-      ) : (
-        <Button className="self-start" onClick={() => setEditing(true)}>
-          Choose a gift
-        </Button>
-      )}
+        </form>
+      </Sheet>
       {error && (
         <p role="alert" className="text-peach-deep text-sm font-semibold">
           {error}
