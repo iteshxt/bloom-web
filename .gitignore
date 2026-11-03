@@ -28,3 +28,6 @@ supabase/.branches/
 
 # personal Claude Code settings
 .claude/settings.local.json
+
+# Google OAuth client secrets (Download JSON): never commit
+client_secret_*.json
