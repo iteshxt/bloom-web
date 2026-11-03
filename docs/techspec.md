@@ -855,6 +855,8 @@ Errors use the shape `{ error: { code, message } }` with an HTTP status of 400, 
 
 **Dashboard data hook:** `useDuelState()` composes, for each player: active run, today's and yesterday's day rows, sync_state summary (`last_success_at`, served by an RPC or API), next milestone, and XP and level. Realtime events invalidate it.
 
+**Home is server-rendered with its data.** `lib/dashboard/loadDuel.ts` is the one loader for the dashboard data; the browser's `useDuel()` calls it with the browser client, and on a fresh page load `app/(app)/page.tsx` calls it on the server (the player's RLS-scoped client, plus `lib/services/syncStatus.ts` for `sync_state`) and seeds the query cache and the clock (`<NowSeed>`) for the first render. The screen then paints from the HTML instead of after the JavaScript and its own data requests. A client navigation (an `RSC` request) skips the server read and renders from the browser's cache at once. The seed is best-effort: any failure falls back to the browser's fetch.
+
 ---
 
 ## 11. Push notifications

@@ -1,10 +1,15 @@
 "use client";
 
+import {
+  hydrate,
+  useQueryClient,
+  type DehydratedState,
+} from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { navigateWithTransition } from "@/lib/viewTransition";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ActivityList, type Person } from "@/components/game/ActivityList";
 import { Banner } from "@/components/game/Banner";
 import { CountdownPill } from "@/components/game/CountdownPill";
@@ -24,7 +29,7 @@ import { Skeleton } from "@/components/ui/Progress";
 import { asKind } from "@/lib/companions";
 import { derivePlayer, moodFor, pickBanner } from "@/lib/dashboard/derive";
 import { useDuel } from "@/lib/dashboard/useDuel";
-import { useNow } from "@/lib/dashboard/useNow";
+import { NowSeed, useNow } from "@/lib/dashboard/useNow";
 import {
   useAchievements,
   useGifts,
@@ -59,7 +64,35 @@ const MomentHost = dynamic(
 // calm panel with a banner, quick actions, both player cards and recent
 // activity. Realtime keeps it live.
 
-export default function HomePage() {
+/** What the server render of home hands over: the dashboard data, ready
+ *  for the query cache, and the request time for the first render. */
+export interface HomeSeed {
+  state: DehydratedState;
+  now: number;
+}
+
+/** Home, either seeded by the server (a fresh page load renders with its
+ *  data, so it paints before the JavaScript arrives) or from the browser's
+ *  own cache (a tab switch). */
+export function HomeScreen({ seed }: { seed?: HomeSeed | null }) {
+  return seed ? <Seeded seed={seed} /> : <Home />;
+}
+
+function Seeded({ seed }: { seed: HomeSeed }) {
+  const client = useQueryClient();
+  // Into the cache before Home reads it, during render. (HydrationBoundary
+  // defers to an effect when the query already exists, and on the server
+  // the skeleton fallback has just created it empty, so it never landed.)
+  // hydrate() only replaces older data, so a fresher cache wins.
+  useMemo(() => hydrate(client, seed.state), [client, seed.state]);
+  return (
+    <NowSeed value={seed.now}>
+      <Home />
+    </NowSeed>
+  );
+}
+
+function Home() {
   const now = useNow();
   const { data, isPending, isError, refetch } = useDuel();
   const gifts = useGifts();
