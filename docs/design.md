@@ -492,7 +492,7 @@ A step-by-step flow on a single calm panel. Progress is shown as **five little s
 │   ( Home ) Journey Gifts  Me │
 └──────────────────────────────┘
 ```
-Until the P1 features ship, the quick actions are Gifts, Restores, Days (your profile) and Settings; Badges and Nudge join with P1. The bell opens Settings.
+The bell opens the activity feed (§11.12); a peach dot on it means there's activity you haven't seen.
 
 **States**
 | State | What changes |
@@ -824,6 +824,15 @@ Warm, playful, gently teasing, never guilt-trippy. Bloom talks like a cozy frien
 - "I already did mine 👀"
 - "One problem. Just one. 🥺"
 - "Race you 🏁"
+- "The grace hour is not a plan 😌"
+- "Two Sum won’t solve itself 🧮"
+- "Your companion is staring at you 👀"
+- "Don’t make me restore you 🧊"
+- "Proud of you. Now go solve 💖"
+- "Tick tock, the moon is up 🌙"
+- "Bet you can’t do a Medium today 😏"
+
+Nudges open from the Nudge quick action on home or the partner's profile: tap a preset to send it, or write your own (up to 140 characters). A counter shows how many of the day's 3 are left. On the receiving phone the partner's creature waves on home while a toast shows the message.
 
 ### 14.4 In-app microcopy examples
 | Place | Copy |

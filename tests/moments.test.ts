@@ -86,4 +86,21 @@ describe("signature moments (design §12.4)", () => {
     ]);
     expect(r.seen.restores).toEqual(["a", "b"]);
   });
+
+  it("waves when a new nudge arrives, once", () => {
+    const seen = baseline(
+      snap({ lastNudge: { id: 1, message: "Race you 🏁" } }),
+    );
+    const r = detectMoments(
+      seen,
+      snap({ lastNudge: { id: 2, message: "One problem. Just one. 🥺" } }),
+    );
+    expect(r.moments).toEqual([
+      { kind: "nudge", message: "One problem. Just one. 🥺" },
+    ]);
+    expect(
+      detectMoments(r.seen, snap({ lastNudge: { id: 2, message: "x" } }))
+        .moments,
+    ).toEqual([]);
+  });
 });

@@ -3,7 +3,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api/client";
 import type { ReceivingGift, GivingGift } from "@/lib/gifts/view";
+import { nudgesLeft } from "@/lib/nudges";
 import { createClient } from "@/lib/supabase/browser";
+import { istMidnight, todayIST } from "@/lib/time";
 
 // Read hooks for the step 6 screens. Rows come from Supabase under RLS,
 // except gifts, which only the server may read (invariant 5). Realtime
@@ -145,6 +147,24 @@ export function usePlayerHistory(playerId: string) {
         })),
         runLengths: (runs.data ?? []).map((r) => r.length),
       };
+    },
+  });
+}
+
+/** How many nudges I can still send today (PRD 5.12). */
+export function useNudgesLeft(playerId: string | null) {
+  return useQuery({
+    queryKey: ["nudges-left", playerId],
+    enabled: Boolean(playerId),
+    queryFn: async () => {
+      const since = istMidnight(todayIST(new Date())).toISOString();
+      const { count, error } = await createClient()
+        .from("nudges")
+        .select("id", { count: "exact", head: true })
+        .eq("from_id", playerId!)
+        .gte("created_at", since);
+      if (error) throw error;
+      return nudgesLeft(count ?? 0);
     },
   });
 }

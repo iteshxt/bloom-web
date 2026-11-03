@@ -11,6 +11,7 @@ import { LineIcon } from "@/components/icons/line";
 import { PuffyIcon } from "@/components/icons/puffy";
 import { Island } from "@/components/sky/Island";
 import { Button } from "@/components/ui/Button";
+import { NudgeSheet } from "@/components/game/NudgeSheet";
 import { ProfileHistory } from "@/components/game/ProfileHistory";
 import { PageShell, SectionTitle } from "@/components/ui/PageShell";
 import { ProgressBar, Skeleton } from "@/components/ui/Progress";
@@ -133,6 +134,8 @@ function PlayerProfile() {
         </>
       }
     >
+      {isPartner && <NudgeButton meId={me.id} partner={player} />}
+
       <ProfileHistory
         playerId={player.id}
         name={player.name}
@@ -298,5 +301,36 @@ function TargetStepper({
         </p>
       )}
     </section>
+  );
+}
+
+/** Nudge from the partner's profile (PRD 5.12). */
+function NudgeButton({
+  meId,
+  partner,
+}: {
+  meId: string;
+  partner: { name: string; color: string; avatarKey: string };
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button
+        variant="soft"
+        tone="peach"
+        className="self-start"
+        onClick={() => setOpen(true)}
+      >
+        <PuffyIcon name="wave" size={28} /> Nudge {partner.name}
+      </Button>
+      <NudgeSheet
+        open={open}
+        onClose={() => setOpen(false)}
+        meId={meId}
+        partnerName={partner.name}
+        partnerKind={asKind(partner.avatarKey)}
+        partnerColor={partner.color}
+      />
+    </>
   );
 }

@@ -3,13 +3,13 @@
 import { motion, useAnimationControls } from "motion/react";
 import { useEffect, useRef } from "react";
 import { Bloom } from "@/components/bloom/Bloom";
-import { Companion } from "@/components/companions/Companion";
+import { Companion, type Mood } from "@/components/companions/Companion";
 import { sparklePath } from "@/components/icons/geometry";
 import { PuffyIcon } from "@/components/icons/puffy";
 import { RollingNumber } from "@/components/moments/MomentOverlay";
 import { ProgressBar } from "@/components/ui/Progress";
 import { growthFor } from "@/lib/bloom";
-import type { CompanionMood, PlayerView } from "@/lib/dashboard/derive";
+import type { PlayerView } from "@/lib/dashboard/derive";
 import type { Companion as Kind } from "@/lib/validation/onboarding";
 import { TokenPouch } from "./TokenPouch";
 
@@ -25,7 +25,7 @@ export function PlayerCard({
 }: {
   player: PlayerView;
   kind: Kind;
-  mood: CompanionMood;
+  mood: Mood;
   label: string;
 }) {
   const stage = growthFor(player.streak).label;

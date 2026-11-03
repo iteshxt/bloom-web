@@ -12,7 +12,8 @@ export type Moment =
   | { kind: "rainbow" }
   | { kind: "milestone"; milestone: number }
   | { kind: "level"; level: number }
-  | { kind: "ice"; day: DayKey };
+  | { kind: "ice"; day: DayKey }
+  | { kind: "nudge"; message: string };
 
 export interface Seen {
   doneDay: DayKey | null;
@@ -22,6 +23,8 @@ export interface Seen {
   milestones: number[];
   /** Restore requests whose answer has been shown. */
   restores: string[];
+  /** The last nudge from my partner that has been shown. */
+  nudgeId?: number | null;
 }
 
 export interface Snapshot {
@@ -41,6 +44,8 @@ export interface Snapshot {
     /** The streak the request was protecting. */
     streak: number;
   }[];
+  /** The newest nudge my partner sent me, if any. */
+  lastNudge?: { id: number; message: string } | null;
 }
 
 export function baseline(s: Snapshot): Seen {
@@ -51,6 +56,7 @@ export function baseline(s: Snapshot): Seen {
     level: s.level,
     milestones: [...s.milestonesReached],
     restores: s.answered.map((a) => a.id),
+    nudgeId: s.lastNudge?.id ?? null,
   };
 }
 
@@ -94,6 +100,11 @@ export function detectMoments(
 
   if (s.level > next.level) moments.push({ kind: "level", level: s.level });
   next.level = Math.max(next.level, s.level);
+
+  if (s.lastNudge && next.nudgeId !== s.lastNudge.id) {
+    next.nudgeId = s.lastNudge.id;
+    moments.push({ kind: "nudge", message: s.lastNudge.message });
+  }
 
   if (s.onIceDay && next.iceDay !== s.onIceDay) {
     moments.push({ kind: "ice", day: s.onIceDay });

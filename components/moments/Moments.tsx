@@ -85,6 +85,14 @@ function MomentView({
       );
     case "level":
       return <LevelUp cast={cast} level={moment.level} onDone={onDone} />;
+    case "nudge":
+      return (
+        <NudgeReceived
+          from={cast.partnerName}
+          message={moment.message}
+          onDone={onDone}
+        />
+      );
   }
 }
 
@@ -109,6 +117,26 @@ function DayComplete({
     };
   }, [streak, onDone]);
   return <PetalBurst />;
+}
+
+/** A nudge arrived: the partner's creature waves on home (the page reads
+ *  this moment) while a toast shows the message. */
+function NudgeReceived({
+  from,
+  message,
+  onDone,
+}: {
+  from: string;
+  message: string;
+  onDone: () => void;
+}) {
+  useEffect(() => {
+    playSound("whoosh");
+    toast(`${from}: ${message}`, "wave");
+    const t = setTimeout(onDone, 2800);
+    return () => clearTimeout(t);
+  }, [from, message, onDone]);
+  return null;
 }
 
 function BothDone({ onDone }: { onDone: () => void }) {

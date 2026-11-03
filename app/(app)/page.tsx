@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { NudgeSheet } from "@/components/game/NudgeSheet";
 import { ActivityList, type Person } from "@/components/game/ActivityList";
 import { Banner } from "@/components/game/Banner";
 import { CountdownPill } from "@/components/game/CountdownPill";
@@ -49,6 +51,7 @@ export default function HomePage() {
     achievements.data,
   );
   const moments = useMoments(data?.me.id ?? null, snapshot);
+  const [nudging, setNudging] = useState(false);
 
   // Cached data (e.g. offline) beats an error screen; only show the error
   // when there's nothing to show.
@@ -90,7 +93,12 @@ export default function HomePage() {
   const myKind = asKind(data.me.avatarKey);
   const partnerKind = asKind(data.partner?.avatarKey);
   const myMood = moodFor(me, now);
-  const partnerMood = partner ? moodFor(partner, now) : "idle";
+  const greeting = moments.queue[0]?.kind === "nudge";
+  const partnerMood = partner
+    ? greeting
+      ? "wave"
+      : moodFor(partner, now)
+    : "idle";
   const banner = pickBanner({
     me,
     pendingRequestFromPartner: data.pendingRequestFromPartner,
@@ -209,18 +217,37 @@ export default function HomePage() {
         <RemindersPrompt />
         <InstallCard dismissible />
 
-        <nav aria-label="Quick actions" className="flex justify-between gap-2">
+        <nav aria-label="Quick actions" className="-mx-1 flex justify-between">
           {QUICK_ACTIONS.map((a) => (
             <Link
               key={a.href}
               href={a.href}
               className="flex flex-1 flex-col items-center gap-1.5 text-[13px] font-semibold transition-transform duration-150 active:scale-[0.94]"
             >
-              <PuffyTile name={a.icon} tone={a.tone} />
+              <PuffyTile name={a.icon} tone={a.tone} size={58} />
               {a.label}
             </Link>
           ))}
+          <button
+            type="button"
+            disabled={!partner}
+            onClick={() => setNudging(true)}
+            className="flex flex-1 flex-col items-center gap-1.5 text-[13px] font-semibold transition-transform duration-150 active:scale-[0.94] disabled:opacity-50"
+          >
+            <PuffyTile name="wave" tone="peach" size={58} />
+            Nudge
+          </button>
         </nav>
+        {partner && data.partner && (
+          <NudgeSheet
+            open={nudging}
+            onClose={() => setNudging(false)}
+            meId={me.id}
+            partnerName={partner.name}
+            partnerKind={partnerKind}
+            partnerColor={partner.color}
+          />
+        )}
 
         {partner ? (
           <div className="grid grid-cols-2 gap-3">
@@ -294,6 +321,12 @@ function momentSnapshot(
         status: r.status as "approved" | "rejected" | "expired",
         streak: data.me.lastEndedRunLength ?? 0,
       })),
+    lastNudge: (() => {
+      const n = data.activity.find(
+        (a) => a.kind === "nudge" && a.payload.toId === data.me.id,
+      );
+      return n ? { id: n.id, message: String(n.payload.message ?? "") } : null;
+    })(),
   };
 }
 
@@ -302,12 +335,12 @@ const QUICK_ACTIONS: {
   href: string;
   label: string;
   icon: PuffyName;
-  tone: "blush" | "frost" | "sky" | "lilac";
+  tone: "blush" | "frost" | "sky" | "butter";
 }[] = [
   { href: "/gifts", label: "Gifts", icon: "gift", tone: "blush" },
   { href: "/restores", label: "Restores", icon: "ice", tone: "frost" },
+  { href: "/badges", label: "Badges", icon: "trophy", tone: "butter" },
   { href: "/player/me", label: "Days", icon: "calendar", tone: "sky" },
-  { href: "/settings", label: "Settings", icon: "gear", tone: "lilac" },
 ];
 
 function Card({ href, children }: { href: string; children: React.ReactNode }) {
