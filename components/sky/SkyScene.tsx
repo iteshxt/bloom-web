@@ -1,7 +1,8 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
+import { svgId } from "@/components/icons/Puff";
 import { useReducedMotionPref } from "@/lib/prefs";
 import { dur, ease } from "@/lib/motion";
 import { SKY_GRADIENTS, type SkyBand } from "@/lib/sky";
@@ -57,6 +58,9 @@ export function SkyScene({
   children?: ReactNode;
 }) {
   const reduced = useReducedMotionPref();
+  // Unique per scene: two skies can be mounted at once (the desktop
+  // backdrop), and a gradient id in a hidden one would blank the other.
+  const u = svgId(useId());
   return (
     <div className={`relative overflow-hidden ${className}`}>
       <svg
@@ -77,13 +81,13 @@ export function SkyScene({
                 ease: ease.inOut,
               }}
             >
-              <BandLayer band={band} />
+              <BandLayer band={band} u={u} />
             </motion.g>
           )}
         </AnimatePresence>
         <Hills night={band !== null && isDark(band)} />
         {band && <Clouds night={isDark(band)} />}
-        {band === "grace" && <Aurora />}
+        {band === "grace" && <Aurora u={u} />}
         {petals && <PetalDrift />}
       </svg>
       {dim && (
@@ -96,9 +100,9 @@ export function SkyScene({
 
 const isDark = (b: SkyBand) => b === "night" || b === "grace" || b === "deep";
 
-function BandLayer({ band }: { band: SkyBand }) {
+function BandLayer({ band, u }: { band: SkyBand; u: string }) {
   const [top, bottom] = SKY_GRADIENTS[band];
-  const id = `sky-${band}`;
+  const id = `${u}-${band}`;
   const stars = STARS[band];
   return (
     <>
