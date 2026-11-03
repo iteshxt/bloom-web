@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import LoginPage from "@/app/(auth)/login/page";
+import { BadgeGrid } from "@/components/badges/BadgeGrid";
 import { Bloom } from "@/components/bloom/Bloom";
+import { BADGES } from "@/lib/badges/catalog";
 import { MomentHost } from "@/components/moments/Moments";
 import { Unboxing } from "@/components/moments/Unboxing";
 import { enqueueMoments, useMoments } from "@/lib/useMoments";
@@ -84,6 +86,17 @@ export function Gallery() {
           partnerName: "Riya",
         }}
       />
+      <section className="flex flex-col gap-3">
+        <h2 className="font-display text-[22px] font-bold">Badges</h2>
+        <BadgeGrid
+          earned={Object.fromEntries(
+            Object.keys(BADGES)
+              .slice(0, 13)
+              .map((k) => [k, "2026-11-04T10:00:00Z"]),
+          )}
+        />
+      </section>
+
       <section className="flex flex-col gap-3">
         <h2 className="font-display text-[22px] font-bold">Sign in</h2>
         <div className="-mx-4 h-[760px] overflow-hidden rounded-xl">

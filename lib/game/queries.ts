@@ -190,3 +190,18 @@ export function useActivityFeed() {
     },
   });
 }
+
+/** Badges earned by both players (PRD 5.11). */
+export function useBadges() {
+  return useQuery({
+    queryKey: ["badges"],
+    queryFn: async () => {
+      const { data, error } = await createClient()
+        .from("badges_earned")
+        .select("player_id, badge_key, earned_at")
+        .order("earned_at", { ascending: true });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}

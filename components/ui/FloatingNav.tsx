@@ -48,7 +48,10 @@ const ITEMS: {
     label: "Me",
     line: "me",
     puffy: "face",
-    match: (p) => p.startsWith("/player/me") || p.startsWith("/settings"),
+    match: (p) =>
+      p.startsWith("/player/me") ||
+      p.startsWith("/settings") ||
+      p.startsWith("/badges"),
   },
 ];
 

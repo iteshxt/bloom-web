@@ -11,6 +11,7 @@ import { LineIcon } from "@/components/icons/line";
 import { PuffyIcon } from "@/components/icons/puffy";
 import { Island } from "@/components/sky/Island";
 import { Button } from "@/components/ui/Button";
+import { BadgesPreview } from "@/components/badges/BadgeGrid";
 import { NudgeSheet } from "@/components/game/NudgeSheet";
 import { ProfileHistory } from "@/components/game/ProfileHistory";
 import { PageShell, SectionTitle } from "@/components/ui/PageShell";
@@ -144,6 +145,8 @@ function PlayerProfile() {
         today={today}
         startDate={duel.data.pair.startDate}
       />
+
+      <BadgesPreview playerId={player.id} />
 
       <section className="bg-surface shadow-soft flex flex-col gap-3 rounded-lg p-5">
         <div className="flex items-center justify-between">
