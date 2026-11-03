@@ -174,7 +174,7 @@ Every main screen uses the same structure as the reference: **sky on top, calm p
 ```
 - **Wave edge:** an SVG path with 2 gentle crests, 18 px amplitude, sitting where the sky meets the panel. The crests shift by 8 px over 12 s (ambient; off with reduced motion).
 - Content is **left-aligned**. Only celebration overlays and empty states are centred.
-- Desktop (≥ 768 px): the app renders as a centred 430 px column, with the sky extending as a full-bleed background behind it, so it feels like a phone-shaped window into the garden.
+- Desktop (≥ 768 px): the app renders as a centred 430 px column, with the sky extending as a full-bleed background behind it, so it feels like a phone-shaped window into the garden. Below 768 px there's no cap: the app fills the screen edge to edge, however wide the phone reports itself (display-size settings can push it past 430 px).
 
 ### 5.4 Glass
 - Background `glass`, `backdrop-filter: blur(18px) saturate(140%)`, border `1px solid rgba(255,255,255,0.6)` (night: `rgba(255,255,255,0.08)`), `shadow-float`.

@@ -127,7 +127,7 @@ export function FloatingNav({
     <nav
       aria-label="Main"
       data-player-color={me?.color}
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[430px] md:bottom-6"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 mx-auto md:bottom-6 md:max-w-[430px]"
     >
       <DockWave />
       <ul

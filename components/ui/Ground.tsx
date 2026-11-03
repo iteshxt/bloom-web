@@ -30,7 +30,7 @@ export function Ground() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-30 mx-auto max-w-[430px] md:hidden"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-30 mx-auto md:hidden md:max-w-[430px]"
     >
       <DockWave />
       <div className="bg-dock h-[env(safe-area-inset-bottom)]" />

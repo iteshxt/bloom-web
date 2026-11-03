@@ -16,7 +16,7 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
   return (
     <>
       <SkyScene band={band} className="fixed! inset-0 hidden md:block" />
-      <div className="bg-cloud md:shadow-float relative mx-auto flex min-h-dvh w-full max-w-[430px] flex-col md:my-6 md:min-h-[calc(100dvh-3rem)] md:overflow-hidden md:rounded-xl">
+      <div className="bg-cloud md:shadow-float relative mx-auto flex min-h-dvh w-full flex-col md:my-6 md:min-h-[calc(100dvh-3rem)] md:max-w-[430px] md:overflow-hidden md:rounded-xl">
         {children}
       </div>
       {/* usePathname() is request data, so the nav streams in. */}

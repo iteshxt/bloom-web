@@ -67,7 +67,7 @@ export function Sheet({
             aria-modal="true"
             aria-labelledby={titleId}
             data-player-color={color}
-            className="bg-surface relative flex max-h-[88dvh] w-full max-w-[430px] flex-col rounded-t-xl pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+            className="bg-surface relative flex max-h-[88dvh] w-full flex-col rounded-t-xl pb-[max(1.5rem,env(safe-area-inset-bottom))] md:max-w-[430px]"
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}

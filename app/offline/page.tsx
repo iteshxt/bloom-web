@@ -6,7 +6,7 @@ import { Ground } from "@/components/ui/Ground";
 
 export default function OfflinePage() {
   return (
-    <main className="mx-auto flex w-full max-w-[430px] flex-1 flex-col justify-center gap-4 px-4 py-12">
+    <main className="mx-auto flex w-full flex-1 flex-col justify-center gap-4 px-4 py-12 md:max-w-[430px]">
       {/* design §11.15: a tiny rain cloud over a creature, never an apology */}
       <div className="relative self-start">
         <svg

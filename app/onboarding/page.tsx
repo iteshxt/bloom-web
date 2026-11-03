@@ -515,7 +515,7 @@ function Shell({
   return (
     <main
       data-player-color={color}
-      className="mx-auto flex w-full max-w-[430px] flex-1 flex-col"
+      className="mx-auto flex w-full flex-1 flex-col md:max-w-[430px]"
     >
       <ScreenSky className="pb-12">
         <div className="flex items-end justify-between px-4 pt-6">

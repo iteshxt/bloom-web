@@ -22,7 +22,7 @@ export default function LoginPage() {
   return (
     <SkyScene band="dusk" className="flex min-h-dvh flex-1 flex-col">
       <motion.main
-        className="text-plum relative mx-auto flex w-full max-w-[430px] flex-1 flex-col px-4 pt-[max(3rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]"
+        className="text-plum relative mx-auto flex w-full flex-1 flex-col px-4 pt-[max(3rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))] md:max-w-[430px]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
