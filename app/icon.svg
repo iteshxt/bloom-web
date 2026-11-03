@@ -1,33 +1,74 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <rect width="200" height="200" rx="46" fill="#F6F4FC"/>
   <defs>
-    <filter id="soft"><feGaussianBlur stdDeviation="1.5"/></filter>
-    <clipPath id="petal"><ellipse rx="25" ry="31"/></clipPath>
-    <clipPath id="centre"><circle r="19"/></clipPath>
-  </defs>
-  <rect width="200" height="200" fill="#F6F4FC"/>
-  <g transform="translate(100 100) scale(1)"><g transform="rotate(-78) translate(0 -38)" clip-path="url(#petal)">
-        <ellipse rx="25" ry="31" fill="#A8346C" opacity="0.32"/>
-        <ellipse cx="-3" cy="-5" rx="25" ry="31" fill="#F7A8C8"/>
-        <ellipse cx="-8" cy="-14" rx="7" ry="11" fill="#FFFFFF" opacity="0.45" filter="url(#soft)"/>
-      </g><g transform="rotate(-6) translate(0 -38)" clip-path="url(#petal)">
-        <ellipse rx="25" ry="31" fill="#1C6E8F" opacity="0.32"/>
-        <ellipse cx="-3" cy="-5" rx="25" ry="31" fill="#8ED3EA"/>
-        <ellipse cx="-8" cy="-14" rx="7" ry="11" fill="#FFFFFF" opacity="0.45" filter="url(#soft)"/>
-      </g><g transform="rotate(66) translate(0 -38)" clip-path="url(#petal)">
-        <ellipse rx="25" ry="31" fill="#A8346C" opacity="0.32"/>
-        <ellipse cx="-3" cy="-5" rx="25" ry="31" fill="#F7A8C8"/>
-        <ellipse cx="-8" cy="-14" rx="7" ry="11" fill="#FFFFFF" opacity="0.45" filter="url(#soft)"/>
-      </g><g transform="rotate(138) translate(0 -38)" clip-path="url(#petal)">
-        <ellipse rx="25" ry="31" fill="#1C6E8F" opacity="0.32"/>
-        <ellipse cx="-3" cy="-5" rx="25" ry="31" fill="#8ED3EA"/>
-        <ellipse cx="-8" cy="-14" rx="7" ry="11" fill="#FFFFFF" opacity="0.45" filter="url(#soft)"/>
-      </g><g transform="rotate(210) translate(0 -38)" clip-path="url(#petal)">
-        <ellipse rx="25" ry="31" fill="#A8346C" opacity="0.32"/>
-        <ellipse cx="-3" cy="-5" rx="25" ry="31" fill="#F7A8C8"/>
-        <ellipse cx="-8" cy="-14" rx="7" ry="11" fill="#FFFFFF" opacity="0.45" filter="url(#soft)"/>
-      </g><g clip-path="url(#centre)">
-         <circle r="19" fill="#7A5800" opacity="0.3"/>
-         <circle cx="-2" cy="-3" r="19" fill="#FFE18F"/>
-         <circle cx="-7" cy="-8" r="5" fill="#FFFFFF" opacity="0.65" filter="url(#soft)"/>
-       </g></g>
+    <filter id="bloom-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+    <filter id="bloom-soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+    <radialGradient id="bloom-glow" cx="100" cy="88" r="125" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#F6F4FC" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bloom-blush-core" cx="0" cy="0" r="72" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#A8346C" stop-opacity="0.5"/>
+      <stop offset="0.36" stop-color="#A8346C" stop-opacity="0.22"/>
+      <stop offset="0.62" stop-color="#A8346C" stop-opacity="0"/>
+    </radialGradient><radialGradient id="bloom-sky-core" cx="0" cy="0" r="72" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1C6E8F" stop-opacity="0.5"/>
+      <stop offset="0.36" stop-color="#1C6E8F" stop-opacity="0.22"/>
+      <stop offset="0.62" stop-color="#1C6E8F" stop-opacity="0"/>
+    </radialGradient>
+  </defs><g transform="translate(100 100) scale(1.02)"><g>
+      <clipPath id="bloom-p0"><path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="rotate(-14)"/></clipPath>
+      <g clip-path="url(#bloom-p0)">
+        <path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="rotate(-14)" fill="#F7A8C8"/>
+        <path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="rotate(-14)" fill="#A8346C" opacity="0.2"/>
+        <path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="translate(-2.5 -4) rotate(-14)" fill="#F7A8C8"/>
+        <circle r="72" fill="url(#bloom-blush-core)"/>
+        <ellipse cx="-22.1" cy="-60.51" rx="10" ry="5.5" transform="rotate(-44 -22.1 -60.51)" fill="#FFFFFF" opacity="0.5" filter="url(#bloom-blur)"/>
+      </g>
+    </g><g>
+      <clipPath id="bloom-p1"><path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="rotate(58)"/></clipPath>
+      <g clip-path="url(#bloom-p1)">
+        <path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="rotate(58)" fill="#8ED3EA"/>
+        <path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="rotate(58)" fill="#1C6E8F" opacity="0.2"/>
+        <path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="translate(-2.5 -4) rotate(58)" fill="#8ED3EA"/>
+        <circle r="72" fill="url(#bloom-sky-core)"/>
+        <ellipse cx="32.4" cy="-38.5" rx="10" ry="5.5" transform="rotate(28 32.4 -38.5)" fill="#FFFFFF" opacity="0.5" filter="url(#bloom-blur)"/>
+      </g>
+    </g><g>
+      <clipPath id="bloom-p2"><path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="rotate(130)"/></clipPath>
+      <g clip-path="url(#bloom-p2)">
+        <path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="rotate(130)" fill="#F7A8C8"/>
+        <path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="rotate(130)" fill="#A8346C" opacity="0.2"/>
+        <path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="translate(-2.5 -4) rotate(130)" fill="#F7A8C8"/>
+        <circle r="72" fill="url(#bloom-blush-core)"/>
+        <ellipse cx="28.3" cy="20.14" rx="10" ry="5.5" transform="rotate(100 28.3 20.14)" fill="#FFFFFF" opacity="0.5" filter="url(#bloom-blur)"/>
+      </g>
+    </g><g>
+      <clipPath id="bloom-p3"><path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="rotate(202)"/></clipPath>
+      <g clip-path="url(#bloom-p3)">
+        <path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="rotate(202)" fill="#8ED3EA"/>
+        <path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="rotate(202)" fill="#1C6E8F" opacity="0.2"/>
+        <path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="translate(-2.5 -4) rotate(202)" fill="#8ED3EA"/>
+        <circle r="72" fill="url(#bloom-sky-core)"/>
+        <ellipse cx="-28.73" cy="34.36" rx="10" ry="5.5" transform="rotate(172 -28.73 34.36)" fill="#FFFFFF" opacity="0.5" filter="url(#bloom-blur)"/>
+      </g>
+    </g><g>
+      <clipPath id="bloom-p4"><path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="rotate(274)"/></clipPath>
+      <g clip-path="url(#bloom-p4)">
+        <path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="rotate(274)" fill="#F7A8C8"/>
+        <path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="rotate(274)" fill="#A8346C" opacity="0.2"/>
+        <path d="M0 -8C-17 -12 -36 -30 -34 -55C-33 -70 -20 -79 -9 -75C-4 -73 -1.5 -69 0 -66C1.5 -69 4 -73 9 -75C20 -79 33 -70 34 -55C36 -30 17 -12 0 -8Z" transform="translate(-2.5 -4) rotate(274)" fill="#F7A8C8"/>
+        <circle r="72" fill="url(#bloom-blush-core)"/>
+        <ellipse cx="-59.88" cy="-15.49" rx="10" ry="5.5" transform="rotate(244 -59.88 -15.49)" fill="#FFFFFF" opacity="0.5" filter="url(#bloom-blur)"/>
+      </g>
+    </g><g>
+      <clipPath id="bloom-c"><circle r="19"/></clipPath>
+      <g clip-path="url(#bloom-c)">
+        <circle r="19" fill="#FFE18F"/>
+        <circle r="19" fill="#7A5800" opacity="0.28"/>
+        <circle cx="-2" cy="-3" r="19" fill="#FFE18F"/>
+        <circle cx="9.29" cy="5" r="1.5" fill="#7A5800" opacity="0.28"/><circle cx="3.43" cy="10.17" r="1.5" fill="#7A5800" opacity="0.28"/><circle cx="-4.26" cy="8.8" r="1.5" fill="#7A5800" opacity="0.28"/><circle cx="-7.99" cy="1.94" r="1.5" fill="#7A5800" opacity="0.28"/><circle cx="-4.95" cy="-5.25" r="1.5" fill="#7A5800" opacity="0.28"/><circle cx="2.57" cy="-7.36" r="1.5" fill="#7A5800" opacity="0.28"/><circle cx="8.91" cy="-2.8" r="1.5" fill="#7A5800" opacity="0.28"/>
+        <ellipse cx="-7" cy="-9" rx="6" ry="3.6" transform="rotate(-30 -7 -9)" fill="#FFFFFF" opacity="0.7" filter="url(#bloom-blur)"/>
+      </g>
+    </g></g>
 </svg>

@@ -63,6 +63,7 @@
   --wood: #f2c4a2;
   --wood-deep: #b97b52;
   --white: #ffffff;
+  --splash: #f6f4fc; /* Cloud in both themes: the manifest's splash colour */
   --plum: #2e2547; /* creature eyes and art lines: plum ink in both themes */
   --body-mochi: #fff6f0;
   --body-tofu: #f4e3d3;
@@ -253,6 +254,23 @@ body {
 :focus-visible {
   outline: 3px solid rgb(var(--p-rgb) / 0.6);
   outline-offset: 2px;
+}
+
+/* The launch screen (components/brand/BootSplash.tsx): only in the
+   installed app, on the same light Cloud as Android's own splash in both
+   themes, so the hand-over is seamless. */
+.boot-splash {
+  display: none;
+  background: radial-gradient(
+    circle at 50% 42%,
+    var(--white),
+    var(--splash) 70%
+  );
+}
+@media (display-mode: standalone) {
+  .boot-splash {
+    display: flex;
+  }
 }
 
 /* A player-owned card: the surface with a wash of their colour (design

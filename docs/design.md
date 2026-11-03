@@ -37,9 +37,12 @@ Every day you solve your problems, your flower grows. Two players, two little co
 
 ### 2.2 App icon
 - A five-petal flower on a **Cloud** background. Petals alternate **Blush** and **Sky** (3 + 2, rotated so it doesn't feel symmetrical), with a **Butter** centre with a tiny highlight.
-- Petals are fat, round, gummy shapes with the same shading as the puffy icons (section 8).
+- Petals are fat, round, gummy blossom petals with a soft notch at the tip, with the same shading as the puffy icons (section 8) and a soft shadow where they meet the centre. The centre has a few seed dots.
+- The single source is `lib/brand/logo.ts`; `LogoMark` draws the same flower in the app (launch screen).
 - Maskable version: the flower fits within the central 80% safe zone.
-- Sizes: 192, 512, maskable 512, apple-touch 180, notification badge 72 (monochrome flower silhouette).
+- Sizes: 192, 512, maskable 192 and 512, apple-touch 180, a monochrome 512 and the notification badge 72 (white silhouette with thin gaps between petals and around the centre), favicons (SVG on a rounded Cloud tile, and a 16/32/48 .ico).
+- **Launch screens:** the flower above the wordmark and the tagline, on Cloud with a soft white glow, for iPhone and iPad; Android builds its own from the manifest, and the app continues it with the same layout until it's ready.
+- **Link preview (1200×630):** the flower, wordmark and tagline on the dusk sky with hills.
 
 ### 2.3 Splash and theme
 - Manifest `background_color` and `theme_color`: `#F6F4FC` (Cloud).

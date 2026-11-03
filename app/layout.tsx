@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Baloo_2, Figtree } from "next/font/google";
 import "./globals.css";
+import { BootSplash } from "@/components/brand/BootSplash";
+import { SPLASH_SCREENS, splashMedia } from "@/lib/brand/splash";
 import { THEME_BOOT_SCRIPT } from "@/lib/sky";
 import { Providers } from "./providers";
 
@@ -19,18 +21,47 @@ const figtree = Figtree({
   display: "swap",
 });
 
+const DESCRIPTION =
+  "Grow a little every day, together. A two-player LeetCode streak garden.";
+
 export const metadata: Metadata = {
+  // Absolute links for the share image; APP_URL is the live address.
+  metadataBase: new URL(process.env.APP_URL ?? "http://localhost:3000"),
   title: "Bloom",
-  description: "Grow a little every day, together.",
+  description: DESCRIPTION,
   applicationName: "Bloom",
-  // techspec §12: full screen when installed, sky running under the notch.
+  // techspec §12: full screen when installed, sky running under the notch,
+  // and an exact-size launch screen per iPhone and iPad.
   appleWebApp: {
     capable: true,
     title: "Bloom",
     statusBarStyle: "black-translucent",
+    startupImage: SPLASH_SCREENS.map((s) => ({
+      url: `/splash/${s.file}`,
+      media: splashMedia(s),
+    })),
   },
-  icons: { apple: "/icons/apple-touch-icon.png" },
+  // app/favicon.ico is linked by convention; the SVG (sharp at any size)
+  // is listed here because setting `icons` replaces the convention's list.
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: "/icons/apple-touch-icon.png",
+  },
   formatDetection: { telephone: false },
+  // The card shown when a Bloom link (like an invite) is shared.
+  openGraph: {
+    type: "website",
+    siteName: "Bloom",
+    title: "Bloom",
+    description: DESCRIPTION,
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Bloom" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Bloom",
+    description: DESCRIPTION,
+    images: ["/og.png"],
+  },
 };
 
 export const viewport: Viewport = {
@@ -50,6 +81,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>
       <body className="flex min-h-full flex-col font-sans">
+        <BootSplash />
         <Providers>{children}</Providers>
       </body>
     </html>

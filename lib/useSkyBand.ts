@@ -25,6 +25,10 @@ export function useDocumentTheme() {
     const root = document.documentElement;
     root.dataset.theme = night ? "night" : "day";
     root.dataset.band = band;
+    // The browser's status bar follows the palette's background.
+    const meta = document.querySelector('meta[name="theme-color"]');
+    const cloud = getComputedStyle(root).getPropertyValue("--cloud").trim();
+    if (meta && cloud) meta.setAttribute("content", cloud);
   }, [band, theme]);
 
   useEffect(() => {
