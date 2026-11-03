@@ -92,6 +92,20 @@ function describe(a: ActivityItem, name: string): string {
       return `${name}’s restore request expired`;
     case "restore_cancelled":
       return `${name} cancelled a restore request`;
+    case "makeup_changed":
+      return `${name} turned make-up days ${p.makeupEnabled ? "on" : "off"}`;
+    case "milestone_added":
+      return `${name} added a ${p.milestone}-day milestone`;
+    case "start_date_changed":
+      return `${name} moved day 1`;
+    case "target_changed":
+      return `${name} set a new daily target: ${p.target}`;
+    case "gift_wrapped":
+      return `${name} wrapped a ${p.milestone}-day gift`;
+    case "gift_revealed":
+      return `${name} opened a ${p.milestone}-day gift`;
+    case "gift_received":
+      return `${name} received a ${p.milestone}-day gift`;
     default:
       return `${name}: ${a.kind.replace(/_/g, " ")}`;
   }

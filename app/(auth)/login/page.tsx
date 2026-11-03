@@ -1,28 +1,83 @@
 "use client";
 
+import { motion } from "motion/react";
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Bloom } from "@/components/bloom/Bloom";
+import { Companion } from "@/components/companions/Companion";
+import { Island } from "@/components/sky/Island";
+import { SkyScene } from "@/components/sky/SkyScene";
 import { Button } from "@/components/ui/Button";
+import { PetalSpinner } from "@/components/ui/Progress";
+import { Wordmark } from "@/components/ui/Wordmark";
+import { spring } from "@/lib/motion";
 import { createClient } from "@/lib/supabase/browser";
 
-// design.md §11.1: one button, no other fields. The sky, islands and
-// entrance choreography arrive with the design pass.
+// Sign in (design §11.1): a full-screen dusk sky with two islands and two
+// waving creatures, the wordmark and one button. The one page-load moment:
+// the sky fades in, the islands float up, the creatures wave, then the
+// wordmark's two o's roll in from the sides.
 
 const FALLBACK_ERROR = "Sign-in didn't finish. Try again.";
 
 export default function LoginPage() {
   return (
-    <main className="mx-auto flex w-full max-w-[430px] flex-1 flex-col justify-center gap-10 px-4 py-12">
-      <header className="flex flex-col gap-2">
-        <h1 className="font-display text-[48px] leading-none font-extrabold tracking-[-0.02em]">
-          bloom
-        </h1>
-        <p className="text-ink-2">Grow a little every day, together.</p>
-      </header>
-      <Suspense>
-        <SignIn />
-      </Suspense>
-    </main>
+    <SkyScene band="dusk" className="flex min-h-dvh flex-1 flex-col">
+      <motion.main
+        className="text-plum relative mx-auto flex w-full max-w-[430px] flex-1 flex-col px-4 pt-[max(3rem,env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))]"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+      >
+        <div className="flex flex-1 items-center justify-between gap-2">
+          {(
+            [
+              ["mochi", "blush", 12],
+              ["tofu", "sky", 22],
+            ] as const
+          ).map(([kind, color, streak], i) => (
+            <motion.div
+              key={kind}
+              data-player-color={color}
+              initial={{ y: 60, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ ...spring.floaty, delay: 0.3 + i * 0.12 }}
+            >
+              <Island width={160} bobDelay={i * 2.5}>
+                {i === 0 && (
+                  <Companion
+                    kind={kind}
+                    mood="wave"
+                    size={92}
+                    className="-mr-3"
+                  />
+                )}
+                <Bloom streak={streak} size={72} />
+                {i === 1 && (
+                  <Companion
+                    kind={kind}
+                    mood="wave"
+                    size={92}
+                    className="-ml-3"
+                  />
+                )}
+              </Island>
+            </motion.div>
+          ))}
+        </div>
+        <header className="flex flex-col gap-2 pt-8 pb-10">
+          <h1>
+            <Wordmark height={56} rollIn delay={1} />
+          </h1>
+          <p className="text-lg font-semibold">
+            Grow a little every day, together.
+          </p>
+        </header>
+        <Suspense>
+          <SignIn />
+        </Suspense>
+      </motion.main>
+    </SkyScene>
   );
 }
 
@@ -57,8 +112,12 @@ function SignIn() {
         </p>
       )}
       <Button onClick={signIn} disabled={opening} data-player-color="blush">
-        {/* eslint-disable-next-line @next/next/no-img-element -- tiny static brand mark */}
-        <img src="/icons/google-g.svg" alt="" width={20} height={20} />
+        {opening ? (
+          <PetalSpinner size={20} />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element -- tiny static brand mark
+          <img src="/icons/google-g.svg" alt="" width={20} height={20} />
+        )}
         {opening ? "Opening Google…" : "Continue with Google"}
       </Button>
       {process.env.NODE_ENV === "development" && <DevSignIn />}
@@ -73,7 +132,7 @@ function DevSignIn() {
     <form
       method="post"
       action="/api/dev/login"
-      className="border-line flex flex-col gap-2 rounded-md border-[1.5px] border-dashed p-4"
+      className="bg-surface/70 text-ink flex flex-col gap-2 rounded-md border-[1.5px] border-dashed border-current/20 p-4"
     >
       <p className="text-ink-2 text-sm">
         Dev only: try the app as a test player

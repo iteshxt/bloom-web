@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   countdownLabel,
   derivePlayer,
+  moodFor,
   pickBanner,
   urgency,
   type PairInput,
@@ -245,5 +246,54 @@ describe("dashboard view model", () => {
         giftOwed: { milestone: 30 },
       }),
     ).toMatchObject({ kind: "on_ice" });
+  });
+
+  describe("companion mood (design §9.3)", () => {
+    const today = "2026-11-10";
+    const mood = (over: Partial<PlayerInput>, time: string) => {
+      const now = at(today, time);
+      return moodFor(derivePlayer(player(over), pair, now), now);
+    };
+    const done = {
+      days: {
+        [today]: {
+          target: 1,
+          makeupRequired: 0,
+          solvedCount: 1,
+          status: "complete" as const,
+          finalized: false,
+        },
+      },
+    };
+
+    it("waits during the day and gets urgent from 21:00", () => {
+      expect(mood({}, "14:00")).toBe("waiting");
+      expect(mood({}, "21:00")).toBe("urgent");
+    });
+
+    it("is happy once today is done, and asleep 01:00–05:00", () => {
+      expect(mood(done, "18:00")).toBe("happy");
+      expect(mood(done, "02:00")).toBe("sleeping");
+    });
+
+    it("is frozen on ice, before anything else", () => {
+      expect(
+        mood(
+          { run: { length: 4, tokensRemaining: 3, atRiskDay: "2026-11-09" } },
+          "12:00",
+        ),
+      ).toBe("frozen");
+    });
+
+    it("is sad after a run ends, until a day is completed", () => {
+      expect(mood({ lastEndedRunLength: 12 }, "12:00")).toBe("sad");
+      expect(mood({ lastEndedRunLength: 12, ...done }, "12:00")).toBe("happy");
+      expect(mood({ lastEndedRunLength: 0 }, "12:00")).toBe("waiting");
+    });
+
+    it("is idle before the start date", () => {
+      const now = at("2026-11-01", "12:00");
+      expect(moodFor(derivePlayer(player(), pair, now), now)).toBe("idle");
+    });
   });
 });

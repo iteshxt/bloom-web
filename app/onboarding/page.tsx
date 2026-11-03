@@ -2,26 +2,39 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Bloom } from "@/components/bloom/Bloom";
+import { Companion as Creature } from "@/components/companions/Companion";
+import {
+  ColorDots,
+  CompanionPicker,
+} from "@/components/companions/CompanionPicker";
+import { LineIcon } from "@/components/icons/line";
+import { PuffyIcon } from "@/components/icons/puffy";
+import { RemindersPrompt } from "@/components/push/RemindersPrompt";
+import { InstallCard } from "@/components/pwa/InstallCard";
+import { ScreenSky } from "@/components/sky/ScreenSky";
 import { Button } from "@/components/ui/Button";
+import { CodeSeeds } from "@/components/ui/CodeSeeds";
+import { PetalSpinner, Skeleton } from "@/components/ui/Progress";
 import { TextField } from "@/components/ui/TextField";
 import { api } from "@/lib/api/client";
-import { COLOR_NAMES, COMPANION_INFO } from "@/lib/companions";
+import { shortDate } from "@/lib/format/ist";
 import { createClient } from "@/lib/supabase/browser";
 import { addDays, todayIST } from "@/lib/time";
+import { toast } from "@/lib/toast";
 import {
-  COMPANIONS,
   MAX_START_DAYS_AHEAD,
-  PLAYER_COLORS,
   type Companion,
   type PlayerColor,
 } from "@/lib/validation/onboarding";
 
-// design.md §11.2, functional pass: name → companion and colour → LeetCode →
-// pair up. Install and notification prompts arrive with push (build step 7)
-// and the PWA (step 8); the illustrated version comes with the design pass.
+// Onboarding (design §11.2): name → companion and colour → LeetCode → pair
+// up → install and reminders, on one calm panel under a little sky, with
+// five sprouts at the top that grow as you go.
 
-type Step = "loading" | "name" | "companion" | "leetcode" | "pair" | "invite";
-const STEPS: Step[] = ["name", "companion", "leetcode", "pair"];
+type Step =
+  "loading" | "name" | "companion" | "leetcode" | "pair" | "invite" | "install";
+const STEPS: Step[] = ["name", "companion", "leetcode", "pair", "install"];
 
 type LcCheck =
   | { state: "idle" | "checking" | "missing" | "unavailable" }
@@ -123,15 +136,21 @@ export default function OnboardingPage() {
 
   if (step === "loading") {
     return (
-      <Shell step={step}>
-        <p className="text-ink-2">Loading…</p>
+      <Shell step={step} color={color} kind={companion}>
+        <Skeleton className="h-[52px]" />
+        <Skeleton className="rounded-pill h-[52px]" />
       </Shell>
     );
   }
 
   if (step === "name") {
     return (
-      <Shell step={step} title="What should your partner call you?">
+      <Shell
+        step={step}
+        color={color}
+        kind={companion}
+        title="What should your partner call you?"
+      >
         <form
           className="flex flex-col gap-6"
           onSubmit={(e) => {
@@ -162,33 +181,19 @@ export default function OnboardingPage() {
 
   if (step === "companion") {
     return (
-      <Shell step={step} title="Pick a companion and your colour">
+      <Shell
+        step={step}
+        color={color}
+        kind={companion}
+        title="Pick a companion and your colour"
+      >
         <div className="flex flex-col gap-6" data-player-color={color}>
-          <fieldset className="grid grid-cols-2 gap-3">
-            <legend className="mb-2 text-sm font-semibold">Companion</legend>
-            {COMPANIONS.map((c) => (
-              <label
-                key={c}
-                className={`bg-surface flex min-h-11 cursor-pointer flex-col rounded-md border-[1.5px] px-4 py-3 ${companion === c ? "border-p ring-p-soft ring-4" : "border-line"}`}
-              >
-                <input
-                  type="radio"
-                  name="companion"
-                  value={c}
-                  checked={companion === c}
-                  onChange={() => setCompanion(c)}
-                  className="sr-only"
-                />
-                <span className="font-display text-lg font-semibold">
-                  {COMPANION_INFO[c].name}
-                </span>
-                <span className="text-ink-2 text-sm">
-                  {COMPANION_INFO[c].blurb}
-                </span>
-              </label>
-            ))}
-          </fieldset>
-          <ColorPicker value={color} onChange={setColor} />
+          <CompanionPicker
+            kind={companion}
+            color={color}
+            onKind={setCompanion}
+            onColor={setColor}
+          />
           {error && <ErrorText>{error}</ErrorText>}
           <Button
             disabled={busy}
@@ -212,7 +217,12 @@ export default function OnboardingPage() {
 
   if (step === "leetcode") {
     return (
-      <Shell step={step} title="Link your LeetCode">
+      <Shell
+        step={step}
+        color={color}
+        kind={companion}
+        title="Link your LeetCode"
+      >
         <form
           className="flex flex-col gap-6"
           data-player-color={color}
@@ -238,7 +248,15 @@ export default function OnboardingPage() {
             spellCheck={false}
             autoFocus
             onChange={(e) => onLcChange(e.target.value)}
-            hint={lcHint(lc)}
+            hint={
+              lc.state === "checking" ? (
+                <span className="text-p-deep inline-flex items-center gap-1.5">
+                  <PetalSpinner size={16} /> Checking…
+                </span>
+              ) : (
+                lcHint(lc)
+              )
+            }
           />
           {lc.state === "found" && (
             <div className="bg-mint-soft text-mint-deep flex items-center gap-3 rounded-md px-4 py-3">
@@ -252,9 +270,10 @@ export default function OnboardingPage() {
                   className="rounded-pill"
                 />
               )}
-              <span className="text-sm font-semibold">
+              <span className="flex-1 text-sm font-semibold">
                 {lc.username} · {lc.solved} solved
               </span>
+              <PuffyIcon name="check" size={32} />
             </div>
           )}
           <p className="text-ink-2 text-sm">
@@ -272,7 +291,7 @@ export default function OnboardingPage() {
 
   if (step === "pair") {
     return (
-      <Shell step={step} title="Pair up">
+      <Shell step={step} color={color} kind={companion} title="Pair up">
         <div className="flex flex-col gap-6" data-player-color={color}>
           <div
             role="tablist"
@@ -349,22 +368,18 @@ export default function OnboardingPage() {
                     setColorClash(res.code === "color_taken");
                     return setError(res.message);
                   }
-                  router.push("/");
+                  toast("You’re paired up", "heart");
+                  setStep("install");
                 });
               }}
             >
-              <TextField
+              <CodeSeeds
                 id="code"
-                label="Invite code"
+                label="The 6-character code your partner shared"
                 value={joinCode}
-                maxLength={7}
-                autoCapitalize="characters"
-                autoCorrect="off"
-                spellCheck={false}
-                onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                hint="The 6-character code your partner shared."
+                onChange={setJoinCode}
               />
-              {colorClash && <ColorPicker value={color} onChange={setColor} />}
+              {colorClash && <ColorDots value={color} onChange={setColor} />}
               {error && <ErrorText>{error}</ErrorText>}
               <Button
                 type="submit"
@@ -383,45 +398,68 @@ export default function OnboardingPage() {
     );
   }
 
-  // step === "invite"
-  return (
-    <Shell step={step} title="Share your code">
-      <div className="flex flex-col gap-6" data-player-color={color}>
-        <p className="text-ink-2">
-          Send this code to your partner so they can join.
-        </p>
-        <p
-          aria-label={`Invite code ${invite?.code.split("").join(" ")}`}
-          className="bg-surface font-display shadow-soft rounded-lg py-6 text-center text-[40px] leading-none font-extrabold tracking-[0.12em]"
-        >
-          {invite?.code}
-        </p>
-        <div className="grid grid-cols-2 gap-3">
-          <Button
-            variant="secondary"
-            onClick={() =>
-              invite && navigator.clipboard?.writeText(invite.code)
-            }
+  if (step === "invite") {
+    return (
+      <Shell step={step} color={color} kind={companion} title="Share your code">
+        <div className="flex flex-col gap-6" data-player-color={color}>
+          <p className="text-ink-2">
+            Send this code to your partner so they can join.
+          </p>
+          <p
+            aria-label={`Invite code ${invite?.code.split("").join(" ")}`}
+            className="bg-surface font-display shadow-player rounded-xl py-7 text-center text-[48px] leading-none font-extrabold tracking-[0.14em]"
           >
-            Copy code
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={() =>
-              invite &&
-              navigator.share?.({
-                title: "Join me on Bloom",
-                text: `Join my Bloom with code ${invite.code}`,
-              })
-            }
-          >
-            Share
-          </Button>
+            {invite?.code}
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="secondary"
+              onClick={async () => {
+                if (!invite) return;
+                await navigator.clipboard?.writeText(invite.code);
+                toast("Code copied", "check");
+              }}
+            >
+              <LineIcon name="copy" size={20} /> Copy code
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() =>
+                invite &&
+                navigator.share?.({
+                  title: "Join me on Bloom",
+                  text: `Join my Bloom with code ${invite.code}`,
+                })
+              }
+            >
+              <LineIcon name="share" size={20} /> Share
+            </Button>
+          </div>
+          <p className="text-ink-2 text-sm">
+            Day 1 is {invite ? shortDate(invite.startDate) : ""}.
+          </p>
+          <Button onClick={() => setStep("install")}>Continue</Button>
         </div>
-        <p className="text-ink-2 text-sm">
-          Your challenge starts on {invite?.startDate}.
-        </p>
-        <Button onClick={() => router.push("/")}>Continue</Button>
+      </Shell>
+    );
+  }
+
+  // step === "install"
+  return (
+    <Shell step={step} color={color} kind={companion} title="Keep Bloom close">
+      <div className="flex flex-col gap-6" data-player-color={color}>
+        <InstallCard />
+        <div className="glass flex items-center gap-3 rounded-md p-3">
+          <PuffyIcon name="bloom" size={40} />
+          <div className="flex-1">
+            <p className="text-sm font-semibold">Your flower’s thirsty</p>
+            <p className="text-ink-2 text-sm">
+              3 hours left today. 0 of 1 done 🌱
+            </p>
+          </div>
+        </div>
+        <RemindersPrompt />
+        <Button onClick={() => router.push("/")}>Go to my garden</Button>
       </div>
     </Shell>
   );
@@ -429,64 +467,51 @@ export default function OnboardingPage() {
 
 function Shell({
   step,
+  color,
+  kind,
   title,
   children,
 }: {
   step: Step;
+  color: PlayerColor;
+  kind: Companion;
   title?: string;
   children: React.ReactNode;
 }) {
-  const index = step === "invite" ? STEPS.length : STEPS.indexOf(step);
+  const index = step === "invite" ? STEPS.indexOf("pair") : STEPS.indexOf(step);
   return (
-    <main className="mx-auto flex w-full max-w-[430px] flex-1 flex-col gap-8 px-4 pt-[max(2.5rem,env(safe-area-inset-top))] pb-10">
-      <ol aria-label="Setup progress" className="flex gap-2">
-        {STEPS.map((s, i) => (
-          <li
-            key={s}
-            aria-current={i === index ? "step" : undefined}
-            className={`rounded-pill h-2 flex-1 ${i <= index ? "bg-mint" : "bg-line"}`}
-          />
-        ))}
-      </ol>
-      {title && (
-        <h1 className="font-display text-[28px] leading-[1.15] font-extrabold">
-          {title}
-        </h1>
-      )}
-      {children}
-    </main>
-  );
-}
-
-function ColorPicker({
-  value,
-  onChange,
-}: {
-  value: PlayerColor;
-  onChange: (c: PlayerColor) => void;
-}) {
-  return (
-    <fieldset className="flex flex-col gap-2">
-      <legend className="mb-2 text-sm font-semibold">Your colour</legend>
-      <div className="flex gap-3">
-        {PLAYER_COLORS.map((c) => (
-          <label key={c} data-player-color={c} className="cursor-pointer">
-            <input
-              type="radio"
-              name="color"
-              value={c}
-              checked={value === c}
-              onChange={() => onChange(c)}
-              className="peer sr-only"
-            />
-            <span className="rounded-pill bg-p-soft text-p-deep peer-checked:ring-p flex h-11 items-center gap-2 px-4 font-semibold peer-checked:ring-4 peer-focus-visible:outline-2">
-              <span className="rounded-pill bg-p h-4 w-4" aria-hidden />
-              {COLOR_NAMES[c]}
-            </span>
-          </label>
-        ))}
+    <main
+      data-player-color={color}
+      className="mx-auto flex w-full max-w-[430px] flex-1 flex-col"
+    >
+      <ScreenSky className="pb-12">
+        <div className="flex items-end justify-between px-4 pt-6">
+          <ol aria-label="Setup progress" className="flex items-end gap-1">
+            {STEPS.map((s, i) => (
+              <li
+                key={s}
+                aria-label={`Step ${i + 1}${i < index ? ", done" : i === index ? ", current" : ""}`}
+                aria-current={i === index ? "step" : undefined}
+              >
+                <Bloom
+                  streak={i < index ? 6 : i === index ? 2 : 0}
+                  size={i === index ? 44 : 36}
+                />
+              </li>
+            ))}
+          </ol>
+          <Creature kind={kind} mood="wave" size={72} color={color} />
+        </div>
+      </ScreenSky>
+      <div className="flex flex-1 flex-col gap-6 px-4 pt-2 pb-10">
+        {title && (
+          <h1 className="font-display text-[28px] leading-[1.15] font-extrabold">
+            {title}
+          </h1>
+        )}
+        {children}
       </div>
-    </fieldset>
+    </main>
   );
 }
 

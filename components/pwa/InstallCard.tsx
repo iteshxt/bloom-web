@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PuffyIcon } from "@/components/icons/puffy";
 import { Button } from "@/components/ui/Button";
 import { promptInstall, useInstallMode } from "@/lib/pwa/install";
 
@@ -40,8 +41,11 @@ export function InstallCard({
   }
 
   return (
-    <section className="bg-mint-soft text-mint-deep flex flex-col gap-2 rounded-md p-4">
-      <p className="font-semibold">Put Bloom on your home screen</p>
+    <section className="bg-mint-soft text-mint-deep shadow-soft flex flex-col gap-2 rounded-md p-4">
+      <p className="flex items-center gap-3 font-semibold">
+        <PuffyIcon name="sprout" size={40} />
+        Put Bloom on your home screen
+      </p>
       {mode === "prompt" ? (
         <>
           <p className="text-sm">

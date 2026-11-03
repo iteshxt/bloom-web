@@ -1,5 +1,6 @@
 "use client";
 
+import { PuffyIcon } from "@/components/icons/puffy";
 import { Button } from "@/components/ui/Button";
 import { usePushState } from "./usePushState";
 
@@ -11,8 +12,9 @@ export function RemindersPrompt() {
   if (state !== "off" && state !== "denied") return null;
 
   return (
-    <section className="bg-butter-soft text-butter-deep flex flex-col gap-2 rounded-md p-4">
-      <p className="font-semibold">
+    <section className="bg-peach-soft text-peach-deep shadow-soft flex flex-col gap-2 rounded-md p-4">
+      <p className="flex items-center gap-3 font-semibold">
+        <PuffyIcon name="bell" size={40} />
         {state === "denied"
           ? "Notifications are blocked for Bloom. Allow them in your browser's site settings to get reminders."
           : "Turn on reminders so you never lose a streak to a busy day."}
