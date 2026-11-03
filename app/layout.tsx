@@ -21,6 +21,15 @@ const figtree = Figtree({
 export const metadata: Metadata = {
   title: "Bloom",
   description: "Grow a little every day, together.",
+  applicationName: "Bloom",
+  // techspec §12: full screen when installed, sky running under the notch.
+  appleWebApp: {
+    capable: true,
+    title: "Bloom",
+    statusBarStyle: "black-translucent",
+  },
+  icons: { apple: "/icons/apple-touch-icon.png" },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
