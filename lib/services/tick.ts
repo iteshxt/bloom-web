@@ -11,16 +11,12 @@ import {
   type Submission,
 } from "@/lib/engine";
 import { getRecentAc, LeetCodeError } from "@/lib/leetcode/client";
-import type { Json } from "@/lib/supabase/types";
 import { withPlayerLock } from "./lock";
 import { deliverNotifications } from "./notify";
-import {
-  buildSavePayload,
-  type NotificationRow,
-  type SyncOutcome,
-} from "./persist";
+import type { SyncOutcome } from "./persist";
 import { loadPlayer, type Admin, type LoadedPlayer } from "./player";
 import { ensureProblems } from "./problems";
+import { saveEngineResult } from "./save";
 
 export interface PlayerTickResult {
   playerId: string;
@@ -65,7 +61,7 @@ export async function tickPlayer(
       ...reminders.effects,
     ];
 
-    const sent = await save(admin, {
+    const sent = await saveEngineResult(admin, {
       refs: player,
       state: reminders.state,
       effects,
@@ -127,17 +123,4 @@ async function fetchNewSolves(
     if (!(err instanceof LeetCodeError)) throw err; // database errors fail the tick
     return { subs: [], sync: { ok: false, attemptedAt: now, error: err.code } };
   }
-}
-
-async function save(
-  admin: Admin,
-  input: Parameters<typeof buildSavePayload>[0],
-): Promise<NotificationRow[]> {
-  const payload = buildSavePayload(input);
-  const { data, error } = await admin.rpc("save_player_state", {
-    p: payload as unknown as Json,
-  });
-  if (error) throw new Error(`save_player_state failed: ${error.message}`);
-  const result = data as { notifications?: NotificationRow[] } | null;
-  return result?.notifications ?? [];
 }

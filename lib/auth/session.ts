@@ -63,3 +63,36 @@ export async function requireProfile(): Promise<
   }
   return { ok: true, user: guard.user, profile, admin };
 }
+
+/** Route guard: a player in a pair. Loads the pair and the partner (null
+ *  until they join), so routes can check self vs partner (invariant 9). */
+export async function requirePair(): Promise<
+  | Guard<{
+      user: SessionUser;
+      profile: Tables<"profiles">;
+      pair: Tables<"pairs">;
+      partner: Tables<"profiles"> | null;
+      admin: ReturnType<typeof createAdminClient>;
+    }>
+  | Denied
+> {
+  const guard = await requireProfile();
+  if (!guard.ok) return guard;
+  const { admin, profile } = guard;
+  if (!profile.pair_id) {
+    return {
+      ok: false,
+      response: apiError(409, "no_pair", "Join a pair first"),
+    };
+  }
+  const [pair, members] = await Promise.all([
+    admin.from("pairs").select("*").eq("id", profile.pair_id).single(),
+    admin.from("profiles").select("*").eq("pair_id", profile.pair_id),
+  ]);
+  if (pair.error || members.error) {
+    const message = pair.error?.message ?? members.error?.message ?? "Unknown";
+    return { ok: false, response: apiError(500, "database", message) };
+  }
+  const partner = members.data.find((m) => m.id !== profile.id) ?? null;
+  return { ...guard, pair: pair.data, partner };
+}
