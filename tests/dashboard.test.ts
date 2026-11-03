@@ -216,4 +216,34 @@ describe("dashboard view model", () => {
       }),
     ).toBeNull();
   });
+
+  it("puts a gift you owe after your frost and before sync trouble", () => {
+    const now = at("2026-11-05", "12:00");
+    const failing = derivePlayer(
+      player({ lastSyncAt: at("2026-11-05", "01:00") }),
+      pair,
+      now,
+    );
+    expect(
+      pickBanner({
+        me: failing,
+        pendingRequestFromPartner: null,
+        giftOwed: { milestone: 30 },
+      }),
+    ).toEqual({ kind: "gift_owed", milestone: 30 });
+    const frosted = derivePlayer(
+      player({
+        run: { length: 5, tokensRemaining: 3, atRiskDay: "2026-11-04" },
+      }),
+      pair,
+      now,
+    );
+    expect(
+      pickBanner({
+        me: frosted,
+        pendingRequestFromPartner: null,
+        giftOwed: { milestone: 30 },
+      }),
+    ).toMatchObject({ kind: "on_ice" });
+  });
 });

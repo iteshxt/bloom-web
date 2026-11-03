@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ActivityList } from "@/components/game/ActivityList";
 import { Banner } from "@/components/game/Banner";
@@ -11,6 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { derivePlayer, pickBanner } from "@/lib/dashboard/derive";
 import { useDuel } from "@/lib/dashboard/useDuel";
 import { useNow } from "@/lib/dashboard/useNow";
+import { useGifts } from "@/lib/game/queries";
 import { createClient } from "@/lib/supabase/browser";
 
 // The duel dashboard (PRD 5.2, design §11.3), functional pass: both players
@@ -21,6 +23,7 @@ export default function HomePage() {
   const router = useRouter();
   const now = useNow();
   const { data, isPending, isError, refetch } = useDuel();
+  const gifts = useGifts();
 
   async function signOut() {
     await createClient().auth.signOut();
@@ -59,6 +62,7 @@ export default function HomePage() {
   const banner = pickBanner({
     me,
     pendingRequestFromPartner: data.pendingRequestFromPartner,
+    giftOwed: gifts.data?.giving.find((g) => g.owed) ?? null,
   });
   const focusDay = me.focus?.day;
   const names = Object.fromEntries(
@@ -80,6 +84,18 @@ export default function HomePage() {
         <Banner banner={banner} partnerName={partner?.name ?? "your partner"} />
       )}
 
+      <nav aria-label="Quick actions" className="grid grid-cols-3 gap-2">
+        {QUICK_ACTIONS.map((a) => (
+          <Link
+            key={a.href}
+            href={a.href}
+            className="bg-surface shadow-soft flex h-14 items-center justify-center rounded-md text-sm font-semibold"
+          >
+            {a.label}
+          </Link>
+        ))}
+      </nav>
+
       <TodayQuestCard
         me={me}
         partner={partner}
@@ -90,8 +106,12 @@ export default function HomePage() {
 
       {partner ? (
         <div className="grid grid-cols-2 gap-3">
-          <PlayerCard player={me} label="You" />
-          <PlayerCard player={partner} label="Partner" />
+          <Link href={`/player/${me.id}`}>
+            <PlayerCard player={me} label="You" />
+          </Link>
+          <Link href={`/player/${partner.id}`}>
+            <PlayerCard player={partner} label="Partner" />
+          </Link>
         </div>
       ) : (
         <>
@@ -113,6 +133,13 @@ export default function HomePage() {
     </Shell>
   );
 }
+
+// design §11.3 quick actions; badges, days and nudge join as they're built.
+const QUICK_ACTIONS = [
+  { href: "/gifts", label: "Gifts" },
+  { href: "/restores", label: "Restores" },
+  { href: "/milestones", label: "Journey" },
+] as const;
 
 function Shell({
   color,

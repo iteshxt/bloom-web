@@ -195,13 +195,16 @@ export function urgency(focus: FocusDay): Urgency {
 export type Banner =
   | { kind: "restore_request"; requestId: string }
   | { kind: "on_ice"; missedDay: DayKey }
+  | { kind: "gift_owed"; milestone: number }
   | { kind: "sync_failing" };
 
 /** At most one banner, in priority order: a request to you, your frost,
- *  then sync trouble (design §10.8). Gift-owed joins with the gift vault. */
+ *  a gift you owe, then sync trouble (design §10.8). */
 export function pickBanner(input: {
   me: PlayerView;
   pendingRequestFromPartner: { id: string } | null;
+  /** A partner's milestone reached with no gift chosen yet. */
+  giftOwed?: { milestone: number } | null;
 }): Banner | null {
   if (input.pendingRequestFromPartner) {
     return {
@@ -211,6 +214,9 @@ export function pickBanner(input: {
   }
   if (input.me.onIce && input.me.atRiskDay) {
     return { kind: "on_ice", missedDay: input.me.atRiskDay };
+  }
+  if (input.giftOwed) {
+    return { kind: "gift_owed", milestone: input.giftOwed.milestone };
   }
   if (input.me.syncFailing) return { kind: "sync_failing" };
   return null;
