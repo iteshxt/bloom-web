@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { roundPoly } from "@/components/icons/geometry";
 import { Puff } from "@/components/icons/Puff";
-import type { Companion } from "@/lib/validation/onboarding";
+import type { Companion } from "@/lib/players";
 
 // The six original creatures (design §9.1–9.2), each a handful of round
 // shapes on a 120 × 120 canvas standing on y = 112. Every kind supplies its

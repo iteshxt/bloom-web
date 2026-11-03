@@ -6,7 +6,7 @@ import { sparklePath } from "@/components/icons/geometry";
 import { Puff, svgId } from "@/components/icons/Puff";
 import { spring } from "@/lib/motion";
 import { useReducedMotionPref } from "@/lib/prefs";
-import type { Companion as Kind } from "@/lib/validation/onboarding";
+import type { Companion as Kind } from "@/lib/players";
 import { KINDS, type KindArt } from "./kinds";
 
 // The mood engine (design §9.3). Every creature shares these moods; the
@@ -92,47 +92,62 @@ export function Companion({
           ? ""
           : "animate-breathe";
 
+  // The creature is drawn once and moved as a whole: the hop, bob and
+  // breathing run on HTML wrappers, which the browser animates on the
+  // compositor. (Moving shapes inside the SVG repainted it every frame.)
+  const svg = "absolute inset-0 overflow-visible";
   return (
-    <svg
-      viewBox="0 0 120 120"
-      width={size}
-      height={size}
+    <span
       data-player-color={color}
-      className={`overflow-visible ${className}`}
+      className={`relative inline-block shrink-0 ${className}`}
+      style={{ width: size, height: size }}
       role={label ? "img" : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
     >
       {/* contact shadow; floaters hover above theirs */}
-      <ellipse
-        cx={60}
-        cy={114}
-        rx={k.floats ? 22 : 34}
-        ry={3.5}
-        fill="var(--plum)"
-        opacity={0.12}
-      />
-      <motion.g animate={hop} className="svg-origin-bottom">
-        <g
-          className={`${k.floats ? "animate-bob" : ""}`}
+      <svg viewBox="0 0 120 120" className={svg}>
+        <ellipse
+          cx={60}
+          cy={114}
+          rx={k.floats ? 22 : 34}
+          ry={3.5}
+          fill="var(--plum)"
+          opacity={0.12}
+        />
+      </svg>
+      <motion.span
+        animate={hop}
+        className="absolute inset-0 block origin-bottom"
+      >
+        <span
+          className={`absolute inset-0 block ${k.floats ? "animate-bob" : ""}`}
           style={k.floats ? { animationDuration: "3.6s" } : undefined}
         >
-          <g
-            className={`svg-origin-bottom ${ambient}`}
-            transform={mood === "sad" ? "translate(0 2)" : undefined}
+          <span
+            className={`absolute inset-0 block origin-bottom ${ambient}`}
+            style={
+              mood === "sad"
+                ? { transform: `translateY(${(2 * size) / 120}px)` }
+                : undefined
+            }
           >
-            {k.back?.(ctx)}
-            {k.body(ctx)}
-            {k.front?.(ctx)}
-            <Scarf u={u} k={k} />
-            <Face k={k} mood={mood} blink={blink} dx={dx} big={size >= 96} />
-            <Paw k={k} mood={mood} />
-          </g>
-        </g>
-      </motion.g>
-      <Extras k={k} mood={mood} />
-      {mood === "frozen" && <IceCube />}
-    </svg>
+            <svg viewBox="0 0 120 120" className={svg}>
+              {k.back?.(ctx)}
+              {k.body(ctx)}
+              {k.front?.(ctx)}
+              <Scarf u={u} k={k} />
+              <Face k={k} mood={mood} blink={blink} dx={dx} big={size >= 96} />
+              <Paw k={k} mood={mood} />
+            </svg>
+          </span>
+        </span>
+      </motion.span>
+      <svg viewBox="0 0 120 120" className={svg}>
+        <Extras k={k} mood={mood} />
+        {mood === "frozen" && <IceCube />}
+      </svg>
+    </span>
   );
 }
 
