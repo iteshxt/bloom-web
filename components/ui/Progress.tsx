@@ -66,8 +66,8 @@ export function PetalSpinner({ size = 22 }: { size?: number }) {
         return (
           <circle
             key={i}
-            cx={12 + 6.5 * Math.cos(a)}
-            cy={12 + 6.5 * Math.sin(a)}
+            cx={Math.round((12 + 6.5 * Math.cos(a)) * 100) / 100}
+            cy={Math.round((12 + 6.5 * Math.sin(a)) * 100) / 100}
             r={3.6}
             fill="currentColor"
             className="animate-pulse-soft"

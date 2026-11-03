@@ -8,6 +8,8 @@ import { Puff, Shine, SoftBlur, svgId } from "./Puff";
 // live area. Colours follow the table: each icon keeps its own meaning.
 
 type Draw = (u: string) => ReactNode;
+/** Rounded so server and browser render identical attributes. */
+const n2 = (x: number) => Math.round(x * 100) / 100;
 const s = (u: string) => `${u}s`;
 
 const DETAIL = {
@@ -29,8 +31,8 @@ const ICONS = {
             return (
               <circle
                 key={i}
-                cx={24 + 9.5 * Math.cos(a)}
-                cy={24 + 9.5 * Math.sin(a)}
+                cx={n2(24 + 9.5 * Math.cos(a))}
+                cy={n2(24 + 9.5 * Math.sin(a))}
                 r={8.6}
                 {...(p as object)}
               />
@@ -61,8 +63,8 @@ const ICONS = {
         return (
           <circle
             key={i}
-            cx={24 + 3.6 * Math.cos(a)}
-            cy={25 + 3.6 * Math.sin(a)}
+            cx={n2(24 + 3.6 * Math.cos(a))}
+            cy={n2(25 + 3.6 * Math.sin(a))}
             r={2.8}
             fill="var(--blush)"
             opacity={0.85}
@@ -387,7 +389,7 @@ const ICONS = {
         [17, 14.5],
       ] as const) {
         const a = ((i * 45 + da) * Math.PI) / 180;
-        pts.push([24 + r * Math.cos(a), 24 + r * Math.sin(a)]);
+        pts.push([n2(24 + r * Math.cos(a)), n2(24 + r * Math.sin(a))]);
       }
     }
     return (

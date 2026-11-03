@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Bloom } from "@/components/bloom/Bloom";
 import { LineIcon } from "@/components/icons/line";
 import { PuffyIcon, type PuffyName } from "@/components/icons/puffy";
 import { Island } from "@/components/sky/Island";
@@ -52,6 +53,40 @@ export function Gallery() {
       className="mx-auto flex w-full max-w-[430px] flex-col gap-8 px-4 py-8"
     >
       <Wordmark />
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-display text-[22px] font-bold">Flowers</h2>
+        <div className="grid grid-cols-4 gap-2">
+          {[0, 1, 3, 6, 7, 10, 14, 15, 22, 29, 30, 40, 50, 75, 100, 140].map(
+            (n, i) => (
+              <div
+                key={n}
+                data-player-color={["blush", "sky", "lilac"][i % 3]}
+                className="bg-surface flex flex-col items-center rounded-md p-1"
+              >
+                <Bloom streak={n} size={80} />
+                <span className="text-ink-3 text-xs">{n}</span>
+              </div>
+            ),
+          )}
+          <div className="bg-surface flex flex-col items-center rounded-md p-1">
+            <Bloom streak={9} size={80} frozen />
+            <span className="text-ink-3 text-xs">9 frozen</span>
+          </div>
+          <div className="bg-surface flex flex-col items-center rounded-md p-1">
+            <Bloom streak={23} size={80} frozen />
+            <span className="text-ink-3 text-xs">23 frozen</span>
+          </div>
+          <div className="bg-surface flex flex-col items-center rounded-md p-1">
+            <Bloom streak={23} size={80} restored />
+            <span className="text-ink-3 text-xs">23 restored</span>
+          </div>
+          <div className="bg-surface flex flex-col items-center rounded-md p-1">
+            <Bloom streak={4} size={40} />
+            <span className="text-ink-3 text-xs">40 px</span>
+          </div>
+        </div>
+      </section>
 
       <section className="flex flex-col gap-4">
         <h2 className="font-display text-[22px] font-bold">Skies</h2>
