@@ -249,7 +249,7 @@ A custom icon set in a soft "gummy 3D" style, made to feel like the clay icons i
 - **48 × 48 grid**, with shapes inside a 40 px live area.
 - **Base shape:** chunky, rounded, with no corner sharper than a 4 px radius.
 - **Fill:** the pastel base colour.
-- **Highlight:** an ellipse at the top-left, white at 45% opacity, blurred with an SVG `feGaussianBlur` of 1.5.
+- **Highlight:** an ellipse at the top-left, white at 45% opacity, softened with a radial gradient that fades out at its rim (it reads like a blur but, unlike an SVG `feGaussianBlur`, costs nothing to repaint).
 - **Shade:** a crescent along the bottom-right in the deep shade at 18% opacity.
 - **Detail lines** (ribbons, eyes, ticks): the deep shade, 2.5 px, round caps.
 - **No outlines** on the main shape.
@@ -749,6 +749,9 @@ When `prefers-reduced-motion: reduce` is on, or the in-app toggle is set:
 - Animate only `transform` and `opacity` (plus SVG masks for frost and ice, which run only during the moment itself).
 - Show at most 3 glass blur elements at once, and pause sky animations under 30 fps.
 - Ambient animations pause when `document.hidden`.
+- Loops move HTML layers, never shapes inside an SVG: Chrome animates an HTML element's transform and opacity on the compositor but repaints a whole SVG for any change inside it. Draw the still art as one SVG and put each moving part (stars, clouds, birds, aurora, petals, a creature's breathing and bob) on its own HTML layer. The sky does this with a "stage" laid over its canvas (`components/sky/stage.ts`).
+- No blur filters on anything that sits in or near an animation; soft edges are gradients.
+- Overlays that appear only on a tap or an event (moments, unboxing, sheets) load after the page (`next/dynamic`), keeping the first screen's JavaScript small. Client code never imports zod: shared constants live in zod-free modules (`lib/players.ts`, `lib/game/limits.ts`).
 - Confetti uses a single shared canvas that's removed after use.
 - Target 60 fps on a mid-range Android phone (for example, a 2023 Redmi or Galaxy A-series).
 
