@@ -63,7 +63,9 @@ async function handle(request: NextRequest) {
 
 /** Constant-time comparison so the secret can't be guessed byte by byte. */
 function authorized(header: string | null): boolean {
-  const secret = process.env.CRON_SECRET;
+  // Forgive whitespace or quotes picked up when pasting the secret into a
+  // dashboard; the secret itself is hex, so neither can be part of it.
+  const secret = process.env.CRON_SECRET?.trim().replace(/^["']|["']$/g, "");
   if (!secret || !header) return false;
   const expected = Buffer.from(`Bearer ${secret}`);
   const received = Buffer.from(header);
