@@ -897,7 +897,9 @@ self.addEventListener('notificationclick', e => {
   })());
 });
 ```
-Registered by a client component: `navigator.serviceWorker.register('/sw.js', { scope: '/', updateViaCache: 'none' })`. Set `Cache-Control: no-cache` for `/sw.js` in `next.config` headers.
+Registered on app start (`lib/push/client.ts`) with `{ scope: '/', updateViaCache: 'none' }`; `/sw.js` is served with `Cache-Control: no-cache` (`next.config.ts`).
+
+**Offline (PRD 5.10).** The worker caches pages network-first (falling back to the last copy, then `/offline` for pages never visited) and `/_next/static/` + `/icons/` cache-first; `/api/*`, `/auth/*` and cross-origin calls (Supabase, LeetCode) are never cached. The app's data comes from TanStack Query, whose cache is saved to `localStorage` (`bloom:query-cache`, 24 h, versioned) and restored on open, so the dashboard shows the last loaded data offline with a "You're offline" pill; sign-out clears it. Caching is off when the worker is registered from the dev server (`/sw.js?mode=dev`), whose files change on every edit. `/offline` is public in the proxy.
 
 ---
 
@@ -920,10 +922,10 @@ export default function manifest(): MetadataRoute.Manifest {
   };
 }
 ```
-In `app/layout.tsx` metadata: `appleWebApp: { capable: true, title: 'Bloom', statusBarStyle: 'black-translucent' }`, an `apple-touch-icon` (180×180), and `viewport: { themeColor, viewportFit: 'cover' }`. Respect safe-area insets in CSS.
+Icons are generated from one SVG by `scripts/generate-icons.mjs` (192, 512, maskable 512, apple-touch 180, the monochrome 72 px notification badge, and `app/icon.svg`). In `app/layout.tsx` metadata: `appleWebApp: { capable: true, title: 'Bloom', statusBarStyle: 'black-translucent' }`, an `apple-touch-icon` (180×180), and `viewport: { themeColor, viewportFit: 'cover' }`. Respect safe-area insets in CSS.
 
-**Install UX**
-- Android/Chrome: capture `beforeinstallprompt` and show a custom "Install" button.
+**Install UX** (`lib/pwa/install.ts`, `components/pwa/InstallCard.tsx`)
+- Android/Chrome: capture `beforeinstallprompt` (as soon as the app loads, since it fires once) and show a custom "Install Bloom" button, dismissible on home and always in Settings.
 - iOS: detect Safari when not in standalone mode (`navigator.standalone !== true`) and show the "Share → Add to Home Screen" instructions.
 - Detect standalone mode with `matchMedia('(display-mode: standalone)')` and hide the install prompts there.
 
