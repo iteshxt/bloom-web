@@ -8,11 +8,13 @@ import { PuffyIcon, type PuffyName } from "@/components/icons/puffy";
 import { useDuel } from "@/lib/dashboard/useDuel";
 import { useGifts } from "@/lib/game/queries";
 import { spring } from "@/lib/motion";
+import { DockWave } from "./Ground";
 import { useHydrated } from "@/lib/useHydrated";
 
-// design §10.7: a glass pill floating 16 px above the safe area. The active
-// item becomes a player-colour pill with a puffy icon and label that glides
-// between items; the rest are line icons.
+// design §10.7: the nav sits on the plum dock at the bottom of the screen,
+// which runs straight into Android's plum navigation bar. The active item
+// becomes a player-colour pill with a puffy icon and label that glides
+// between items; the rest are soft lavender line icons.
 
 const ITEMS: {
   href: string;
@@ -70,12 +72,17 @@ export function FloatingNav() {
   };
 
   return (
-    <nav
+    // layoutRoot: the nav is fixed, so the pill's glide is measured within
+    // the nav, not the page; otherwise a page change that scrolls to the
+    // top makes it fly in from below instead of sliding across.
+    <motion.nav
+      layoutRoot
       aria-label="Main"
       data-player-color={me?.color}
-      className="fixed inset-x-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-40 mx-auto max-w-[398px]"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[430px] md:bottom-6"
     >
-      <ul className="glass rounded-pill flex h-16 items-center justify-between px-2">
+      <DockWave />
+      <ul className="bg-dock pointer-events-auto box-content flex h-16 items-center justify-between px-3 pb-[env(safe-area-inset-bottom)] md:rounded-b-xl">
         {ITEMS.map((item) => {
           // Decided after hydration, so the first client render matches the
           // server's however the route was prerendered.
@@ -88,12 +95,16 @@ export function FloatingNav() {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 aria-label={item.label}
-                className={`rounded-pill relative flex h-12 items-center justify-center gap-1.5 ${active ? "text-p-deep px-3" : "text-ink-2 w-12"}`}
+                className={`rounded-pill relative flex h-12 items-center justify-center gap-1.5 transition-colors ${
+                  active
+                    ? "text-p-deep px-3"
+                    : "text-dock-ink hover:text-dock-ink-strong w-12"
+                }`}
               >
                 {active && (
                   <motion.span
                     layoutId="nav-pill"
-                    className="bg-p shadow-player rounded-pill absolute inset-0"
+                    className="bg-p rounded-pill absolute inset-0 shadow-[0_8px_24px_-10px_rgb(var(--p-rgb)/0.9)]"
                     transition={spring.soft}
                   />
                 )}
@@ -114,7 +125,7 @@ export function FloatingNav() {
                 {dots[item.href] && (
                   <span
                     aria-label="New"
-                    className="bg-peach ring-surface rounded-pill absolute top-1.5 right-1.5 h-2.5 w-2.5 ring-2"
+                    className="bg-peach ring-dock rounded-pill absolute top-1.5 right-1.5 h-2.5 w-2.5 ring-2"
                   />
                 )}
               </Link>
@@ -122,6 +133,6 @@ export function FloatingNav() {
           );
         })}
       </ul>
-    </nav>
+    </motion.nav>
   );
 }
