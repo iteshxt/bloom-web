@@ -492,6 +492,8 @@ A step-by-step flow on a single calm panel. Progress is shown as **five little s
 │   ( Home ) Journey Gifts  Me │
 └──────────────────────────────┘
 ```
+Until the P1 features ship, the quick actions are Gifts, Restores, Days (your profile) and Settings; Badges and Nudge join with P1. The bell opens Settings.
+
 **States**
 | State | What changes |
 |---|---|
@@ -919,17 +921,17 @@ Extend the theme to read the variables: colours (`cloud`, `ink`, `ink-2`, `p`, `
 
 ## 17. Asset checklist
 
-- [ ] App icons: 192, 512, maskable 512, apple-touch 180, badge 72 (monochrome)
-- [ ] Wordmark SVG (light and night)
-- [ ] Six sky bands plus aurora, rainbow, snow-cloud and petal-drift overlays
-- [ ] Island (grass top, soft underside)
-- [ ] Bloom: 7 stages × micro-steps, frozen shell, stitched heart
-- [ ] Six companions × 9 moods, each with a scarf slot for the player colour
-- [ ] Puffy icons (20) and line icons (nav + inline)
-- [ ] Journey road scenes (5 stage sections), gift pedestals, flags
-- [ ] Gift box (closed, wiggle, open, lid, ribbon), keepsake card
-- [ ] Badge medallions (16)
-- [ ] Wooden gift shelf
-- [ ] Empty-state illustrations: broken pot, rain cloud, gift wrapping
-- [ ] Eight sounds
-- [ ] iOS install guide illustration (3 steps)
+- [x] App icons: 192, 512, maskable 512, apple-touch 180, badge 72 (monochrome)
+- [x] Wordmark SVG (light and night)
+- [x] Six sky bands plus aurora, rainbow, snow-cloud and petal-drift overlays
+- [x] Island (grass top, soft underside)
+- [x] Bloom: 7 stages × micro-steps, frozen shell, stitched heart
+- [x] Six companions × 9 moods, each with a scarf slot for the player colour
+- [x] Puffy icons (20, plus home, face, heart and lock for the nav and states) and line icons (nav + inline)
+- [x] Journey road scenes (5 stage sections), gift pedestals, flags
+- [x] Gift box (closed, wiggle, open, lid, ribbon), keepsake card
+- [ ] Badge medallions (16), with the badges screen (P1)
+- [x] Wooden gift shelf
+- [ ] Empty-state illustrations: broken pot, rain cloud, gift wrapping (the rain cloud is done; the others use companions for now)
+- [x] Eight sounds (synthesized by `scripts/generate-sounds.sh`)
+- [ ] iOS install guide illustration (3 steps); the steps are text for now, as both players use Android
