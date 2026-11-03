@@ -244,7 +244,12 @@
   color-scheme: dark;
 }
 
-html,
+/* Anything outside the page (behind a see-through system bar, or the
+   overscroll bounce) is dock plum, matching Android's navigation bar. */
+html {
+  background: var(--dock);
+}
+
 body {
   background: var(--cloud);
   color: var(--ink);
